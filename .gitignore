@@ -1,0 +1,20 @@
+# Secrets — never commit
+.env
+.env.local
+.env*.local
+
+# macOS
+.DS_Store
+
+# Node (in case a Node-based stack is chosen later, matching the German Breaks precedent)
+node_modules/
+
+# Vercel (in case Vercel hosting is chosen later, matching the German Breaks precedent)
+.vercel
+
+# Logs
+*.log
+
+# NOTE: The production runtime/framework is still an open decision (see
+# BUILD_TRACKER.md and the "Open questions" section of LOCKED_DECISIONS.md).
+# Revisit and expand this file once that decision is locked.
