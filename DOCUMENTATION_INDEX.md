@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Documentation Index
 
-**Version:** 1.4  
+**Version:** 1.5  
 **Last updated:** 18 August 2026  
 **Document owner:** Joule
 
@@ -43,9 +43,9 @@ These paths are planned by the build tracker but do not become requirements beyo
 3. Interview records are evidence, not decisions.
 4. The interview summary may recommend changes but cannot lock them.
 5. Only Joule can approve a new decision or change a locked decision.
-6. Claude AI prepares complete, standards-checked implementation prompts for Codex Desktop after the ChatGPT handoff.
-7. Codex Desktop may implement and document approved work in the local repository but must not silently redesign it.
-8. Each Codex prompt must state scope, locked constraints, required checks, stop conditions and report format.
+6. Claude AI prepares complete, standards-checked implementation prompts for the current implementation agent (Claude Code as of LDTKB-023; originally Codex Desktop) after the ChatGPT handoff.
+7. The implementation agent may implement and document approved work in the local repository but must not silently redesign it.
+8. Each implementation prompt must state scope, locked constraints, required checks, stop conditions and report format.
 9. Personal participant information must not be committed to the repository.
 
 ## Naming conventions

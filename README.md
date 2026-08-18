@@ -32,10 +32,10 @@ GitHub is the approved host for the project's source code and documentation. The
 
 ## AI working model
 
-- Claude AI is the primary discovery, specification, documentation, review and Codex-prompt partner after the ChatGPT handoff.
-- Codex Desktop works separately in the local repository and performs authorized file, code, test and Git operations.
-- Claude AI prepares every Codex task as a bounded prompt containing the approved scope, locked constraints, checks, stop conditions and required report.
-- Codex must not convert open questions into decisions or move to a later build-tracker stage without Joule's approval.
+- Claude AI is the primary discovery, specification, documentation, review and implementation-prompt partner after the ChatGPT handoff.
+- The current implementation agent is **Claude Code** (changed from Codex Desktop per LDTKB-023, 18 August 2026, after Codex reached a usage limit). It works separately in the local repository and performs authorized file, code, test and Git operations.
+- Claude AI prepares every implementation task as a bounded prompt containing the approved scope, locked constraints, checks, stop conditions and required report.
+- The implementation agent must not convert open questions into decisions or move to a later build-tracker stage without Joule's approval.
 
 ## Current next action
 

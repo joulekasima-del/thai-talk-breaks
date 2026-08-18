@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 1.5  
+**Register version:** 1.6  
 **Last updated:** 18 August 2026  
 **Authority:** Joule
 
@@ -158,13 +158,14 @@ This file contains confirmed decisions only. It must not convert suggestions or 
 
 ## LDTKB-021 — Claude AI coordination and Codex Desktop implementation
 
-**Status:** Locked  
-**Decision:** After receiving the ChatGPT handoff, Claude AI becomes the primary discovery, specification, documentation, review and Codex-prompt partner for Thai Talk Breaks. Codex Desktop remains the separate implementation agent working in the local repository.  
-**Prompt standard:** Claude AI must give Codex complete, bounded prompts identifying the goal, workspace, inputs, outputs, locked constraints, permitted and prohibited changes, steps, edge cases, validation, stop conditions, Git authority and required report.  
-**Evidence rule:** Claude AI must review Codex's returned evidence and must not claim that Codex modified, tested, committed, pushed or deployed anything until Joule provides the actual Codex result.  
+**Status:** Locked, amended by LDTKB-023  
+**Decision:** After receiving the ChatGPT handoff, Claude AI becomes the primary discovery, specification, documentation, review and implementation-prompt partner for Thai Talk Breaks. Codex Desktop remains the separate implementation agent working in the local repository.  
+**Prompt standard:** Claude AI must give the implementation agent complete, bounded prompts identifying the goal, workspace, inputs, outputs, locked constraints, permitted and prohibited changes, steps, edge cases, validation, stop conditions, Git authority and required report.  
+**Evidence rule:** Claude AI must review the implementation agent's returned evidence and must not claim that it modified, tested, committed, pushed or deployed anything until Joule provides the actual result.  
 **Authority boundary:** Joule remains the sole product decision authority. The handoff does not change the approved eight-stage programme or authorize work beyond the current stage.  
-**Supersedes:** LDTKB-020 only in relation to which conversational AI prepares Codex prompts. Its Codex scope, safety and authority boundaries remain applicable.  
-**Locked by:** Joule’s instruction to move project coordination to Claude AI while continuing to use Codex on 18 August 2026.
+**Supersedes:** LDTKB-020 only in relation to which conversational AI prepares implementation prompts. Its scope, safety and authority boundaries remain applicable.  
+**Locked by:** Joule’s instruction to move project coordination to Claude AI while continuing to use Codex on 18 August 2026.  
+**Amended by LDTKB-023:** the implementation agent identity (Codex Desktop specifically) is no longer fixed — see LDTKB-023.
 
 ## LDTKB-022 — Customer interviews deferred; lesson production unblocked
 
@@ -173,6 +174,14 @@ This file contains confirmed decisions only. It must not convert suggestions or 
 **Boundary:** This decision removes the interview gate as a *prerequisite* to lesson production. It does not retroactively validate pricing, notification tolerance, or Karaoke/tone-cue comprehension with the target EU/RU audience — those questions remain genuinely open and untested. Joule may reintroduce interviews, informal user feedback, or another validation method at any later stage at his discretion.  
 **Supersedes:** LDTKB-012 (interview-before-lessons requirement) and amends the stage order in LDTKB-017 accordingly — Stage 2 is no longer a hard gate for Stage 3.  
 **Locked by:** Joule's explicit confirmation on 18 August 2026.
+
+## LDTKB-023 — Implementation agent changed to Claude Code
+
+**Status:** Locked  
+**Decision:** Codex Desktop is replaced by Claude Code as the implementation agent working in the local Thai Talk Breaks repository, because Codex reached a usage limit. All prompt-standard, evidence-rule and authority-boundary requirements from LDTKB-021 apply identically to Claude Code — only the tool changed, not the working model, review discipline, or Joule's decision authority.  
+**Boundary:** This is a tooling substitution, not a reopening of scope, safety, or authority rules. Claude AI (this conversational assistant) continues to prepare bounded implementation prompts and review returned evidence exactly as before; Joule may switch back to Codex Desktop or to another implementation agent at any time without needing a further locked decision, since the underlying rule is "one implementation agent works in the local repo under a bounded prompt" rather than a commitment to a specific product.  
+**Supersedes:** The Codex-specific tool identity in LDTKB-020 and LDTKB-021. Their process/safety terms remain in force.  
+**Locked by:** Joule's instruction on 18 August 2026.
 
 ## Open questions — not locked
 
@@ -205,3 +214,4 @@ The following remain open and must not be treated as decisions:
 | 18 Aug 2026 | LDTKB-020 | ChatGPT prepares standards-checked prompts; Codex Desktop implements separately in the local repository | Joule |
 | 18 Aug 2026 | LDTKB-021 | Claude AI becomes the primary planning/review/prompt partner; Codex Desktop remains the implementation agent | Joule |
 | 18 Aug 2026 | LDTKB-022 | Stage 2 customer interviews deferred; LDTKB-012 superseded; Stage 3 lesson production unblocked without an interview prerequisite | Joule |
+| 18 Aug 2026 | LDTKB-023 | Implementation agent changed from Codex Desktop to Claude Code after Codex reached a usage limit; LDTKB-021 amended | Joule |
