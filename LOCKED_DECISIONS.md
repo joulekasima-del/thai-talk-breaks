@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.8  
-**Last updated:** 19 August 2026  
+**Register version:** 2.9  
+**Last updated:** 20 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -200,7 +200,6 @@ The following remain open and must not be treated as decisions:
 - GitHub repository visibility: public or private
 - Repository licence
 - Branch protection and contribution rules
-- Production runtime and deployment host
 - GitHub remote creation and first-push checkpoint
 - Exact Thai Karaoke consonant-cluster and vowel-length spelling conventions for edge cases (tone-marking system itself is locked — see LDTKB-025)
 - Number of notifications per day
@@ -211,7 +210,6 @@ The following remain open and must not be treated as decisions:
 - Exact payment amount if 500 Stars produces an unsuitable buyer-visible price
 - Refund window and eligibility rules
 - Data-retention period
-- Hosting/repository architecture and whether the German engine is forked or generalized
 - Onboarding gender-question wording and whether/how a learner may skip or decline it
 
 ## LDTKB-025 — Tone-marking standard for Thai Karaoke
@@ -390,6 +388,14 @@ See you soon, ka!
 **Boundary:** Locks this message only. This is the final step of the six-step onboarding flow — onboarding sequence is now fully locked end to end (LDTKB-031, 033, 034, 035, 036).  
 **Locked by:** Joule's confirmation on 19 August 2026.
 
+## LDTKB-037 — Production tech stack: Vercel + Supabase Postgres + pg_cron
+
+**Status:** Locked  
+**Decision:** The production application is built on Vercel (application hosting/deployment) with Supabase Postgres as the database and pg_cron for scheduled lesson delivery, following the same overall architecture pattern proven by Joule's German Breaks bot (CLAUDE_AI_HANDOFF.md Section 4). This is a fresh build, not a fork of the German Breaks codebase. Unlike German Breaks' single-user design, the schema and application must support multiple concurrent learners from day one.  
+**Rationale:** German Breaks already proved this pattern works for scheduled Telegram micro-lessons at Thailand times, with idempotent, observable delivery. Reusing a proven pattern for a new product in the same problem space reduces build risk versus adopting an unproven stack, while a fresh build (not a fork) keeps Thai Talk Breaks free of German-specific assumptions and lets the schema be designed multi-learner from the start.  
+**Boundary:** This locks the stack choice (Vercel / Supabase Postgres / pg_cron) and the multi-learner requirement. It does not lock specific schema design, package versions, hosting plan/region, or any Telegram bot/webhook/scheduler implementation detail — those are implementation work for the relevant build checkpoint, not locked by this entry.  
+**Locked by:** Joule's confirmation on 20 August 2026, during the Checkpoint 1 (Technical Foundation) session with Claude Code, after Claude Code flagged that this decision was referenced in the checkpoint prompt but missing from this register.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -420,3 +426,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-034 | Final schedule selection copy locked: two-step period-then-time flow, Thailand time (UTC+7) | Joule |
 | 19 Aug 2026 | LDTKB-035 | Final notification test copy locked, exact text and spacing | Joule |
 | 19 Aug 2026 | LDTKB-036 | Final onboarding-complete message copy locked; full six-step onboarding flow now locked end to end | Joule |
+| 20 Aug 2026 | LDTKB-037 | Production tech stack locked: Vercel + Supabase Postgres + pg_cron, fresh build, multi-learner from day one; resolves the "production runtime and deployment host" and "forked or generalized" open questions | Joule |
