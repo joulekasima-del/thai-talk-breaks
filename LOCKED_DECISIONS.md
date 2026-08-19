@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.7  
+**Register version:** 2.8  
 **Last updated:** 19 August 2026  
 **Authority:** Joule
 
@@ -373,6 +373,23 @@ No buttons, no confirm/retry, no gate on proceeding — matches LDTKB-028 exactl
 **Boundary:** Locks this message only.  
 **Locked by:** Joule's confirmation on 19 August 2026.
 
+## LDTKB-036 — Final onboarding-complete message copy
+
+**Status:** Locked  
+**Decision:** The exact text below is the approved onboarding-complete message, sent as the final onboarding step, immediately after the notification test (LDTKB-035). Exact spacing is part of the approved copy — implement verbatim:
+
+```
+That's it, you're all set, ka! 🎉
+
+Your first lesson arrives at your chosen time.
+
+See you soon, ka!
+```
+
+**Rationale:** Deliberately doesn't restate the exact chosen time (already confirmed in schedule selection, LDTKB-034) to avoid redundancy. Closes on anticipation rather than reusing the welcome message's "Have fun!" line, so the two closing beats feel distinct rather than repetitive.  
+**Boundary:** Locks this message only. This is the final step of the six-step onboarding flow — onboarding sequence is now fully locked end to end (LDTKB-031, 033, 034, 035, 036).  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -402,3 +419,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-033 | Final gender question copy locked, exact text and button labels | Joule |
 | 19 Aug 2026 | LDTKB-034 | Final schedule selection copy locked: two-step period-then-time flow, Thailand time (UTC+7) | Joule |
 | 19 Aug 2026 | LDTKB-035 | Final notification test copy locked, exact text and spacing | Joule |
+| 19 Aug 2026 | LDTKB-036 | Final onboarding-complete message copy locked; full six-step onboarding flow now locked end to end | Joule |
