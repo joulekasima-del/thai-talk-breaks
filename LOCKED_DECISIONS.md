@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.0  
+**Register version:** 2.4  
 **Last updated:** 19 August 2026  
 **Authority:** Joule
 
@@ -254,6 +254,57 @@ A short legend explaining these five marks must be shown to the learner once, ea
 
 **Original tool rationale (unchanged):** Adobe Firefly — commercial licensing is included on all paid plans with clear content sourcing (trained on licensed Adobe Stock content, not scraped web images), and Adobe provides an indemnification policy for eligible generated content, which is a meaningfully lower legal-risk profile than most competing tools. Not a locked requirement — any tool with clear commercial-use terms is acceptable.
 
+## LDTKB-028 — Notification test: passive implementation, no gate
+
+**Status:** Locked  
+**Decision:** The notification test required by LDTKB-005 is implemented as a passive, single message during onboarding — not an interactive question with confirm/retry buttons. The bot sends one message resembling a real lesson notification, with brief inline text explaining what it demonstrates and what to check if the learner didn't notice it. No button, no branching logic, no gate on proceeding to the first lesson.  
+**Rationale:** Joule's own experience with German Breaks showed reliable notification delivery once Telegram is configured; an interactive confirm/retry exchange adds friction Joule does not want in onboarding. A passive message still honors the "honest promise the bot sends on time but cannot force sound" principle (CLAUDE_AI_HANDOFF.md Section 4) without gating the learner's progress on a UI interaction.  
+**Boundary:** This resolves *how* the LDTKB-005 test is implemented, not whether it exists — LDTKB-005 itself is unchanged. If real pilot learners report missed lessons due to notification settings, this implementation should be revisited with actual evidence rather than assumption.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
+## LDTKB-029 — Onboarding and bot communication language
+
+**Status:** Locked  
+**Decision:** All bot-side communication (welcome message, onboarding copy, instructions, buttons) is in English, not Thai. Only the actual lesson content being taught (Karaoke, Thai script) is in Thai.  
+**Rationale:** The initial audience is European and Russian Telegram-using expats (per README.md), not Thai speakers — English is the practical shared language for instructions, even though a Russian-language interface remains a separately open question (see LOCKED_DECISIONS open questions).  
+**Boundary:** Does not resolve the separate open question of whether a Russian-language interface option is added later.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
+## LDTKB-030 — Onboarding/narrator voice is fixed, separate from learner practice branching
+
+**Status:** Locked  
+**Decision:** The bot's own narrator voice (welcome message, onboarding copy, any first-person bot messages) is fixed as female, using ka/นะคะ, regardless of which gender branch (LDTKB-024) the learner selects for their own lesson practice content. The narrator is not named (no "Hi, I'm Joule" or similar) — it speaks in first person without self-identifying.  
+**Boundary:** This is distinct from LDTKB-024, which governs only the learner's own practice phrases (the krap/kha branching of what the *learner* says in each lesson). The two systems are independent — do not conflate them. If this distinction is unclear to a future implementation agent, point them to this entry.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
+## LDTKB-031 — Final welcome message copy
+
+**Status:** Locked  
+**Decision:** The exact text and spacing below is the approved onboarding welcome message, sent as the first bot message after `/start` (or after the gender question, per final onboarding-order decision — sequencing unaffected since this message doesn't branch, per LDTKB-030). Exact line breaks are part of the approved copy, not incidental formatting — implement verbatim:
+
+```
+Sawasdee ka! 🙏 Welcome to Thai Talk Breaks.
+
+This is a 30-day conversational Thai course — the first 7 days are a free trial. 
+
+Every lesson is short and simple: one picture, one phrase, native audio, and a quick activity. No reading Thai script required.
+
+Ready to begin? 
+
+Have fun! 😊
+```
+
+**Boundary:** This locks this specific message only. Other onboarding messages (schedule selection, notification test, etc.) are separate content, not yet finalized.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
+## LDTKB-032 — No community group for the pilot
+
+**Status:** Locked  
+**Decision:** No Telegram community group is created for the pilot. Learners are told they can message Joule directly for support/questions instead.  
+**Rationale:** A group with only 5-10 pilot learners risks feeling emptier and less trustworthy than no group at all, and adds ongoing moderation work for a solo operator — contrary to the low-friction, founder-led positioning (LDTKB-009). Direct-message support keeps the same warmth without the social-proof risk. A group may be reconsidered later once there's enough real activity to sustain it.  
+**Boundary:** DM support is available but not proactively mentioned anywhere in onboarding — no dedicated message, no line added to the welcome message (LDTKB-031 stays exactly as locked). Learners can simply message Joule directly if they choose to; the bot doesn't prompt them toward it.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -275,3 +326,8 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-025 | Tone-marking standard locked: full 5-tone diacritic system (Paiboon-style) for all Thai Karaoke text | Joule |
 | 19 Aug 2026 | LDTKB-026 | Pilot lesson activity type locked as recognition tap (2-3 audio clips, learner taps the correct one) | Joule |
 | 19 Aug 2026 | LDTKB-027 | Image production method locked as AI-generated semi-comic-book style: 12 two-character interaction scenes (lessons 1,3-7, gender-matched) + 10 standalone numeral images (lesson 2) = 22 images total | Joule |
+| 19 Aug 2026 | LDTKB-028 | Notification test (LDTKB-005) implemented as passive single message, no confirm/retry gate | Joule |
+| 19 Aug 2026 | LDTKB-029 | Bot communication language locked as English; only lesson content itself is in Thai | Joule |
+| 19 Aug 2026 | LDTKB-030 | Onboarding/narrator voice fixed as female (ka/นะคะ), unnamed, independent of learner's own practice-gender branching (LDTKB-024) | Joule |
+| 19 Aug 2026 | LDTKB-031 | Final welcome message copy locked, exact text and spacing | Joule |
+| 19 Aug 2026 | LDTKB-032 | No community group for the pilot; DM support exists but is not proactively mentioned anywhere in onboarding | Joule |
