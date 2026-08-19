@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 1.6  
+**Register version:** 1.7  
 **Last updated:** 18 August 2026  
 **Authority:** Joule
 
@@ -183,6 +183,15 @@ This file contains confirmed decisions only. It must not convert suggestions or 
 **Supersedes:** The Codex-specific tool identity in LDTKB-020 and LDTKB-021. Their process/safety terms remain in force.  
 **Locked by:** Joule's instruction on 18 August 2026.
 
+## LDTKB-024 — Gender-particle onboarding and lesson branching
+
+**Status:** Locked  
+**Decision:** Onboarding asks the learner's gender once. Lesson content and audio then branch accordingly for every phrase that requires a Thai polite particle (ครับ/krap for male speakers, ค่ะ/kha for female speakers). This applies to the seven pilot lessons and all lessons thereafter — any phrase carrying a gendered particle must be authored and recorded in both forms, not a single default.  
+**Rationale:** Thai politeness particles are not optional flourish; using the wrong one is immediately noticeable and undermines the product's promise of natural, useful spoken Thai from lesson one.  
+**Boundary:** This decision fixes the mechanism (ask once, branch content). It does not fix the exact onboarding question wording or what happens if a learner skips/declines to answer — those remain open and should be resolved during onboarding-flow design, not silently defaulted.  
+**Cultural note (per Joule, 18 August 2026):** ครับ/kráp and ค่ะ/kâ are voice/speaker markers built into the Thai language itself, not a gender-identity form. Thai social norms around gender diversity are already comfortable and non-fraught; this selection is a linguistic choice about which spoken-particle set to teach, asked and explained gently, and does not require special accommodation design for non-binary learners the way an identity-disclosure question might in other contexts. Any future agent working in this repo should not reopen this as an unresolved inclusivity question — it was considered and closed by Joule on 18 August 2026.  
+**Locked by:** Joule's confirmation on 18 August 2026.
+
 ## Open questions — not locked
 
 The following remain open and must not be treated as decisions:
@@ -203,6 +212,13 @@ The following remain open and must not be treated as decisions:
 - Refund window and eligibility rules
 - Data-retention period
 - Hosting/repository architecture and whether the German engine is forked or generalized
+- Onboarding gender-question wording and whether/how a learner may skip or decline it
+
+## Future ideas — not decisions, not scheduled
+
+These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
+
+- **Pasa Thai as it's actually spoken — a post-pilot expansion idea.** Beyond the standard male/female krap/kha taught in the pilot, Thai has additional speech registers associated with kathoey and tom speakers (different particles, distinct pronoun choices, softer or more playful intonation) that are a genuine, well-integrated part of everyday spoken Thai. Joule's view (18 August 2026): Thai LGBTQ+ communities are already embraced without needing to "ask for" acceptance, and language here evolves and plays with gender expression as something creative and alive, not fraught. A future expansion teaching this register could be a real differentiator — most language products flatten it entirely — but it must be built with genuine input from people who speak this way, not guessed at. Framed as something a learner graduates into once they have the basics, through the real Thai community, not something the bot tries to fully model in the pilot.
 
 ## Decision change log
 
@@ -215,3 +231,4 @@ The following remain open and must not be treated as decisions:
 | 18 Aug 2026 | LDTKB-021 | Claude AI becomes the primary planning/review/prompt partner; Codex Desktop remains the implementation agent | Joule |
 | 18 Aug 2026 | LDTKB-022 | Stage 2 customer interviews deferred; LDTKB-012 superseded; Stage 3 lesson production unblocked without an interview prerequisite | Joule |
 | 18 Aug 2026 | LDTKB-023 | Implementation agent changed from Codex Desktop to Claude Code after Codex reached a usage limit; LDTKB-021 amended | Joule |
+| 18 Aug 2026 | LDTKB-024 | Onboarding asks learner's gender once; lesson audio/text branch for krap/kha particles; non-binary accommodation question closed per Joule's cultural clarification | Joule |
