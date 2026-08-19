@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.6  
+**Register version:** 2.7  
 **Last updated:** 19 August 2026  
 **Authority:** Joule
 
@@ -356,6 +356,23 @@ Buttons: `18:00` `19:00` `20:00` `21:00`
 **Boundary:** Assumes one lesson delivery per day, matching the 7-lessons-for-7-days pilot structure (LDTKB-013) — not confirmed as a separate explicit decision, but consistent with everything locked so far. If Joule later wants multiple daily sessions, this design needs revisiting.  
 **Locked by:** Joule's confirmation on 19 August 2026.
 
+## LDTKB-035 — Final notification test copy
+
+**Status:** Locked  
+**Decision:** The exact text below is the approved notification test message, sent per the passive, no-gate design locked in LDTKB-028. Exact spacing is part of the approved copy — implement verbatim:
+
+```
+🔔 This is what your lesson notifications will look like, naka.
+
+If you saw or heard this, you're all set — your first lesson arrives at your chosen time.
+
+If you didn't notice anything, check that notifications are turned on for Telegram in your phone settings.
+```
+
+No buttons, no confirm/retry, no gate on proceeding — matches LDTKB-028 exactly.  
+**Boundary:** Locks this message only.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -384,3 +401,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-032 | No community group for the pilot; DM support exists but is not proactively mentioned anywhere in onboarding | Joule |
 | 19 Aug 2026 | LDTKB-033 | Final gender question copy locked, exact text and button labels | Joule |
 | 19 Aug 2026 | LDTKB-034 | Final schedule selection copy locked: two-step period-then-time flow, Thailand time (UTC+7) | Joule |
+| 19 Aug 2026 | LDTKB-035 | Final notification test copy locked, exact text and spacing | Joule |
