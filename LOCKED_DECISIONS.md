@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.4  
+**Register version:** 2.5  
 **Last updated:** 19 August 2026  
 **Authority:** Joule
 
@@ -305,6 +305,25 @@ Have fun! 😊
 **Boundary:** DM support is available but not proactively mentioned anywhere in onboarding — no dedicated message, no line added to the welcome message (LDTKB-031 stays exactly as locked). Learners can simply message Joule directly if they choose to; the bot doesn't prompt them toward it.  
 **Locked by:** Joule's confirmation on 19 August 2026.
 
+## LDTKB-033 — Final gender question copy
+
+**Status:** Locked  
+**Decision:** The exact text and buttons below are the approved gender question, sent during onboarding per LDTKB-024. Exact spacing is part of the approved copy — implement verbatim:
+
+```
+Quick thing before we start, ka!
+
+Thai has two polite word-endings depending on who's speaking — krap for a male voice, ka for a female voice.
+
+Which one should I use for you?
+```
+
+Buttons: `Male (krap)` / `Female (ka)`
+
+**Rationale:** Frames the choice as picking a voice/sound for the bot to use, not a personal identity question — consistent with LDTKB-024's cultural note that krap/kha are linguistic speaker markers, not gender-identity forms. Buttons show the actual Thai words rather than plain "Male/Female," so the learner's first interactive choice already teaches something real.  
+**Boundary:** Locks this message only. Does not lock what happens immediately after the choice (e.g. any confirmation line) — not yet designed.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -331,3 +350,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-030 | Onboarding/narrator voice fixed as female (ka/นะคะ), unnamed, independent of learner's own practice-gender branching (LDTKB-024) | Joule |
 | 19 Aug 2026 | LDTKB-031 | Final welcome message copy locked, exact text and spacing | Joule |
 | 19 Aug 2026 | LDTKB-032 | No community group for the pilot; DM support exists but is not proactively mentioned anywhere in onboarding | Joule |
+| 19 Aug 2026 | LDTKB-033 | Final gender question copy locked, exact text and button labels | Joule |
