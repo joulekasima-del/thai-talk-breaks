@@ -2,7 +2,7 @@
 
 **Situation:** Asking for help (arc position 7 of 7 — final pilot lesson)
 **Phrase taught:** "I don't understand" / "Can you help me?"
-**Status:** Draft — requires native-speaker pronunciation review before pilot use
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -39,6 +39,6 @@ Learner hears today's phrase plus 2 distractors drawn from across the whole week
 A short, warm wrap-up after the activity: acknowledges the 7-day pilot is complete, reassures the learner that "mâi kâo-jai" is always a safe thing to say, and transitions into whatever comes next per Stage 4/8 (free pilot → 30-day paid product) — exact wording is a Stage 7 concern (privacy/payment info must be accessible before this is finalized) and out of scope for this lesson-content batch.
 
 ## Open items requiring resolution before pilot-ready
-1. Native-speaker pronunciation/tone review.
+~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 2. The closing/transition message needs its own dedicated drafting pass once Stage 5–7 decisions (payment, refund policy) are further along — flagged here so it isn't forgotten, not blocking lesson 7's core teaching content.
-3. Image and audio production method (same open items as lesson 1).
+~~3. Image and audio production method (same open items as lesson 1).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson07_*.mp3`), images complete (`curriculum/pilot/images/lesson07_*.png`), 19 August 2026.

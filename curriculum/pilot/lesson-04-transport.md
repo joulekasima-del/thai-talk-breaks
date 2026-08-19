@@ -2,7 +2,7 @@
 
 **Situation:** Transport & directions (arc position 4 of 7)
 **Phrase taught:** "How much?" / "Stop here, please"
-**Status:** Reviewed and approved by Joule (native Thai speaker), 19 August 2026 — pending image/audio production
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -39,4 +39,4 @@ Learner hears a number spoken (reusing lesson 2's audio) immediately followed by
 ~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 ~~2. Grammar: ค่ะ vs. คะ~~ — **Resolved:** corrected to คะ (question form) per Joule, 19 August 2026. Audio already generated correctly (`เท่าไหร่คะ.mp3`) — this was a documentation catch-up, not an audio re-record.
 3. Confirm whether the "3 pictures" activity variant above is worth the extra production complexity vs. sticking to the simpler 3-audio-clips format used in lessons 1–3 — this is a build-complexity trade-off, not just a content question, so worth Joule's explicit call once addressed with the implementation agent.
-4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).
+~~4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson04_*.mp3`), images complete (`curriculum/pilot/images/lesson04_*.png`), 19 August 2026.

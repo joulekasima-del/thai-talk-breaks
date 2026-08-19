@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 1.9  
+**Register version:** 2.0  
 **Last updated:** 19 August 2026  
 **Authority:** Joule
 
@@ -207,7 +207,7 @@ The following remain open and must not be treated as decisions:
 - Exact lesson times or scheduling choices offered
 - Russian-language interface or translation scope
 - Exact 30-day curriculum and learning outcome
-- Visual style and image-production method
+- Exact AI tool choice, specific prompts, and per-lesson icon/gesture selection (image-production method and scope are locked — see LDTKB-027)
 - Exact payment amount if 500 Stars produces an unsuitable buyer-visible price
 - Refund window and eligibility rules
 - Data-retention period
@@ -238,6 +238,22 @@ A short legend explaining these five marks must be shown to the learner once, ea
 **Boundary:** This is the pilot default. A future lesson could reasonably use a different activity type (e.g. speaking, recall) where recognition tap doesn't fit — this decision governs the default, not an unbreakable rule for all seven lessons.  
 **Locked by:** Joule's confirmation on 19 August 2026.
 
+## LDTKB-027 — Image production method
+
+**Status:** Locked  
+**Decision:** Lesson pictures (step 1 of the locked six-step structure, LDTKB-006) are AI-generated, semi-comic-book style illustrations featuring Thai characters in local style, with two distinct treatments depending on content type:
+- **Situational lessons (1, 3, 4, 5, 6, 7):** each shown as a two-character interaction scene depicting the real situation (e.g. two people greeting, a customer ordering from a waiter, a customer asking a taxi driver the price). The learner-facing character is gender-matched to the learner's chosen audio branch (per LDTKB-024) and carries a speech/conversation bubble with a simple icon representing the lesson's theme. 6 lessons × 2 genders = 12 images.
+- **Lesson 2 (Numbers):** each of the 10 numbers gets its own standalone image — a simple, bold, colorful cartoon-style Arabic numeral, no characters, no scenario (numbers carry no gender branch in the audio, per the lesson file, so none is needed in the image either). 10 images.
+- **Total: 22 images**, matching the 22 audio clips already in the repo.
+
+**Rationale:** A single character with a floating icon (the original draft) didn't actually depict the *situation* — showing two people interacting (asker and the person being asked) makes each lesson's picture teach the real social context, not just decorate it. Numbers are abstract/countable, not situational, so a bare numeral is clearer and simpler than forcing them into an artificial scene.  
+**Tool guidance:** Adobe Firefly remains the recommended starting point (see original rationale below).  
+**Boundary:** This locks the *method and scope*. It does not lock the exact tool, specific prompts, or exact icon/scene choice per lesson — production details to finalize during actual generation.  
+**Supersedes:** Earlier same-day drafts of this decision (free illustration libraries; stock photos; single-character-with-icon AI images) — none were ever pushed to the repository, so no formal amendment trail is needed.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
+**Original tool rationale (unchanged):** Adobe Firefly — commercial licensing is included on all paid plans with clear content sourcing (trained on licensed Adobe Stock content, not scraped web images), and Adobe provides an indemnification policy for eligible generated content, which is a meaningfully lower legal-risk profile than most competing tools. Not a locked requirement — any tool with clear commercial-use terms is acceptable.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -258,3 +274,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 18 Aug 2026 | LDTKB-024 | Onboarding asks learner's gender once; lesson audio/text branch for krap/kha particles; non-binary accommodation question closed per Joule's cultural clarification | Joule |
 | 19 Aug 2026 | LDTKB-025 | Tone-marking standard locked: full 5-tone diacritic system (Paiboon-style) for all Thai Karaoke text | Joule |
 | 19 Aug 2026 | LDTKB-026 | Pilot lesson activity type locked as recognition tap (2-3 audio clips, learner taps the correct one) | Joule |
+| 19 Aug 2026 | LDTKB-027 | Image production method locked as AI-generated semi-comic-book style: 12 two-character interaction scenes (lessons 1,3-7, gender-matched) + 10 standalone numeral images (lesson 2) = 22 images total | Joule |

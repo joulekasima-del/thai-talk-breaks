@@ -1,10 +1,10 @@
 # Thai Talk Breaks — Build Tracker
 
-**Tracker version:** 1.5  
-**Last updated:** 18 August 2026  
+**Tracker version:** 1.7  
+**Last updated:** 19 August 2026  
 **Project owner:** Joule  
-**Current stage:** Stage 3 — Create seven sample lessons  
-**Overall status:** Lesson production (Stage 2 interviews deferred — see LDTKB-022)
+**Current stage:** Stage 3 — Complete. Ready to consider Stage 4 (free pilot with notification testing)  
+**Overall status:** Stage 3 lesson production complete (Stage 2 interviews deferred — see LDTKB-022)
 
 ## Status key
 
@@ -22,7 +22,7 @@
 |---:|---|---|---|---|
 | 1 | Lock the revised product direction | ✅ Complete | Product, audience, format, price intention, delivery behavior and founder role explicitly confirmed by Joule | `LOCKED_DECISIONS.md` |
 | 2 | Interview five European and five Russian Telegram-using expats | ⏸ Deferred (LDTKB-022) | No longer required before Stage 3; may resume at Joule's discretion | Method/templates remain ready in `research/` if resumed |
-| 3 | Create seven sample lessons | 🟡 In progress | Seven reviewed lessons follow the locked content structure; Thai Karaoke is consistent; native audio and image rights are recorded | To be created: `curriculum/pilot/` |
+| 3 | Create seven sample lessons | ✅ Complete | Seven reviewed lessons follow the locked content structure; Thai Karaoke is consistent; native audio and images complete | `curriculum/pilot/` (lesson files, `audio/`, `images/`) |
 | 4 | Run a free pilot with notification testing | ⬜ Not started | Pilot learners onboarded; notification test completed; seven-day delivery measured; learner feedback and completion data summarized | To be created: `pilot/` |
 | 5 | Verify the 500-Star checkout and withdrawal process | ⬜ Not started | Test purchase checked on relevant Telegram clients; buyer-visible cost recorded; refund/support path tested; withdrawal availability and net receipt documented | To be created: `payments/500-star-test.md` |
 | 6 | Complete individual commercial registration | ⬜ Not started | Local authority confirms the correct registration; registration completed before regular public paid sales; tax-recording method established | To be created: `operations/registration-checklist.md` |
@@ -89,8 +89,8 @@ Deferred. If resumed, use `research/INTERVIEW_SCRIPT.md`, create records from `r
 
 ### Stage 3: Seven sample lessons
 
-**Status:** 🟡 In progress — active as of 18 August 2026.  
-Lesson production no longer requires Stage 2 closure (LDTKB-022). Since interview evidence isn't available to choose situations, lesson topics/situations should be chosen deliberately using best available judgment (e.g. Joule's own lived experience, the German Breaks precedent, or other informal input) and documented as such rather than presented as customer-validated. Every lesson still needs a pronunciation/curriculum review and documented image/audio usage rights.
+**Status:** ✅ Complete — content, native-speaker review, audio, and images all done for all 7 lessons (19 August 2026).  
+All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced (22 audio clips), and fully illustrated (22 images: 12 two-character interaction scenes for lessons 1, 3–7, gender-matched; 10 standalone numeral images for lesson 2). Grammar corrected during review: female question forms use คะ, not ค่ะ (statement form) — affects lessons 4, 5, 6. Lesson 6's phrase was also replaced (มาจากไหน → เป็นคนที่ไหน) during review. All content lives in `curriculum/pilot/` (lesson files, `audio/`, `images/`). One design detail remains open, not a Stage 3 blocker: confirming distractor-clip content for each recognition-tap activity — see individual lesson files.
 
 ### Stage 4: Free pilot
 
@@ -136,3 +136,4 @@ The first commercial validation succeeds when:
 | 18 Aug 2026 | Coordination handed from ChatGPT to Claude AI; Codex Desktop remains the implementation agent | Joule |
 | 18 Aug 2026 | Stage 2 (interviews) deferred per LDTKB-022; Stage 3 (seven sample lessons) activated as current stage without an interview prerequisite | Joule |
 | 18 Aug 2026 | Implementation agent changed from Codex Desktop to Claude Code (LDTKB-023) after Codex reached a usage limit; no stage change | Joule |
+| 19 Aug 2026 | Stage 3 complete: all 7 lessons content-reviewed (native speaker), voiced (22 audio clips), and illustrated (22 images) | Joule |

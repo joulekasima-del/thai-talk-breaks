@@ -2,7 +2,7 @@
 
 **Situation:** Small talk (arc position 6 of 7)
 **Phrase taught:** "Where are you from?"
-**Status:** Reviewed and approved by Joule (native Thai speaker), 19 August 2026 — pending image/audio production
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -39,4 +39,4 @@ Learner hears today's phrase plus 2 distractors (a mix of transactional phrases 
 ~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 ~~2. Grammar: ค่ะ vs. คะ, and phrase replacement~~ — **Resolved:** phrase changed from "มาจากไหน" to "เป็นคนที่ไหน" and corrected to คะ (question form) per Joule, 19 August 2026. Audio already generated correctly (`เป็นคนที่ไหนคะ.mp3`) — this was a documentation catch-up, not an audio re-record.
 3. Whether this lesson should also gently preview how to *answer* this question (e.g. "I'm from ___") — currently scoped as asking only, matching the single-phrase-per-lesson pattern; worth a deliberate call rather than silently expanding scope.
-4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).
+~~4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson06_*.mp3`), images complete (`curriculum/pilot/images/lesson06_*.png`), 19 August 2026.

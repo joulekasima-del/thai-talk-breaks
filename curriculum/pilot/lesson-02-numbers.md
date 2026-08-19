@@ -2,7 +2,7 @@
 
 **Situation:** Numbers (arc position 2 of 7 — see BUILD_TRACKER.md Stage 3)
 **Phrases taught:** Numbers 1–10
-**Status:** Draft — requires native-speaker pronunciation review before pilot use
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -44,6 +44,6 @@ Ten short clips, one per number. No gender branching needed for this lesson.
 Learner hears one number spoken aloud, taps the matching numeral from 3 options (e.g. hears "hâa," taps "5" from options 3/5/8).
 
 ## Open items requiring resolution before pilot-ready
-1. Native-speaker pronunciation/tone review (all ten words).
+~~1. Native-speaker pronunciation/tone review (all ten words).~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 2. Whether to teach all ten numbers in a single lesson delivery or split across the day/multiple messages — currently drafted as one delivery; worth a pacing check once real audio exists.
-3. Image and audio production method (same open items as lesson 1).
+~~3. Image and audio production method (same open items as lesson 1).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson02_*.mp3`), images complete (`curriculum/pilot/images/lesson02_*.png`), 19 August 2026.

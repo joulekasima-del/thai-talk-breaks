@@ -2,7 +2,7 @@
 
 **Situation:** Greetings & basic politeness (arc position 1 of 7 — see BUILD_TRACKER.md Stage 3)
 **Phrase taught:** Hello
-**Status:** Draft — requires native-speaker pronunciation review before pilot use (per CLAUDE_AI_HANDOFF.md Section 4: "native-speaker pronunciation review" is a mandatory safeguard)
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -48,8 +48,8 @@ Learner is shown 2–3 short audio clips (one correct "sà-wàt-dii," two clearl
 - No other Thai vocabulary is assumed or required to complete this lesson (first lesson in the arc — nothing to build on yet).
 
 ## Open items requiring resolution before this lesson is pilot-ready
-1. **Native-speaker pronunciation review** — tone assignment and Karaoke spelling above are a first draft; not yet reviewed by a native Thai speaker (required per project safeguards).
-2. **Image production method** — still an open decision (LOCKED_DECISIONS.md).
+~~1. **Native-speaker pronunciation review**~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
+~~2. **Image production method** — still an open decision (LOCKED_DECISIONS.md).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson01_*.mp3`), images complete (`curriculum/pilot/images/lesson01_*.png`), 19 August 2026.
 3. **Audio production method** — offline TTS vs. human recording not yet chosen for Thai (LOCKED_DECISIONS.md notes this is open; German Breaks used Piper for German, no equivalent Thai voice model confirmed yet).
 4. **Onboarding gender-question wording** — still open per LDTKB-024's boundary note; this lesson assumes the branch already happened during onboarding.
 5. **Distractor clips for the recognition-tap activity** — need 1–2 short, clearly different audio clips; not yet specified.

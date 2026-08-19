@@ -2,7 +2,7 @@
 
 **Situation:** Shopping & the market (arc position 5 of 7)
 **Phrase taught:** "Can I pay by card?"
-**Status:** Reviewed and approved by Joule (native Thai speaker), 19 August 2026 — pending image/audio production
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -41,4 +41,4 @@ Learner hears today's phrase plus 2 distractors from earlier lessons (e.g. lesso
 ~~1. Native-speaker pronunciation/tone review — six syllables plus the gendered ending is on the longer side; worth confirming this is still beginner-appropriate for lesson 5.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 ~~2. Phrasing corrected by Joule (19 August 2026) to include ผ่าน ("via")~~ — **Resolved.**
 ~~3. Grammar: ค่ะ vs. คะ~~ — **Resolved:** corrected to คะ (question form) per Joule, 19 August 2026. Audio already generated correctly (`จ่ายผ่านบัตรได้ไหมคะ.mp3`) — this was a documentation catch-up, not an audio re-record.
-4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).
+~~4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson05_*.mp3`), images complete (`curriculum/pilot/images/lesson05_*.png`), 19 August 2026.

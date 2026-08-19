@@ -2,7 +2,7 @@
 
 **Situation:** Ordering food & drink (arc position 3 of 7)
 **Phrase taught:** "I would like..." / "Check, please"
-**Status:** Draft — requires native-speaker pronunciation review before pilot use
+**Status:** Pilot-ready — content, native-speaker review, audio, and images all complete (Joule, 19 August 2026)
 
 ---
 
@@ -36,6 +36,6 @@ Two recordings (male/female branch), matching lesson 1's pattern.
 Learner sees 3 short audio clips — one is today's phrase, two are clearly different phrases from lesson 1 (reinforcing prior learning by using them as distractors, not testing new material).
 
 ## Open items requiring resolution before pilot-ready
-1. Native-speaker pronunciation/tone review.
+~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 2. Confirm "ao an-níi" is the best beginner-friendly ordering phrase vs. alternatives (e.g. a more explicit "check, please" phrase) — this is a judgment call worth a native speaker's opinion, not just tone accuracy.
-3. Image and audio production method (same open items as lesson 1).
+~~3. Image and audio production method (same open items as lesson 1).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson03_*.mp3`), images complete (`curriculum/pilot/images/lesson03_*.png`), 19 August 2026.
