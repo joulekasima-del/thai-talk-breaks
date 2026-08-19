@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 1.7  
-**Last updated:** 18 August 2026  
+**Register version:** 1.9  
+**Last updated:** 19 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -202,7 +202,7 @@ The following remain open and must not be treated as decisions:
 - Branch protection and contribution rules
 - Production runtime and deployment host
 - GitHub remote creation and first-push checkpoint
-- Exact Thai Karaoke spelling and tone-marking standard
+- Exact Thai Karaoke consonant-cluster and vowel-length spelling conventions for edge cases (tone-marking system itself is locked — see LDTKB-025)
 - Number of notifications per day
 - Exact lesson times or scheduling choices offered
 - Russian-language interface or translation scope
@@ -213,6 +213,30 @@ The following remain open and must not be treated as decisions:
 - Data-retention period
 - Hosting/repository architecture and whether the German engine is forked or generalized
 - Onboarding gender-question wording and whether/how a learner may skip or decline it
+
+## LDTKB-025 — Tone-marking standard for Thai Karaoke
+
+**Status:** Locked  
+**Decision:** Thai Talk Breaks' Karaoke transliteration uses a full 5-tone diacritic system (in the style of the Paiboon system used by established Thai-learning materials), not plain unmarked spelling, colour-coded text, or numbered tones. Every syllable in every lesson's Karaoke line carries its correct tone mark:
+- Mid tone — unmarked (a)
+- Low tone — grave accent (à)
+- Falling tone — circumflex (â)
+- High tone — acute accent (á)
+- Rising tone — caron (ǎ)
+
+A short legend explaining these five marks must be shown to the learner once, early in onboarding or lesson 1, so the marks are meaningful rather than decorative.  
+**Rationale:** Thai is a tonal language where tone changes word meaning, not emphasis — Karaoke text that omits tone information teaches an incomplete or misleading version of the word. This system stays inside a plain Telegram text message (no custom image rendering required per phrase) and teaches something real about the language, consistent with the product's positioning as genuine spoken-Thai learning rather than sound-alike mimicry.  
+**Boundary:** This locks the *tone-marking system*, not the full transliteration ruleset for every possible consonant cluster or vowel length. Exact spelling conventions for edge cases should be resolved consistently as they arise during lesson authoring and checked in native-speaker review, not redecided per lesson.  
+**Evidence status:** Chosen by Joule's judgment in the absence of interview evidence (per LDTKB-022's boundary) — reasonable and well-precedented, but not customer-validated. Worth pressure-testing with native-speaker review and, if resumed later, learner interviews.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
+## LDTKB-026 — Lesson activity type for the pilot
+
+**Status:** Locked  
+**Decision:** The completion activity in step 6 of every pilot lesson (LDTKB-006) is a recognition tap: the learner is shown 2–3 audio clips and taps the one matching the phrase just taught, rather than an honor-system self-check button.  
+**Rationale:** Produces real completion/accuracy data during the free pilot, which matters directly for the Stage 4→5 go/no-go decision, at only marginally more build complexity than an honor-system checkmark (both are Telegram inline-keyboard messages).  
+**Boundary:** This is the pilot default. A future lesson could reasonably use a different activity type (e.g. speaking, recall) where recognition tap doesn't fit — this decision governs the default, not an unbreakable rule for all seven lessons.  
+**Locked by:** Joule's confirmation on 19 August 2026.
 
 ## Future ideas — not decisions, not scheduled
 
@@ -232,3 +256,5 @@ These are not locked decisions, not open questions blocking current work, and no
 | 18 Aug 2026 | LDTKB-022 | Stage 2 customer interviews deferred; LDTKB-012 superseded; Stage 3 lesson production unblocked without an interview prerequisite | Joule |
 | 18 Aug 2026 | LDTKB-023 | Implementation agent changed from Codex Desktop to Claude Code after Codex reached a usage limit; LDTKB-021 amended | Joule |
 | 18 Aug 2026 | LDTKB-024 | Onboarding asks learner's gender once; lesson audio/text branch for krap/kha particles; non-binary accommodation question closed per Joule's cultural clarification | Joule |
+| 19 Aug 2026 | LDTKB-025 | Tone-marking standard locked: full 5-tone diacritic system (Paiboon-style) for all Thai Karaoke text | Joule |
+| 19 Aug 2026 | LDTKB-026 | Pilot lesson activity type locked as recognition tap (2-3 audio clips, learner taps the correct one) | Joule |
