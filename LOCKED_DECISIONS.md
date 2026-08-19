@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.5  
+**Register version:** 2.6  
 **Last updated:** 19 August 2026  
 **Authority:** Joule
 
@@ -324,6 +324,38 @@ Buttons: `Male (krap)` / `Female (ka)`
 **Boundary:** Locks this message only. Does not lock what happens immediately after the choice (e.g. any confirmation line) — not yet designed.  
 **Locked by:** Joule's confirmation on 19 August 2026.
 
+## LDTKB-034 — Final schedule selection copy
+
+**Status:** Locked  
+**Decision:** Schedule selection is a two-step flow: pick a period (Morning/Afternoon/Evening), then pick a specific time within that period. All times are Thailand time (UTC+7), stated explicitly in step 1 only, not repeated in step 2. Exact text below, implement verbatim:
+
+**Step 1:**
+```
+What time works best for your daily lesson, ka? (Thailand time 🇹🇭)
+```
+Buttons: `🌅 Morning` / `☀️ Afternoon` / `🌙 Evening`
+
+**Step 2 (after Morning):**
+```
+Pick your time, ka:
+```
+Buttons: `08:00` `09:00` `10:00` `11:00`
+
+**Step 2 (after Afternoon):**
+```
+Pick your time, ka:
+```
+Buttons: `12:00` `13:00` `14:00` `15:00` `16:00` `17:00`
+
+**Step 2 (after Evening):**
+```
+Pick your time, ka:
+```
+Buttons: `18:00` `19:00` `20:00` `21:00`
+
+**Boundary:** Assumes one lesson delivery per day, matching the 7-lessons-for-7-days pilot structure (LDTKB-013) — not confirmed as a separate explicit decision, but consistent with everything locked so far. If Joule later wants multiple daily sessions, this design needs revisiting.  
+**Locked by:** Joule's confirmation on 19 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -351,3 +383,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-031 | Final welcome message copy locked, exact text and spacing | Joule |
 | 19 Aug 2026 | LDTKB-032 | No community group for the pilot; DM support exists but is not proactively mentioned anywhere in onboarding | Joule |
 | 19 Aug 2026 | LDTKB-033 | Final gender question copy locked, exact text and button labels | Joule |
+| 19 Aug 2026 | LDTKB-034 | Final schedule selection copy locked: two-step period-then-time flow, Thailand time (UTC+7) | Joule |
