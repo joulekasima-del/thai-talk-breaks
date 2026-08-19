@@ -2,7 +2,7 @@
 
 **Situation:** Small talk (arc position 6 of 7)
 **Phrase taught:** "Where are you from?"
-**Status:** Draft — requires native-speaker pronunciation review before pilot use
+**Status:** Reviewed and approved by Joule (native Thai speaker), 19 August 2026 — pending image/audio production
 
 ---
 
@@ -18,16 +18,16 @@ Two people chatting casually, relaxed body language (contrast with the more tran
 
 | Speaker voice | Karaoke | Tone pattern |
 |---|---|---|
-| Male | **maa jàak năi kráp** | mid – low – rising – high |
-| Female | **maa jàak năi kâ** | mid – low – rising – falling |
+| Male | **bpen kon tîi năi kráp** | mid – mid – falling – rising – high |
+| Female | **bpen kon tîi năi ká** | mid – mid – falling – rising – high |
 
-*("maa jàak năi" = where do [you] come from — a natural conversation-opener.)*
+*("bpen kon tîi năi" = [you] are a person from where — a natural, commonly used way to ask someone's origin. Replaced "maa jàak năi" per Joule's correction, 19 August 2026. Female particle is คะ (ká, high tone), not ค่ะ — this is a question, per Joule's grammar correction, 19 August 2026.)*
 
 ### Step 3 — English meaning
 "Where are you from?"
 
 ### Step 4 — Thai script (decorative)
-มาจากไหนครับ / มาจากไหนค่ะ
+เป็นคนที่ไหนครับ / เป็นคนที่ไหนคะ
 
 ### Step 5 — Native audio
 Two recordings (male/female branch).
@@ -36,6 +36,7 @@ Two recordings (male/female branch).
 Learner hears today's phrase plus 2 distractors (a mix of transactional phrases from earlier lessons), taps the one meaning "where are you from" — reinforces the social/transactional contrast conceptually, not just as vocabulary review.
 
 ## Open items requiring resolution before pilot-ready
-1. Native-speaker pronunciation/tone review.
-2. Whether this lesson should also gently preview how to *answer* this question (e.g. "I'm from ___") — currently scoped as asking only, matching the single-phrase-per-lesson pattern; worth a deliberate call rather than silently expanding scope.
-3. Image and audio production method (same open items as lesson 1).
+~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
+~~2. Grammar: ค่ะ vs. คะ, and phrase replacement~~ — **Resolved:** phrase changed from "มาจากไหน" to "เป็นคนที่ไหน" and corrected to คะ (question form) per Joule, 19 August 2026. Audio already generated correctly (`เป็นคนที่ไหนคะ.mp3`) — this was a documentation catch-up, not an audio re-record.
+3. Whether this lesson should also gently preview how to *answer* this question (e.g. "I'm from ___") — currently scoped as asking only, matching the single-phrase-per-lesson pattern; worth a deliberate call rather than silently expanding scope.
+4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).

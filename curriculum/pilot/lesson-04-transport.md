@@ -2,7 +2,7 @@
 
 **Situation:** Transport & directions (arc position 4 of 7)
 **Phrase taught:** "How much?" / "Stop here, please"
-**Status:** Draft — requires native-speaker pronunciation review before pilot use
+**Status:** Reviewed and approved by Joule (native Thai speaker), 19 August 2026 — pending image/audio production
 
 ---
 
@@ -19,15 +19,15 @@ A taxi or tuk-tuk with a simple "?" price gesture, or a hand signal for "stop he
 | Speaker voice | Karaoke | Tone pattern |
 |---|---|---|
 | Male | **tâo-rài kráp** | falling – falling – high |
-| Female | **tâo-rài kâ** | falling – falling – falling |
+| Female | **tâo-rài ká** | falling – falling – high |
 
-*("tâo-rài" = how much — one of the single highest-utility phrases in the whole pilot, reusable across lessons 3, 4, and 5.)*
+*("tâo-rài" = how much — one of the single highest-utility phrases in the whole pilot, reusable across lessons 3, 4, and 5. Female particle is คะ (ká, high tone) not ค่ะ — this is a question, and Thai grammar requires คะ for questions vs. ค่ะ for statements, per Joule's correction, 19 August 2026.)*
 
 ### Step 3 — English meaning
 "How much?"
 
 ### Step 4 — Thai script (decorative)
-เท่าไหร่ครับ / เท่าไหร่ค่ะ
+เท่าไหร่ครับ / เท่าไหร่คะ
 
 ### Step 5 — Native audio
 Two recordings (male/female branch).
@@ -36,6 +36,7 @@ Two recordings (male/female branch).
 Learner hears a number spoken (reusing lesson 2's audio) immediately followed by "tâo-rài" in a short dialogue-style clip, then taps which of 3 pictures shows the correct scenario (e.g. paying a taxi vs. ordering food vs. greeting someone) — a slightly more contextual variant of recognition tap, worth confirming this added complexity is still low-build-risk before finalizing.
 
 ## Open items requiring resolution before pilot-ready
-1. Native-speaker pronunciation/tone review.
-2. Confirm whether the "3 pictures" activity variant above is worth the extra production complexity vs. sticking to the simpler 3-audio-clips format used in lessons 1–3 — this is a build-complexity trade-off, not just a content question, so worth Joule's explicit call once addressed with the implementation agent.
-3. Image and audio production method (same open items as lesson 1).
+~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
+~~2. Grammar: ค่ะ vs. คะ~~ — **Resolved:** corrected to คะ (question form) per Joule, 19 August 2026. Audio already generated correctly (`เท่าไหร่คะ.mp3`) — this was a documentation catch-up, not an audio re-record.
+3. Confirm whether the "3 pictures" activity variant above is worth the extra production complexity vs. sticking to the simpler 3-audio-clips format used in lessons 1–3 — this is a build-complexity trade-off, not just a content question, so worth Joule's explicit call once addressed with the implementation agent.
+4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).
