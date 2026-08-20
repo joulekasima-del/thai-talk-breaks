@@ -24,9 +24,9 @@ All lessons follow the locked six-step structure (LDTKB-006), the 5-tone diacrit
 | เจ็บตรงนี้ | jèp dtrong-níi | low – mid – high | It hurts here *(said while pointing)* |
 
 Each takes the standard male/female ending (all statements, ค่ะ correct — none are questions), e.g.:
-- ผมรู้สึกตัวร้อนครับ / หนูรู้สึกตัวร้อนค่ะ (younger speaker forms)
-- ผมปวดท้องครับ / หนูปวดท้องค่ะ
-- ผมเจ็บตรงนี้ครับ / หนูเจ็บตรงนี้ค่ะ
+- ผมรู้สึกตัวร้อนครับ *(phǒm-rúu-sèuk-dtua-rórn-kráp)* / หนูรู้สึกตัวร้อนค่ะ *(nǔu-rúu-sèuk-dtua-rórn-kâ)* (younger speaker forms)
+- ผมปวดท้องครับ *(phǒm-bpùat-tóng-kráp)* / หนูปวดท้องค่ะ *(nǔu-bpùat-tóng-kâ)*
+- ผมเจ็บตรงนี้ครับ *(phǒm-jèp-dtrong-níi-kráp)* / หนูเจ็บตรงนี้ค่ะ *(nǔu-jèp-dtrong-níi-kâ)*
 
 *(Older-speaker พี่ forms follow the same pattern as the headache phrase above.)*
 
@@ -72,8 +72,8 @@ Script: ขอ...ได้ไหมครับ / ขอ...ได้ไหมค
 
 **How to build your own sentence** — the blank space after ขอ takes one of two forms:
 
-1. **Verb + Object (most common)** — e.g. ขอจอดรถตรงนี้ได้ไหมครับ/คะ ("may I park here?"), ขอไปเข้าห้องน้ำได้ไหมครับ/ค่ะ ("may I go to the bathroom?"), ขอยืมดินสอ 1 แท่งได้ไหมครับ/คะ ("may I borrow a pencil?"). You can also replace the ending "ได้ไหมครับ/คะ" with "นะครับ/นะคะ" (per LDTKB-041) — this softens the phrase from asking permission to simply letting the listener know.
-2. **Object only** — stronger and more direct, since you're asking to actually receive the item from the person you're speaking to: ขอยาดมอันนี้นะคะ ("[give me] this inhaler, please"), ขอปากกาอันนี้ได้ไหมครับ/คะ ("may I have this pen?")
+1. **Verb + Object (most common)** — e.g. ขอจอดรถตรงนี้ได้ไหมครับ/คะ *(khǎw-jòrt-rót-dtrong-níi-dâai-mǎi-kráp/ká, "may I park here?")*, ขอไปเข้าห้องน้ำได้ไหมครับ/คะ *(khǎw-bpai-khâo-hôrng-náam-dâai-mǎi-kráp/ká, "may I go to the bathroom?")* — corrected from ค่ะ to คะ, this is a question (ได้ไหม), so the female ending must be คะ per the grammar rule, ขอยืมดินสอ 1 แท่งได้ไหมครับ/คะ *(khǎw-yeuum-din-sǎw-nèung-thâeng-dâai-mǎi-kráp/ká, "may I borrow a pencil?")*. You can also replace the ending "ได้ไหมครับ/คะ" with "นะครับ/นะคะ" (per LDTKB-041) — this softens the phrase from asking permission to simply letting the listener know.
+2. **Object only** — stronger and more direct, since you're asking to actually receive the item from the person you're speaking to: ขอยาดมอันนี้นะครับ/นะคะ *(khǎw-yaa-dom-an-níi-ná-kráp/ná-ká, "[give me] this inhaler, please")* — male form added, original draft only had the female version, ขอปากกาอันนี้ได้ไหมครับ/คะ *(khǎw-bpaak-gaa-an-níi-dâai-mǎi-kráp/ká, "may I have this pen?")*
 
 ## Day 26 — Common responses
 **Type:** word set (no gender branch)
@@ -94,7 +94,7 @@ Script: ขอ...ได้ไหมครับ / ขอ...ได้ไหมค
 
 Script: ขอบคุณมากครับ / ขอบคุณมากค่ะ
 
-**Note on มาก (mâak):** this is a very common intensifier placed after an adjective to mean "very" — already seen in Day 11 (ร้อนมาก, "very hot") and Day 19 (อร่อยมาก, "very delicious"). Worth explicitly calling out here that it's the same reusable word, not a new one, reinforcing the pattern across lessons.
+**Note on มาก (mâak):** this is a very common intensifier placed after an adjective to mean "very" — already seen in Day 11 (ร้อนมาก, *rórn-mâak*, "very hot") and Day 19 (อร่อยมาก, *a-rôi-mâak*, "very delicious"). Worth explicitly calling out here that it's the same reusable word, not a new one, reinforcing the pattern across lessons.
 
 ## Day 28 — Talking about Thailand
 **Phrase:** Thailand is beautiful (statement — ค่ะ)

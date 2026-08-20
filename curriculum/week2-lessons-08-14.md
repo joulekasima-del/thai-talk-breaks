@@ -31,6 +31,8 @@ Script: กี่โมงแล้วครับ / กี่โมงแล้
 | Male | khǎaw-thôht ná kráp, gìi-mohng-láew kráp | ขอโทษนะครับ กี่โมงแล้วครับ |
 | Female | khǎaw-thôht ná-ká, gìi-mohng-láew ká | ขอโทษนะคะ กี่โมงแล้วคะ |
 
+**English:** "Excuse me, what time is it now?"
+
 (Note: ขอโทษ reuses the same word taught in Day 20 as "sorry" — here it functions as "excuse me," a natural overlap in Thai. Female "นะคะ" spelling per LDTKB-041.)
 
 ## Day 10 — Days of the week / today, tomorrow
@@ -83,16 +85,16 @@ Script: เอากาแฟเย็นหนึ่งแก้วครับ
 
 **Sweetness levels — commonly used in Thai cafes (shown as a fill level, lowest to highest sugar):**
 
-| Level | Karaoke | Script |
-|---|---|---|
-| 🥤▱▱▱▱ | mâi wǎan | ไม่หวาน |
-| 🥤▰▱▱▱ | wǎan nói | หวานน้อย |
-| 🥤▰▰▰▱ | wǎan bpòk-gà-tì | หวานปกติ |
-| 🥤▰▰▰▰ | wǎan mâak | หวานมาก |
+| Level | Karaoke | Script | Meaning |
+|---|---|---|---|
+| 🥤▱▱▱▱ | mâi wǎan | ไม่หวาน | No sugar |
+| 🥤▰▱▱▱ | wǎan nói | หวานน้อย | Less sweet |
+| 🥤▰▰▰▱ | wǎan bpòk-gà-tì | หวานปกติ | Normal sweetness |
+| 🥤▰▰▰▰ | wǎan mâak | หวานมาก | Extra sweet |
 
 *(Fill level shown visually rather than exact percentages, since exact conventions can vary slightly cafe to cafe — the relative order low → high is the reliable, consistent part.)*
 
-**Self-construction note:** unlike earlier lessons, this one should explicitly show learners they can mix and match — swap "กาแฟ" (coffee) for "ชา" (tea), or add a sweetness level from the table above, to build their own real order rather than only ever saying the exact phrase taught.
+**Self-construction note:** unlike earlier lessons, this one should explicitly show learners they can mix and match — swap "กาแฟ" (gaa-fae, coffee) for "ชา" (chaa, tea), or add a sweetness level from the table above, to build their own real order rather than only ever saying the exact phrase taught.
 
 ## Day 14 — Saying goodbye
 **Phrase:** See you next time (statement — ค่ะ)
