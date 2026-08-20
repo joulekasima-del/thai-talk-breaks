@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 2.9  
+**Register version:** 3.6  
 **Last updated:** 20 August 2026  
 **Authority:** Joule
 
@@ -205,7 +205,7 @@ The following remain open and must not be treated as decisions:
 - Number of notifications per day
 - Exact lesson times or scheduling choices offered
 - Russian-language interface or translation scope
-- Exact 30-day curriculum and learning outcome
+- Individual lesson content (phrases, Karaoke, audio, images) for Days 8-30 (topic arc itself is locked — see LDTKB-039)
 - Exact AI tool choice, specific prompts, and per-lesson icon/gesture selection (image-production method and scope are locked — see LDTKB-027)
 - Exact payment amount if 500 Stars produces an unsuitable buyer-visible price
 - Refund window and eligibility rules
@@ -245,12 +245,14 @@ A short legend explaining these five marks must be shown to the learner once, ea
 - **Total: 22 images**, matching the 22 audio clips already in the repo.
 
 **Rationale:** A single character with a floating icon (the original draft) didn't actually depict the *situation* — showing two people interacting (asker and the person being asked) makes each lesson's picture teach the real social context, not just decorate it. Numbers are abstract/countable, not situational, so a bare numeral is clearer and simpler than forcing them into an artificial scene.  
-**Tool guidance:** Adobe Firefly remains the recommended starting point (see original rationale below).  
+**Tool used (final):** Adobe Firefly — after a documented back-and-forth (see history below), Firefly is the final decision, specifically for its explicit IP-infringement indemnification, which was confirmed via direct research (20 August 2026) to be genuinely absent from ElevenLabs' Image & Video product. This applies to images/video only — ElevenLabs remains the tool for audio (LDTKB-025's audio production, unaffected by this finding).  
+**Research finding (20 August 2026):** ElevenLabs' general paid-plan commercial license explicitly excludes Beta Services. Separately, Image & Video's own dedicated Service Terms (elevenlabs.io/image-and-video-terms, last updated 11 June 2026) state in Section 6: "any indemnity provided by ElevenLabs in respect of third-party intellectual property infringement shall not apply to or in connection with your access to or use of Image & Video." Image & Video is also explicitly powered by third-party model providers (e.g. Veo, Sora, Kling, GPT Image), with ElevenLabs disclaiming all liability for their output. This means ElevenLabs' image tool carries the same no-indemnity risk profile as ChatGPT, not the stronger protection Firefly offers — switching to ElevenLabs for images would not have actually solved the licensing concern that motivated the switch.  
+**Practical consequence:** all 22 pilot images (currently ChatGPT-generated, per the tool history below) must be regenerated via Firefly and will replace the existing files in `curriculum/pilot/images/` — same filenames, same prompts from `pilot-image-prompt-list.md` (tool-agnostic, no rewrite needed).  
+**Tool history (context only, no longer current):** originally recommended Firefly before production began → production actually used ChatGPT → briefly considered switching to ElevenLabs for vendor consolidation (20 August 2026) → reverted to Firefly after direct research confirmed ElevenLabs Image & Video lacks indemnification, while Firefly has it.  
+**Original tool rationale (superseded by the above, kept for context only):** Adobe Firefly — commercial licensing is included on all paid plans with clear content sourcing (trained on licensed Adobe Stock content, not scraped web images), and Adobe provides an indemnification policy for eligible generated content, which is a meaningfully lower legal-risk profile than most competing tools. Not a locked requirement — any tool with clear commercial-use terms is acceptable, which is exactly what happened: ChatGPT was used instead.  
 **Boundary:** This locks the *method and scope*. It does not lock the exact tool, specific prompts, or exact icon/scene choice per lesson — production details to finalize during actual generation.  
 **Supersedes:** Earlier same-day drafts of this decision (free illustration libraries; stock photos; single-character-with-icon AI images) — none were ever pushed to the repository, so no formal amendment trail is needed.  
 **Locked by:** Joule's confirmation on 19 August 2026.
-
-**Original tool rationale (unchanged):** Adobe Firefly — commercial licensing is included on all paid plans with clear content sourcing (trained on licensed Adobe Stock content, not scraped web images), and Adobe provides an indemnification policy for eligible generated content, which is a meaningfully lower legal-risk profile than most competing tools. Not a locked requirement — any tool with clear commercial-use terms is acceptable.
 
 ## LDTKB-028 — Notification test: passive implementation, no gate
 
@@ -396,6 +398,62 @@ See you soon, ka!
 **Boundary:** This locks the stack choice (Vercel / Supabase Postgres / pg_cron) and the multi-learner requirement. It does not lock specific schema design, package versions, hosting plan/region, or any Telegram bot/webhook/scheduler implementation detail — those are implementation work for the relevant build checkpoint, not locked by this entry.  
 **Locked by:** Joule's confirmation on 20 August 2026, during the Checkpoint 1 (Technical Foundation) session with Claude Code, after Claude Code flagged that this decision was referenced in the checkpoint prompt but missing from this register.
 
+## LDTKB-038 — Returning-learner "/start" message copy
+
+**Status:** Locked  
+**Decision:** The exact text below is sent when a learner who has already completed onboarding sends `/start` again:
+
+```
+You're all set already, ka! Your next lesson is on its way. 😊
+```
+
+No re-onboarding, no gender/schedule questions repeated. This resolves the design choice Claude Code flagged during Checkpoint 2 (onboarding webhook implementation, 20 August 2026).  
+**Boundary:** Locks this message only. Does not change the separate mid-onboarding resume behavior implemented in Checkpoint 2 (a learner who hasn't finished onboarding resumes at their current pending question, not restarted) — that remains an accepted implementation judgment call, not formally locked copy, since it has no user-facing text of its own.  
+**Locked by:** Joule's confirmation on 20 August 2026.
+
+## LDTKB-039 — 30-day curriculum arc
+
+**Status:** Locked  
+**Decision:** The full 30-day curriculum follows this four-week thematic arc, building on the 7 pilot lessons (Week 1) as its foundation:
+
+**Week 1 — Survival basics (Days 1–7, already built):** Greetings, Numbers, Ordering food, Transport, Paying, Small talk, Asking for help
+
+**Week 2 — Daily life (Days 8–14):** Directions, Telling time, Days of the week, Weather small talk, At the market, Ordering drinks/coffee, Saying goodbye
+
+**Week 3 — Social & relationships (Days 15–21):** Introducing yourself, Family words, Hobbies, Making plans, Complimenting food/things, Apologizing, Preferences
+
+**Week 4 — Confidence & real life (Days 22–30):** Health basics, Emergency phrases, Booking things, Asking permission, Common responses, Ways to say thank you, Talking about Thailand, Review/consolidation, Wrap-up
+
+**Rationale:** Resolves the previously open question "exact 30-day curriculum and learning outcome." Days 29–30 are deliberately review/consolidation rather than new vocabulary, closing the course on reinforcement rather than cramming. Day 24 (booking things) avoids a bargaining posture, consistent with the reasoning behind lesson 5's earlier revision (LOCKED_DECISIONS, 19 August 2026).  
+**Boundary:** This locks the *topic arc and day ordering* only. Individual lesson content (phrases, Karaoke, tone marks, images, audio) for Days 8–30 is not yet built — that is future production work, following the same process used for the 7-day pilot (draft → native-speaker review → audio → images). This arc is Joule's judgment, consistent with LDTKB-022's boundary — no customer validation has occurred for Days 8–30 any more than it did for the pilot.  
+**Locked by:** Joule's confirmation on 20 August 2026.
+
+## LDTKB-040 — Age-relative "I" pronoun system
+
+**Status:** Locked  
+**Decision:** Throughout all 30 days of the curriculum, self-reference ("I") uses an age-relative pronoun system, not a single fixed word per gender:
+- **Male speaker:** ผม (phǒm) — general, respectful, commonly used when the speaker is younger than the listener. พี่ (phîi) — used when the speaker is older than the listener.
+- **Female speaker:** หนู (nǔu) — used when the speaker is younger than the listener. พี่ (phîi) — used when the speaker is older than the listener.
+
+This applies wherever a self-referential "I" statement occurs across the full 30-day course (e.g. Day 15 introductions, Day 17 hobbies, Day 21 preferences, Day 22 health), not just simple krap/kha ending branching.  
+**Boundary:** This locks the *pronoun logic*. It does NOT resolve how the app determines whether a given learner is "younger or older" than whoever they're speaking to in a real conversation — that's a genuinely open onboarding/product question (does the app ask the learner's age? Leave the choice to the learner per-lesson? Default to one form?). Flagged as open, not decided by this entry.  
+**Locked by:** Joule's confirmation on 20 August 2026.
+
+## LDTKB-041 — นะคะ standard spelling
+
+**Status:** Locked  
+**Decision:** Whenever a sentence ends with the softening particle นะ combined with a female polite ending, it is always spelled นะคะ — never นะค่ะ — regardless of whether the sentence is grammatically a question or a statement.  
+**Boundary:** This is a specific, narrow override of the general คะ (questions) / ค่ะ (statements) rule established 19 August 2026 — it applies only to the นะ-combined case. The general rule is unchanged everywhere else. Locked as the standard spelling for the rest of Thai Talk Breaks' existence, per Joule's own framing.  
+**Locked by:** Joule's confirmation on 20 August 2026.
+
+## LDTKB-042 — Day 30 wrap-up game format
+
+**Status:** Locked  
+**Decision:** Day 30's "10 game quests" (per LDTKB-039's arc) take the quiz-ladder format: 10 sequential recall questions drawing on vocabulary from across the full 30-day curriculum, using the same recognition-tap mechanic already built and proven in Checkpoint 3 (multiple audio/answer options, learner taps the correct one). No branching narrative, no grid-based interaction, no new interaction pattern — a direct extension of existing, working infrastructure.  
+**Rationale:** Chosen over three more ambitious alternatives (escape-room chain with story framing, memory-match grid, branching choose-your-adventure) specifically for lowest build risk, after visual comparison of all four formats' structure.  
+**Boundary:** Locks the *format* only. Does not resolve exact question selection (random across all 30 days vs. a curated fixed set), scoring/completion display, or closing message — those remain open production details for whenever Day 30 content is actually built.  
+**Locked by:** Joule's confirmation on 20 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -427,3 +485,8 @@ These are not locked decisions, not open questions blocking current work, and no
 | 19 Aug 2026 | LDTKB-035 | Final notification test copy locked, exact text and spacing | Joule |
 | 19 Aug 2026 | LDTKB-036 | Final onboarding-complete message copy locked; full six-step onboarding flow now locked end to end | Joule |
 | 20 Aug 2026 | LDTKB-037 | Production tech stack locked: Vercel + Supabase Postgres + pg_cron, fresh build, multi-learner from day one; resolves the "production runtime and deployment host" and "forked or generalized" open questions | Joule |
+| 20 Aug 2026 | LDTKB-038 | Returning-learner "/start" message copy locked, exact text | Joule |
+| 20 Aug 2026 | LDTKB-039 | 30-day curriculum arc locked: four-week thematic structure (Days 8-30 topics), building on the 7-day pilot as Week 1 | Joule |
+| 20 Aug 2026 | LDTKB-040 | Age-relative "I" pronoun system locked (male: ผม younger/พี่ older; female: หนู younger/พี่ older) for all 30 days | Joule |
+| 20 Aug 2026 | LDTKB-041 | นะคะ locked as standard spelling (never นะค่ะ) whenever นะ combines with a female ending, overriding the general question/statement rule for this specific case | Joule |
+| 20 Aug 2026 | LDTKB-042 | Day 30 wrap-up game format locked as a 10-question quiz ladder, reusing the existing recognition-tap mechanic | Joule |
