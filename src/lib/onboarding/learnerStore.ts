@@ -41,6 +41,13 @@ export interface LearnerStore {
   findByTelegramId(telegramUserId: number): Promise<Learner | null>;
   create(telegramUserId: number): Promise<Learner>;
   update(id: string, patch: LearnerPatch): Promise<Learner>;
+  /**
+   * All learners with onboarding_step = 'complete' (uses the
+   * idx_learners_due_for_delivery partial index). Added in Checkpoint 3 for
+   * the delivery cron route — the onboarding flow itself (handleUpdate.ts)
+   * never calls this; it only ever looks up a single learner by Telegram id.
+   */
+  listOnboarded(): Promise<Learner[]>;
 }
 
 export function supabaseLearnerStore(client: SupabaseClient): LearnerStore {
@@ -74,6 +81,12 @@ export function supabaseLearnerStore(client: SupabaseClient): LearnerStore {
         .single();
       if (error) throw error;
       return data as Learner;
+    },
+
+    async listOnboarded() {
+      const { data, error } = await client.from("learners").select("*").eq("onboarding_step", "complete");
+      if (error) throw error;
+      return (data as Learner[]) ?? [];
     },
   };
 }

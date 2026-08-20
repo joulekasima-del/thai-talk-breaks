@@ -1,4 +1,4 @@
-import type { InlineKeyboard, TelegramClient } from "@/lib/telegram";
+import type { InlineKeyboard, MediaFile, TelegramClient } from "@/lib/telegram";
 import type { Learner, LearnerPatch, LearnerStore } from "@/lib/onboarding/learnerStore";
 
 export class FakeLearnerStore implements LearnerStore {
@@ -35,6 +35,10 @@ export class FakeLearnerStore implements LearnerStore {
     this.learners.set(id, updated);
     return { ...updated };
   }
+
+  async listOnboarded(): Promise<Learner[]> {
+    return [...this.learners.values()].filter((l) => l.onboarding_step === "complete").map((l) => ({ ...l }));
+  }
 }
 
 export interface SentMessage {
@@ -43,9 +47,20 @@ export interface SentMessage {
   keyboard?: InlineKeyboard;
 }
 
+export interface SentMedia {
+  chatId: number;
+  filename: string;
+  caption?: string;
+}
+
 export class FakeTelegramClient implements TelegramClient {
   sent: SentMessage[] = [];
+  sentPhotos: SentMedia[] = [];
+  sentAudio: SentMedia[] = [];
   answeredCallbackIds: string[] = [];
+
+  /** Optional shared event log (see tests/deliveryFakes.ts EventLog), for cross-fake ordering assertions. */
+  constructor(private log?: { push(event: string): void }) {}
 
   async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard): Promise<void> {
     this.sent.push({ chatId, text, keyboard });
@@ -53,5 +68,14 @@ export class FakeTelegramClient implements TelegramClient {
 
   async answerCallbackQuery(callbackQueryId: string): Promise<void> {
     this.answeredCallbackIds.push(callbackQueryId);
+  }
+
+  async sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void> {
+    this.sentPhotos.push({ chatId, filename: photo.filename, caption });
+  }
+
+  async sendAudio(chatId: number, audio: MediaFile, caption?: string): Promise<void> {
+    this.sentAudio.push({ chatId, filename: audio.filename, caption });
+    this.log?.push(`sendAudio:${audio.filename}`);
   }
 }

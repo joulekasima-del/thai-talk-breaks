@@ -9,9 +9,19 @@ export interface InlineKeyboardButton {
 
 export type InlineKeyboard = InlineKeyboardButton[][];
 
+export interface MediaFile {
+  buffer: Buffer;
+  filename: string;
+  contentType: string;
+}
+
 export interface TelegramClient {
   sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard): Promise<void>;
   answerCallbackQuery(callbackQueryId: string): Promise<void>;
+  /** Uploads photo bytes directly (multipart) — Checkpoint 3, for lesson pictures. */
+  sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void>;
+  /** Uploads audio bytes directly (multipart) — Checkpoint 3, for lesson/activity audio. */
+  sendAudio(chatId: number, audio: MediaFile, caption?: string): Promise<void>;
 }
 
 class HttpTelegramClient implements TelegramClient {
@@ -44,6 +54,32 @@ class HttpTelegramClient implements TelegramClient {
     });
     if (!res.ok) {
       throw new Error(`Telegram answerCallbackQuery failed: ${res.status} ${await res.text()}`);
+    }
+  }
+
+  async sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void> {
+    await this.sendMultipart("sendPhoto", "photo", chatId, photo, caption);
+  }
+
+  async sendAudio(chatId: number, audio: MediaFile, caption?: string): Promise<void> {
+    await this.sendMultipart("sendAudio", "audio", chatId, audio, caption);
+  }
+
+  private async sendMultipart(
+    method: string,
+    field: string,
+    chatId: number,
+    file: MediaFile,
+    caption?: string,
+  ): Promise<void> {
+    const form = new FormData();
+    form.set("chat_id", String(chatId));
+    if (caption) form.set("caption", caption);
+    form.set(field, new Blob([new Uint8Array(file.buffer)], { type: file.contentType }), file.filename);
+
+    const res = await fetch(`${this.baseUrl}/${method}`, { method: "POST", body: form });
+    if (!res.ok) {
+      throw new Error(`Telegram ${method} failed: ${res.status} ${await res.text()}`);
     }
   }
 }
