@@ -10,17 +10,17 @@ All lessons follow the locked six-step structure (LDTKB-006: picture → Karaoke
 | Word | Karaoke | Tone pattern | Meaning |
 |---|---|---|---|
 | ตรงไป | dtrong bpai | mid – mid | Straight ahead |
-| เลี้ยวซ้าย | líeow sái | falling – falling | Turn left |
-| เลี้ยวขวา | líeow khwǎa | falling – rising | Turn right |
-| จอดตรงนี้ | jòrt dtrong-níi | low – mid – falling | Stop here |
+| เลี้ยวซ้าย | líeow sái | high – high | Turn left |
+| เลี้ยวขวา | líeow khwǎa | high – rising | Turn right |
+| จอดตรงนี้ | jòrt dtrong-níi | low – mid – high | Stop here |
 
 ## Day 9 — Telling time
 **Phrase:** What time is it now? (question — คะ)
 
 | Voice | Karaoke | Tone pattern |
 |---|---|---|
-| Male | gìi-mohng-láew kráp | rising – mid – falling – high |
-| Female | gìi-mohng-láew ká | rising – mid – falling – high |
+| Male | gìi-mohng-láew kráp | rising – mid – high – high |
+| Female | gìi-mohng-láew ká | rising – mid – high – high |
 
 Script: กี่โมงแล้วครับ / กี่โมงแล้วคะ
 
@@ -38,17 +38,17 @@ Script: กี่โมงแล้วครับ / กี่โมงแล้
 
 | Word | Karaoke | Tone pattern | Meaning |
 |---|---|---|---|
-| วันนี้ | wan-níi | mid – falling | Today |
-| พรุ่งนี้ | phrûng-níi | falling – falling | Tomorrow |
-| เมื่อวานนี้ | mêua-waan-níi | falling – mid – falling | Yesterday |
+| วันนี้ | wan-níi | mid – high | Today |
+| พรุ่งนี้ | phrûng-níi | falling – high | Tomorrow |
+| เมื่อวานนี้ | mêua-waan-níi | falling – mid – high | Yesterday |
 
 ## Day 11 — Weather small talk
 **Phrase:** It's really hot today (statement — ค่ะ)
 
 | Voice | Karaoke | Tone pattern |
 |---|---|---|
-| Male | wan-níi rórn mâak kráp | mid – falling – falling – falling – high |
-| Female | wan-níi rórn mâak kâ | mid – falling – falling – falling – falling |
+| Male | wan-níi rórn mâak kráp | mid – high – high – falling – high |
+| Female | wan-níi rórn mâak kâ | mid – high – high – falling – falling |
 
 Script: วันนี้ร้อนมากครับ / วันนี้ร้อนมากค่ะ
 
@@ -57,8 +57,8 @@ Script: วันนี้ร้อนมากครับ / วันนี้
 
 | Voice | Karaoke | Tone pattern |
 |---|---|---|
-| Male | mii yài gwàa níi mǎi kráp | mid – falling – low – falling – rising – high |
-| Female | mii yài gwàa níi mǎi ká | mid – falling – low – falling – rising – high |
+| Male | mii yài gwàa níi mǎi kráp | mid – falling – low – high – rising – high |
+| Female | mii yài gwàa níi mǎi ká | mid – falling – low – high – rising – high |
 
 Script: มีใหญ่กว่านี้ไหมครับ / มีใหญ่กว่านี้ไหมคะ
 
@@ -66,8 +66,8 @@ Script: มีใหญ่กว่านี้ไหมครับ / มีใ
 
 | Voice | Karaoke | Tone pattern |
 |---|---|---|
-| Male | mii lék gwàa níi mǎi kráp | mid – high – low – falling – rising – high |
-| Female | mii lék gwàa níi mǎi ká | mid – high – low – falling – rising – high |
+| Male | mii lék gwàa níi mǎi kráp | mid – high – low – high – rising – high |
+| Female | mii lék gwàa níi mǎi ká | mid – high – low – high – rising – high |
 
 Script: มีเล็กกว่านี้ไหมครับ / มีเล็กกว่านี้ไหมคะ ("Do you have anything smaller than this?")
 
@@ -81,14 +81,16 @@ Script: มีเล็กกว่านี้ไหมครับ / มีเ
 
 Script: เอากาแฟเย็นหนึ่งแก้วครับ / เอากาแฟเย็นหนึ่งแก้วค่ะ
 
-**Sweetness levels — commonly used in Thai cafes:**
+**Sweetness levels — commonly used in Thai cafes (shown as a fill level, lowest to highest sugar):**
 
-| Word | Karaoke | Meaning |
+| Level | Karaoke | Script |
 |---|---|---|
-| หวานปกติ | wǎan bpòk-gà-tì | Normal sweetness |
-| หวานน้อย | wǎan nói | Less sweet |
-| ไม่หวาน | mâi wǎan | No sugar |
-| หวานมาก | wǎan mâak | Extra sweet |
+| 🥤▱▱▱▱ | mâi wǎan | ไม่หวาน |
+| 🥤▰▱▱▱ | wǎan nói | หวานน้อย |
+| 🥤▰▰▰▱ | wǎan bpòk-gà-tì | หวานปกติ |
+| 🥤▰▰▰▰ | wǎan mâak | หวานมาก |
+
+*(Fill level shown visually rather than exact percentages, since exact conventions can vary slightly cafe to cafe — the relative order low → high is the reliable, consistent part.)*
 
 **Self-construction note:** unlike earlier lessons, this one should explicitly show learners they can mix and match — swap "กาแฟ" (coffee) for "ชา" (tea), or add a sweetness level from the table above, to build their own real order rather than only ever saying the exact phrase taught.
 

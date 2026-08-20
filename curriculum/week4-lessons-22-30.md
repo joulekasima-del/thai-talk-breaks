@@ -53,8 +53,8 @@ Script: จองห้องหนึ่งคืนครับ / จองห
 
 | Voice | Karaoke | Tone pattern |
 |---|---|---|
-| Male | jorng online wái láew, nîi raai-lá-ìiat kráp | mid – (english) – falling – falling – falling – low – rising – high |
-| Female | jorng online wái láew, nîi raai-lá-ìiat kâ | mid – (english) – falling – falling – falling – low – rising – falling |
+| Male | jorng online wái láew, nîi raai-lá-ìiat kráp | mid – (english) – falling – high – falling – low – rising – high |
+| Female | jorng online wái láew, nîi raai-lá-ìiat kâ | mid – (english) – falling – high – falling – low – rising – falling |
 
 Script: จองออนไลน์ไว้แล้ว นี่รายละเอียดครับ / จองออนไลน์ไว้แล้ว นี่รายละเอียดค่ะ ("I've already booked online, here are the details" — while showing the confirmation)
 
@@ -72,7 +72,7 @@ Script: ขอ...ได้ไหมครับ / ขอ...ได้ไหมค
 
 **How to build your own sentence** — the blank space after ขอ takes one of two forms:
 
-1. **Verb + Object (most common)** — e.g. ขอจอดรถตรงนี้ได้ไหมครับ/คะ ("may I park here?"), ขอไปเข้าห้องน้ำได้ไหมครับ/ค่ะ ("may I go to the bathroom?"), ขอยืมดินสอ 1 แท่งได้ไหมครับ/คะ ("may I borrow a pencil?"). You can also replace the ending "ได้ไหมครับ/คะ" with "นะคะ" (per LDTKB-041) — this softens the phrase from *asking permission* to simply *letting the listener know*.
+1. **Verb + Object (most common)** — e.g. ขอจอดรถตรงนี้ได้ไหมครับ/คะ ("may I park here?"), ขอไปเข้าห้องน้ำได้ไหมครับ/ค่ะ ("may I go to the bathroom?"), ขอยืมดินสอ 1 แท่งได้ไหมครับ/คะ ("may I borrow a pencil?"). You can also replace the ending "ได้ไหมครับ/คะ" with "นะครับ/นะคะ" (per LDTKB-041) — this softens the phrase from asking permission to simply letting the listener know.
 2. **Object only** — stronger and more direct, since you're asking to actually receive the item from the person you're speaking to: ขอยาดมอันนี้นะคะ ("[give me] this inhaler, please"), ขอปากกาอันนี้ได้ไหมครับ/คะ ("may I have this pen?")
 
 ## Day 26 — Common responses
