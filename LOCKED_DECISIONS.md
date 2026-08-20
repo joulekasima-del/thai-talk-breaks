@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 3.6  
+**Register version:** 3.7  
 **Last updated:** 20 August 2026  
 **Authority:** Joule
 
@@ -454,6 +454,15 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Boundary:** Locks the *format* only. Does not resolve exact question selection (random across all 30 days vs. a curated fixed set), scoring/completion display, or closing message — those remain open production details for whenever Day 30 content is actually built.  
 **Locked by:** Joule's confirmation on 20 August 2026.
 
+## LDTKB-043 — Day 30 quiz question selection and completion display
+
+**Status:** Locked  
+**Decision:** The 10 quiz questions (per LDTKB-042's quiz-ladder format) are a **fixed curated set**, not randomized — the same 10 questions every time, spanning representative phrases from all four weeks of the 30-day curriculum, not just Week 1. Completion shows **both** a numeric score (e.g. "8/10") **and** a badge/certificate — not one or the other.  
+**Rationale:** A fixed set is easier to test and verify than a random pool, and matters more for a pilot where you want to know exactly what a learner experienced. Both score and badge give concrete achievement feedback (the number) plus an emotional/shareable payoff (the badge) rather than picking just one.  
+**Boundary:** Locks the *selection method* and *display format*. Does not lock the exact 10 questions, exact badge name/design, or exact score-display wording — see the actual question list for the current draft.  
+**Production dependency, flagged honestly:** Weeks 2–4 have no audio produced yet (each week's file lists "Audio production — not started" as an open item). Any quiz question drawn from Days 8–28 cannot actually function in the live bot until that week's audio exists — this is a real production gap, not a design gap, and shouldn't block drafting the full-course-spanning question list now.  
+**Locked by:** Joule's confirmation on 20 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -490,3 +499,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 20 Aug 2026 | LDTKB-040 | Age-relative "I" pronoun system locked (male: ผม younger/พี่ older; female: หนู younger/พี่ older) for all 30 days | Joule |
 | 20 Aug 2026 | LDTKB-041 | นะคะ locked as standard spelling (never นะค่ะ) whenever นะ combines with a female ending, overriding the general question/statement rule for this specific case | Joule |
 | 20 Aug 2026 | LDTKB-042 | Day 30 wrap-up game format locked as a 10-question quiz ladder, reusing the existing recognition-tap mechanic | Joule |
+| 20 Aug 2026 | LDTKB-043 | Day 30 quiz question selection locked as fixed curated set (not random), spanning all 4 weeks; completion shows both score and badge | Joule |

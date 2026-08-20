@@ -1,5 +1,7 @@
 # Day 29 Recap — Story Draft: "A Day in Thailand"
 
+**Production status:** Story confirmed, all 8 pages illustrated and live in `curriculum/day29/images/` (Firefly, 20 August 2026). **Delivery mechanism changed 20 August 2026** — no longer a single rendered video file; now a "living comic" delivered as an interactive Telegram Web App (scrollable page sequence, timed synced audio per speech, sound on/off toggle). See `day29-living-comic-spec.md` for the full interaction spec and Kiki Protocol prototype analysis. This is genuinely new technical scope beyond anything built in Checkpoints 1–3 (which only handle simple bot messages, not embedded interactive web apps) — needs its own dedicated technical design pass before implementation.
+
 **Purpose:** the semi-comic-book recap video (LDTKB vision, 20 August 2026) — a short story drawing on phrases from across the 30-day curriculum, formatted as comic pages with Karaoke dialogue in speech bubbles, narrated with timed audio per page.
 
 **Format reference:** panel layout style (multi-panel pages, mixed panel sizes, speech bubble placement) inspired by the sample page Joule shared — not reproducing that comic's actual art or characters, purely a structural reference for how to arrange panels on a page.
@@ -10,16 +12,16 @@
 
 ---
 
-## Page 1 — Morning Greeting
-*(Days 1, 9)*
+## Page 1 — Morning Greeting (Market)
+*(Days 1, 9 — revised 20 August 2026 for narrative logic: original version had the woman checking a working phone while also asking someone the time, which doesn't make sense. Fixed: her phone has died (0% battery), which is *why* she needs to ask.)*
 
-**Panel 1:** Character wakes, steps outside, greets a neighbor with a wai.
+**Panel 1:** At a Thai market, she greets an elderly woman vendor with a wai.
 > สวัสดีค่ะ *(sà-wàt-dii-kâ)*
 
-**Panel 2:** She checks her phone, unsure of the time, asks the neighbor.
+**Panel 2:** She holds up her phone, showing a dead, 0% battery screen — a rueful, apologetic expression. Since she can't check the time herself, she asks.
 > ขอโทษนะคะ กี่โมงแล้วคะ *(khǎaw-thôht-ná-ká, gìi-mohng-láew-ká)*
 
-**Panel 3:** Neighbor answers.
+**Panel 3:** The elderly woman — who has her own smartphone tucked away and a woven market basket on one arm, a nice blend of traditional and modern — answers.
 > 🟡 แปดโมงค่ะ *(bpàet-mohng-kâ)*
 
 *🟡 "แปดโมงค่ะ" = "It's eight o'clock." Days 1–30 taught how to **ask** the time, but never how to **answer** it — a natural, high-value next step.*
@@ -39,24 +41,24 @@
 
 ---
 
-## Page 3 — Market
-*(Days 5, 12)*
+## Page 3 — Elephant Shirt Shop
+*(Days 5, 12 — setting revised 20 August 2026: moved from a generic market to an elephant-print shirt shop with a proper cashier, since "bigger/smaller?" fits clothing sizing more naturally, and card payment fits a real checkout counter better than an open-air stall)*
 
-**Panel 1:** Holding up a bag, asking the vendor.
+**Panel 1:** Holding up an elephant-print shirt, asking the cashier.
 > มีใหญ่กว่านี้ไหมคะ *(mii-yài-gwàa-níi-mǎi-ká)*
 
-**Panel 2:** Paying at the counter.
+**Panel 2:** Paying at the checkout counter.
 > จ่ายผ่านบัตรได้ไหมคะ *(jàai-pàan-bàt-dâai-mǎi-ká)*
 
 ---
 
-## Page 4 — Midday Heat
-*(Day 11, 22)*
+## Page 4 — Midday Heat (Songkran)
+*(Day 11, 22 — setting revised 20 August 2026: now set during Songkran, with an older female friend present. Panel 2's line is said directly to the friend, who reacts with visible worry.)*
 
-**Panel 1:** Fanning herself, squinting at the sun.
+**Panel 1:** Celebrating Songkran with an older friend, both in festival shirts, water guns in hand. Fanning herself, squinting at the sun.
 > วันนี้ร้อนมากค่ะ *(wan-níi-rórn-mâak-kâ)*
 
-**Panel 2:** Sitting down, a little overheated.
+**Panel 2:** Sitting in the shade, a little overheated, speaking to her friend. The friend looks visibly worried.
 > หนูรู้สึกตัวร้อนค่ะ *(nǔu-rúu-sèuk-dtua-rórn-kâ)*
 
 ---
