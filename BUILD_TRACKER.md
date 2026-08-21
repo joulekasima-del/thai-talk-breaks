@@ -1,10 +1,10 @@
 # Thai Talk Breaks — Build Tracker
 
-**Tracker version:** 1.7  
-**Last updated:** 19 August 2026  
+**Tracker version:** 1.8  
+**Last updated:** 20 August 2026  
 **Project owner:** Joule  
-**Current stage:** Stage 3 — Complete. Ready to consider Stage 4 (free pilot with notification testing)  
-**Overall status:** Stage 3 lesson production complete (Stage 2 interviews deferred — see LDTKB-022)
+**Current stage:** Stage 3 — Complete (Week 1 only). Full 30-day delivery tracked via new checklist below.  
+**Overall status:** See Full 30-Day Delivery Checklist for real progress across all 4 categories
 
 ## Status key
 
@@ -92,6 +92,54 @@ Deferred. If resumed, use `research/INTERVIEW_SCRIPT.md`, create records from `r
 **Status:** ✅ Complete — content, native-speaker review, audio, and images all done for all 7 lessons (19 August 2026).  
 All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced (22 audio clips), and fully illustrated (22 images: 12 two-character interaction scenes for lessons 1, 3–7, gender-matched; 10 standalone numeral images for lesson 2). Grammar corrected during review: female question forms use คะ, not ค่ะ (statement form) — affects lessons 4, 5, 6. Lesson 6's phrase was also replaced (มาจากไหน → เป็นคนที่ไหน) during review. All content lives in `curriculum/pilot/` (lesson files, `audio/`, `images/`). One design detail remains open, not a Stage 3 blocker: confirming distractor-clip content for each recognition-tap activity — see individual lesson files.
 
+## Full 30-Day Delivery Checklist
+
+**Added 20 August 2026.** This checklist tracks what "fully delivered" actually means across four categories — deliberately more granular than the 8-stage programme above, since Stage 3 being "complete" only covers Week 1 and the design work, not the full 30-day product. Use this to track real progress; the 8-stage table above remains the authoritative high-level gate structure.
+
+### Category 1 — Learner-facing materials
+
+| Item | Status |
+|---|---|
+| Onboarding (6 messages) | ✅ Done |
+| Week 1 content, audio, images (Days 1–7) | ✅ Done |
+| Weeks 2–4 content (Days 8–28) | ✅ Done, reviewed |
+| Weeks 2–4 audio | ⬜ Not started |
+| Weeks 2–4 images | ⬜ Not started |
+| Day 29 story + 8-page illustration | ✅ Done |
+| Day 29 narration audio | ⚠️ Unclear — new-phrase needs identified (Page 5), full 8-page narration audio not confirmed |
+| Day 30 quiz content (10 questions) | ✅ Drafted |
+| Day 30 badge/monkey completion image | ⬜ Specified, not generated |
+| Day 30 quiz functionality | ⚠️ 7 of 10 questions blocked on Weeks 2–4 audio |
+
+### Category 2 — Technical/operational systems (code)
+
+| Item | Status |
+|---|---|
+| Checkpoint 1 (foundation) | ✅ Done |
+| Checkpoint 2 (onboarding webhook) | ✅ Done |
+| Checkpoint 3 (scheduler + delivery) | ✅ Done |
+| Checkpoint 4 (activity handling + quiz-ladder) | 🟡 Prompt written, not yet run |
+| Day 29 living comic Web App | 🟡 Spec done, zero code written |
+
+### Category 3 — Deployment & real-world verification
+
+Every checkpoint so far has explicitly avoided deploying live. None of this has run against a real bot yet.
+
+| Item | Status |
+|---|---|
+| Real Supabase project connected | ⬜ Not done |
+| Real Telegram bot token + webhook set | ⬜ Not done |
+| Real Vercel deployment (live) | ⬜ Not done |
+| End-to-end test with an actual Telegram account | ⬜ Not done |
+
+### Category 4 — Business/legal/commercial readiness (Stages 5–7 below, tracked in detail here)
+
+| Stage | Item | Status |
+|---|---|---|
+| 5 | 500-Star checkout/withdrawal verification | ⬜ Not started |
+| 6 | Individual commercial registration | ⬜ Not started |
+| 7 | Privacy/payment-support/refund policy pages | ⬜ Not started |
+
 ### Stage 4: Free pilot
 
 The bot can guarantee scheduled sending, not that every phone makes a sound. The onboarding test must confirm the user’s Telegram and phone settings before the first scheduled lesson.
@@ -137,3 +185,4 @@ The first commercial validation succeeds when:
 | 18 Aug 2026 | Stage 2 (interviews) deferred per LDTKB-022; Stage 3 (seven sample lessons) activated as current stage without an interview prerequisite | Joule |
 | 18 Aug 2026 | Implementation agent changed from Codex Desktop to Claude Code (LDTKB-023) after Codex reached a usage limit; no stage change | Joule |
 | 19 Aug 2026 | Stage 3 complete: all 7 lessons content-reviewed (native speaker), voiced (22 audio clips), and illustrated (22 images) | Joule |
+| 20 Aug 2026 | Added Full 30-Day Delivery Checklist (4 categories: materials, technical systems, deployment/verification, business/legal readiness) to track real progress beyond the 8-stage gate structure | Joule |
