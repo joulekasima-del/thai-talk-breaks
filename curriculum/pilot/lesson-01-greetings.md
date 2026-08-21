@@ -9,7 +9,7 @@
 ## Delivery sequence (per LDTKB-006, the locked six-step structure)
 
 ### Step 1 — Picture
-Two people greeting each other with a wai (palms together, slight bow) — the actual physical gesture that accompanies this phrase in real life. Sourced/produced per the open "visual style and image-production method" decision (still open — see LOCKED_DECISIONS.md).
+Two people greeting each other with a wai (palms together, slight bow) — the actual physical gesture that accompanies this phrase in real life. Produced via Adobe Firefly per LDTKB-027's final decision (regenerated 20 August 2026 after an earlier ChatGPT/ElevenLabs detour — see LDTKB-027's full history).
 
 ### Step 2 — Thai Karaoke (gender-branched per LDTKB-024)
 
@@ -35,10 +35,10 @@ Two people greeting each other with a wai (palms together, slight bow) — the a
 สวัสดีครับ (male) / สวัสดีค่ะ (female)
 
 ### Step 5 — Native audio
-Two recordings required: one male voice ("...kráp"), one female voice ("...kâ"). Served per branch selected at onboarding (LDTKB-024). Production method: offline-generated, matching the German Breaks precedent (Piper-style local TTS or human recording — method not yet chosen, see open questions).
+Two recordings required: one male voice ("...kráp"), one female voice ("...kâ"). Served per branch selected at onboarding (LDTKB-024). Production method: ElevenLabs, using Joule's voice clones — complete (`curriculum/pilot/audio/lesson01_*.mp3`).
 
-### Step 6 — Activity (recognition tap, per LDTKB-026)
-Learner is shown 2–3 short audio clips (one correct "sà-wàt-dii," two clearly different distractor phrases/sounds — not phrases the learner hasn't been taught, per the "teach before testing" rule in CLAUDE_AI_HANDOFF.md Section 4) and taps the one that means "hello."
+### Step 6 — Activity
+**None for this lesson.** Confirmed during Checkpoint 3's implementation (20 August 2026): the recognition-tap format (LDTKB-026) requires distractor phrases drawn from *already-taught* content, and Lesson 1 is the first lesson in the arc — there's nothing prior to draw distractors from. Rather than invent content or test untaught material, Lesson 1's activity is intentionally skipped. This was a deliberate design decision, not an oversight — see Checkpoint 3's final report and BUILD_TRACKER.md.
 
 ---
 
@@ -49,9 +49,11 @@ Learner is shown 2–3 short audio clips (one correct "sà-wàt-dii," two clearl
 
 ## Open items requiring resolution before this lesson is pilot-ready
 ~~1. **Native-speaker pronunciation review**~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
-~~2. **Image production method** — still an open decision (LOCKED_DECISIONS.md).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson01_*.mp3`), images complete (`curriculum/pilot/images/lesson01_*.png`), 19 August 2026.
-3. **Audio production method** — offline TTS vs. human recording not yet chosen for Thai (LOCKED_DECISIONS.md notes this is open; German Breaks used Piper for German, no equivalent Thai voice model confirmed yet).
-4. **Onboarding gender-question wording** — still open per LDTKB-024's boundary note; this lesson assumes the branch already happened during onboarding.
-5. **Distractor clips for the recognition-tap activity** — need 1–2 short, clearly different audio clips; not yet specified.
+~~2. **Image production method**~~ — **Resolved:** Firefly, complete (`curriculum/pilot/images/lesson01_*.png`).
+~~3. **Audio production method**~~ — **Resolved:** ElevenLabs, complete (`curriculum/pilot/audio/lesson01_*.mp3`).
+~~4. **Onboarding gender-question wording**~~ — **Resolved:** locked (LDTKB-033) and built (Checkpoint 2).
+~~5. **Distractor clips for the recognition-tap activity**~~ — **Resolved differently than expected:** Lesson 1 has no activity at all (see Step 6 above) — there was never a distractor question to answer for this specific lesson.
+
+**This review pass (20 August 2026) found this file had fallen out of sync with decisions made after it was originally written — corrected above. All items now genuinely resolved.**
 
 *This file is the template pattern for lessons 2–7 of the pilot arc. Once reviewed and approved, lessons 2–7 will follow this exact structure with content specific to their situation.*

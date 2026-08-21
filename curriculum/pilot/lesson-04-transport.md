@@ -33,10 +33,10 @@ A taxi or tuk-tuk with a simple "?" price gesture, or a hand signal for "stop he
 Two recordings (male/female branch).
 
 ### Step 6 — Activity (recognition tap)
-Learner hears a number spoken (reusing lesson 2's audio) immediately followed by "tâo-rài" in a short dialogue-style clip, then taps which of 3 pictures shows the correct scenario (e.g. paying a taxi vs. ordering food vs. greeting someone) — a slightly more contextual variant of recognition tap, worth confirming this added complexity is still low-build-risk before finalizing.
+**Reconciled 20 August 2026:** the original draft here proposed a more complex "3 pictures, contextual scenario" variant. Checkpoint 3's actual implementation built the standard format instead — Learner hears today's phrase plus 2 distractors from earlier lessons in short audio clips and taps the one meaning "how much?" — consistent with every other lesson, not the contextual-picture variant. The open item below asking whether the complex variant was "worth it" is resolved: it wasn't built, and the simpler format is what's live.
 
 ## Open items requiring resolution before pilot-ready
 ~~1. Native-speaker pronunciation/tone review.~~ — **Resolved:** reviewed and approved by Joule (native Thai speaker), 19 August 2026.
 ~~2. Grammar: ค่ะ vs. คะ~~ — **Resolved:** corrected to คะ (question form) per Joule, 19 August 2026. Audio already generated correctly (`เท่าไหร่คะ.mp3`) — this was a documentation catch-up, not an audio re-record.
-3. Confirm whether the "3 pictures" activity variant above is worth the extra production complexity vs. sticking to the simpler 3-audio-clips format used in lessons 1–3 — this is a build-complexity trade-off, not just a content question, so worth Joule's explicit call once addressed with the implementation agent.
+~~3. Confirm whether the "3 pictures" activity variant above is worth the extra production complexity vs. sticking to the simpler 3-audio-clips format used in lessons 1–3.~~ — **Resolved:** the simpler format was what Checkpoint 3 actually built; see updated Step 6 above.
 ~~4. Image production method (audio production now complete — see `curriculum/pilot/audio/`).~~ — **Resolved:** audio complete (`curriculum/pilot/audio/lesson04_*.mp3`), images complete (`curriculum/pilot/images/lesson04_*.png`), 19 August 2026.
