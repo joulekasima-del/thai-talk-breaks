@@ -103,12 +103,13 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Onboarding (6 messages) | ✅ Done |
 | Week 1 content, audio, images (Days 1–7) | ✅ Done |
 | Weeks 2–4 content (Days 8–28) | ✅ Done, reviewed |
-| Weeks 2–4 audio | ⬜ Not started |
-| Weeks 2–4 images | ⬜ Not started |
+| Weeks 2–4 audio | ✅ Done (79 files: Week 2 = 25, Week 3 = 21, Week 4 = 33) — female voice recordings updated 21 Aug 2026 |
+| Weeks 2–4 images | ✅ Done (38 images: Week 2 = 12, Week 3 = 13, Week 4 = 13) |
 | Day 29 story + 8-page illustration | ✅ Done |
-| Day 29 narration audio | ⚠️ Unclear — new-phrase needs identified (Page 5), full 8-page narration audio not confirmed |
-| Day 30 quiz content (10 questions) | ✅ Drafted |
-| Day 30 badge/monkey completion image | ⬜ Specified, not generated |
+| Day 29 narration audio | 🟡 Partial — 6 of 8 pages have audio; **missing `day29_page05_panel1_dtom.mp3`** (flagged by `day29-page5-new-audio.md` as needing fresh generation, never produced); **Pages 3, 4, 7 have zero audio files** and whether they reuse Week 1 audio has never been confirmed page-by-page (per that same file's own note) |
+| Day 30 quiz content (10 questions) | ✅ Drafted, all 10 questions' audio dependencies now resolved (Weeks 2–4 audio complete) — see `day30-quiz-content.md` |
+| Day 30 completion badge (text/emoji) | ✅ Drafted ("🏅 Thai Talk Breaks Graduate") — draft only, not yet finalized/reviewed |
+| Day 29 monkey mascot celebration image | ⬜ Not generated — part of the unbuilt Day 29 living comic Web App, not Day 30; see `day29-living-comic-spec.md` |
 | Day 30 quiz functionality | 🟡 Unblocked — Weeks 2–4 audio now complete; awaiting Checkpoint 4 |
 
 ### Category 2 — Technical/operational systems (code)
