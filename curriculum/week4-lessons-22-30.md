@@ -31,13 +31,16 @@ Each takes the standard male/female ending (all statements, ค่ะ correct �
 *(Older-speaker พี่ forms follow the same pattern as the headache phrase above.)*
 
 ## Day 23 — Emergency phrases
-**Phrase:** Help me! (urgent exclamation — no gender particle; urgency overrides normal politeness branching)
+**Phrase:** Help me! (urgent exclamation — statement, ครับ/ค่ะ)
 
-Karaoke: chûay dûay
-Tone pattern: falling – falling
-Script: ช่วยด้วย
+| Voice | Karaoke | Tone pattern |
+|---|---|---|
+| Male | chûay-dûay kráp | falling – falling – high |
+| Female | chûay-dûay kâ | falling – falling – falling |
 
-**Note:** flagged for explicit review — is dropping the krap/kha ending appropriate for a genuine emergency phrase, or should it still branch? My instinct is urgency reasonably overrides normal politeness convention, but this is exactly the kind of judgment call that needs native confirmation, not my assumption.
+Script: ช่วยด้วยครับ / ช่วยด้วยค่ะ
+
+**Note:** earlier draft treated this phrase as gender-neutral, reasoning that urgency might override normal politeness branching. **Resolved — Joule confirmed 21 August 2026 that Day 23 branches by gender like every other lesson;** male and female audio are produced and locked.
 
 ## Day 24 — Booking things
 **Phrase:** I'd like to book a room for one night (statement — ค่ะ)
