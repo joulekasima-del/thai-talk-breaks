@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Build Tracker
 
-**Tracker version:** 1.8  
-**Last updated:** 20 August 2026  
+**Tracker version:** 1.9  
+**Last updated:** 21 August 2026  
 **Project owner:** Joule  
 **Current stage:** Stage 3 — Complete (Week 1 only). Full 30-day delivery tracked via new checklist below.  
 **Overall status:** See Full 30-Day Delivery Checklist for real progress across all 4 categories
@@ -109,7 +109,7 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Day 29 narration audio | ⚠️ Unclear — new-phrase needs identified (Page 5), full 8-page narration audio not confirmed |
 | Day 30 quiz content (10 questions) | ✅ Drafted |
 | Day 30 badge/monkey completion image | ⬜ Specified, not generated |
-| Day 30 quiz functionality | ⚠️ 7 of 10 questions blocked on Weeks 2–4 audio |
+| Day 30 quiz functionality | 🟡 Unblocked — Weeks 2–4 audio now complete; awaiting Checkpoint 4 |
 
 ### Category 2 — Technical/operational systems (code)
 
@@ -118,7 +118,8 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Checkpoint 1 (foundation) | ✅ Done |
 | Checkpoint 2 (onboarding webhook) | ✅ Done |
 | Checkpoint 3 (scheduler + delivery) | ✅ Done |
-| Checkpoint 4 (activity handling + quiz-ladder) | 🟡 Prompt written, not yet run |
+| Checkpoint 4 (activity handling, Lessons 2–7 + Day 30 quiz-ladder) | 🟡 Prompt written, not yet run |
+| Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ⬜ Not started — scoped out of Checkpoint 4 (21 days, 4-way male/female × younger/older branching on Days 15/17/21); unblocked now that Weeks 2–4 audio is complete, but not yet prompted |
 | Day 29 living comic Web App | 🟡 Spec done, zero code written |
 
 ### Category 3 — Deployment & real-world verification
