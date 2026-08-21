@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 3.7  
-**Last updated:** 20 August 2026  
+**Register version:** 3.8  
+**Last updated:** 21 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -463,6 +463,13 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Production dependency, flagged honestly:** Weeks 2–4 have no audio produced yet (each week's file lists "Audio production — not started" as an open item). Any quiz question drawn from Days 8–28 cannot actually function in the live bot until that week's audio exists — this is a real production gap, not a design gap, and shouldn't block drafting the full-course-spanning question list now.  
 **Locked by:** Joule's confirmation on 20 August 2026.
 
+## LDTKB-044 — Scheduler day-window testing extension
+
+**Status:** Locked  
+**Decision:** The scheduler's day-window is temporarily extended from 7 to 30 **for testing purposes only**, so the full 30-day curriculum can be exercised end-to-end before real content is live for all four weeks.  
+**Boundary:** This is explicitly **not** a change to the real pilot's commercial scope — the 7-day free pilot (per the product's core pricing model) is unaffected. The extension must be clearly marked in code as a testing bypass (e.g. a flagged constant or comment identifying it as non-production), so it cannot be mistaken for a real scope change during later review or by Claude Code in a future checkpoint.  
+**Locked by:** Joule's confirmation, 20 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -500,3 +507,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 20 Aug 2026 | LDTKB-041 | นะคะ locked as standard spelling (never นะค่ะ) whenever นะ combines with a female ending, overriding the general question/statement rule for this specific case | Joule |
 | 20 Aug 2026 | LDTKB-042 | Day 30 wrap-up game format locked as a 10-question quiz ladder, reusing the existing recognition-tap mechanic | Joule |
 | 20 Aug 2026 | LDTKB-043 | Day 30 quiz question selection locked as fixed curated set (not random), spanning all 4 weeks; completion shows both score and badge | Joule |
+| 20 Aug 2026 | LDTKB-044 | Scheduler day-window temporarily extended to 30 for testing only; explicitly not a change to the 7-day pilot's commercial scope; must be marked as a testing bypass in code | Joule |
