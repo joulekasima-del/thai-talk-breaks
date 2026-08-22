@@ -135,6 +135,6 @@ This remains simpler in scope than Day 29's video, since it's a direct extension
 
 ## Open items (all Week 4 lessons)
 1. Native-speaker pronunciation/tone review — none checked yet.
-2. Day 23's dropped gender particle — flagged for explicit review, see note above.
+2. ~~Day 23's dropped gender particle — flagged for explicit review, see note above.~~ **Resolved 21 August 2026** — see the note under Day 23 above; this item was left stale after resolution.
 3. Days 29–30 need real content design, not just placeholders — noted as open work, not yet done.
-4. Audio and image production — not started.
+4. ~~Audio and image production — not started.~~ **Resolved** — audio and images are complete for all of Weeks 2–4 (79 audio files, 38 images; see `BUILD_TRACKER.md`).

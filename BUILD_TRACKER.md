@@ -102,11 +102,11 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 |---|---|
 | Onboarding (6 messages) | ✅ Done |
 | Week 1 content, audio, images (Days 1–7) | ✅ Done |
-| Weeks 2–4 content (Days 8–28) | ✅ Done, reviewed |
+| Weeks 2–4 content (Days 8–28) | ✅ Done, content-QA reviewed (tone-mark accuracy, staleness/consistency — see `curriculum-review-log.md`). **Native-speaker pronunciation/tone review has NOT happened yet** (each week file's own "Open items" confirms this) — do not read "reviewed" as equivalent to the pilot's Stage 3 native-speaker review |
 | Weeks 2–4 audio | ✅ Done (79 files: Week 2 = 25, Week 3 = 21, Week 4 = 33) — female voice recordings updated 21 Aug 2026 |
 | Weeks 2–4 images | ✅ Done (38 images: Week 2 = 12, Week 3 = 13, Week 4 = 13) |
 | Day 29 story + 8-page illustration | ✅ Done |
-| Day 29 narration audio | 🟡 Partial — 6 of 8 pages have audio; **missing `day29_page05_panel1_dtom.mp3`** (flagged by `day29-page5-new-audio.md` as needing fresh generation, never produced); **Pages 3, 4, 7 have zero audio files** and whether they reuse Week 1 audio has never been confirmed page-by-page (per that same file's own note) |
+| Day 29 narration audio | 🟡 Partial — **5 of 8 pages have any audio file** (01, 02, 05, 06, 08); Pages 3, 4, 7 have zero. Confirmed missing (flagged by `day29-page5-new-audio.md`, never produced): `day29_page05_panel1_dtom.mp3`. **Unclear, needs Joule's confirmation, not assumed:** Page 1 panels 1–2 and Page 2 panel 1 have no dedicated audio file — panels 1–2 of Page 1 exactly match existing pilot/Week 2 audio and may be intentional reuse, but Page 2 panel 1 ("เอากาแฟเย็นหนึ่งแก้วค่ะ หวานน้อยนะคะ") is an *extended* version of an existing phrase, not an exact match, so it's unclear if it has audio or needs a fresh recording. `day29_page08_panel2.mp3` also exists despite `day29-story-draft.md`'s Page 8 section describing only a single "Panel 1" — naming inconsistency, unresolved. Per `day29-page5-new-audio.md`'s own note, reuse-vs-new status was only ever checked for Page 5, not the other 7 pages. |
 | Day 30 quiz content (10 questions) | ✅ Drafted, all 10 questions' audio dependencies now resolved (Weeks 2–4 audio complete) — see `day30-quiz-content.md` |
 | Day 30 completion badge (text/emoji) | ✅ Drafted ("🏅 Thai Talk Breaks Graduate") — draft only, not yet finalized/reviewed |
 | Day 29 monkey mascot celebration image | ⬜ Not generated — part of the unbuilt Day 29 living comic Web App, not Day 30; see `day29-living-comic-spec.md` |

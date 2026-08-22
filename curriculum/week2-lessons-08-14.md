@@ -110,6 +110,6 @@ Script: เจอกันใหม่ครับ / เจอกันใหม
 
 ## Open items (all Week 2 lessons)
 1. Native-speaker pronunciation/tone review — none of these have been checked, unlike the Week 1 pilot content.
-2. Audio production — not started.
-3. Image production — not started.
+2. ~~Audio production — not started.~~ **Resolved** — audio is complete for all of Weeks 2–4 (79 files; see `BUILD_TRACKER.md`).
+3. ~~Image production — not started.~~ **Resolved** — images are complete for all of Weeks 2–4 (38 images; see `BUILD_TRACKER.md`).
 4. Recognition-tap distractors — can reuse Week 1 pilot phrases as the initial distractor pool per lesson, per the pattern Claude Code already implemented in Checkpoint 3.

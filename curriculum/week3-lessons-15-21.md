@@ -89,4 +89,4 @@ To make a complete, natural sentence: pick your form from the table above (match
 ## Open items (all Week 3 lessons)
 1. Native-speaker pronunciation/tone review — none checked yet.
 2. Days 15, 17, and 21 use LDTKB-040's four-way age-relative pronoun system (ผม/พี่ for male, หนู/พี่ for female) — a new pattern not used in Weeks 1–2. Flag for explicit review of whether this is handled correctly in both content and (eventually) delivery logic, and whether Days 16, 18–20 correctly omit it (those phrases don't require explicit self-reference in natural Thai — worth confirming this judgment is right, not just assumed).
-3. Audio and image production — not started.
+3. ~~Audio and image production — not started.~~ **Resolved** — audio and images are complete for all of Weeks 2–4 (79 audio files, 38 images; see `BUILD_TRACKER.md`).
