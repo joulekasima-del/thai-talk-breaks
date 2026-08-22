@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.2  
+**Register version:** 4.3  
 **Last updated:** 22 August 2026  
 **Authority:** Joule
 
@@ -509,6 +509,14 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 2. **Day 25 ("Asking permission," 5 valid example sentences)** uses example #1 — "may I park here?" (ขอจอดรถตรงนี้ได้ไหมครับ/คะ) — as the canonical tested phrase for its recognition-tap activity. The other 4 examples remain in the lesson as teaching content/reference but aren't the activity's correct answer. All 5 examples' audio already exists and nothing produced is wasted.  
 **Locked by:** Joule's confirmation, 22 August 2026.
 
+## LDTKB-049 — Day 29 living comic: Surprise Quest persistence and monkey removal
+
+**Status:** Locked  
+**Decision, two parts:**
+1. **Surprise Quest lock-state is server-side**, stored in Supabase and tied to the learner's ID — consistent with how every other piece of learner progress in this project is tracked (onboarding steps, delivery records, Day 30's quiz progress). Rejected: client-side-only storage (e.g. localStorage), since it wouldn't survive a new device or reinstalled Telegram, and would be the only piece of learner state in the whole product not backed by Supabase. This means the "living comic" page is not purely static/serverless in the way the Kiki reference prototype was — it calls back to the existing Vercel API for this one piece of state.
+2. **The monkey mascot concept is removed entirely** — no new character, no illustration, no audio for the Surprise Quest's completion moment. Replaced with a text-only completion message (see `day29-living-comic-spec.md`'s "Completion reward" section for the drafted copy). The page count remains **9 pages total** — Page 9 is still the Surprise Quest interaction itself, just without an illustrated reward.  
+**Locked by:** Joule's confirmation, 22 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -551,3 +559,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 22 Aug 2026 | LDTKB-046 | Day 30 quiz audio drops ครับ/ค่ะ/คะ and gendered pronouns; on-screen buttons show English meaning, not Thai text — deliberate audio/text mismatch for genuine listening comprehension; Day 30 only | Joule |
 | 22 Aug 2026 | LDTKB-047 | Resolves LDTKB-040's open question: no onboarding question added; every learner is taught/tested the younger-speaker form (ผม/หนู) for Days 15, 17, 21, 22 — older form remains reference content only | Joule |
 | 22 Aug 2026 | LDTKB-048 | Weeks 2-4 activity design: Days 8/16/26 (word-sets) use Lesson 2's word-matching pattern; Day 25 uses example #1 ("may I park here?") as its canonical tested phrase | Joule |
+| 22 Aug 2026 | LDTKB-049 | Day 29 Surprise Quest lock-state stored server-side (Supabase), consistent with all other learner progress; monkey mascot concept removed entirely, replaced with text-only completion message | Joule |

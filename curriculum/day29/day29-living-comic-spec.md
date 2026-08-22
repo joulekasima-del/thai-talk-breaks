@@ -1,6 +1,6 @@
 # Day 29 — Living Comic: Interaction Spec & Prototype Analysis
 
-**Status:** Full interaction spec confirmed by Joule, 20 August 2026 — all open questions resolved. Technical design and build not yet started; drafted copy (entry message, question wording, monkey's line) still needs review.
+**Status:** Full interaction spec confirmed by Joule, 20 August 2026 — all open questions resolved. Technical design and build not yet started. Completion message confirmed 22 August 2026; entry message and Surprise Quest question wording still draft, need review.
 
 ## What changed
 Day 29 was originally planned as a single rendered video file (Joule edits together the 8 illustrated pages + narration in a video editor, bot sends one `.mp4`). **This is now replaced** with a "living comic" — an interactive experience where the learner scrolls through the 8 pages themselves, with speech-bubble audio playing in sync as they go.
@@ -22,6 +22,7 @@ Learner taps Start → bot sends scripted messages → bot sends a button
 → tapping the button opens a hosted page (GitHub Pages) as a Telegram Web App
 → that page is plain HTML/CSS/JS, fully client-side, no server
 ```
+**Important — "Learner taps Start" is Kiki's own flow, NOT Day 29's (clarified 22 August 2026):** Kiki is a standalone bot where a learner manually begins the conversation. Day 29 is not standalone — it's one day within an already-running course. **Day 29's buildup messages and button are sent automatically by the scheduler at the learner's normal notification time, exactly like every other lesson day (1–28).** There is no manual "tap Start" gate for Day 29 — the learner does nothing to initiate it; it simply arrives on schedule. Only the *button → Web App → hosted page* portion of Kiki's architecture is what Day 29 reuses — not the manual-start trigger. See "Bot trigger sequence" below, which already states this correctly; this note exists so the diagram above isn't misread as contradicting it.
 
 ### What's directly reusable for Day 29
 - **The bot → button → Web App → hosted page pattern itself.** This is the right mechanism for anything requiring real interactivity beyond what Telegram messages alone can do — exactly the case here (scroll + synced audio + toggle).
@@ -41,8 +42,8 @@ Learner taps Start → bot sends scripted messages → bot sends a button
 ## Sound toggle re-enable behavior (corrected 20 August 2026 — ambiguity resolved)
 **Confirmed:** audio restarts from the first speech of whatever page the learner is currently on — scoped per-page, not global. If they're viewing page 6 when they re-enable sound, page 6's own first speech plays from the start. This means audio and the visible page are always matched — there's no scenario where one page's dialogue plays while a different page is on screen.
 
-## Bot trigger sequence (confirmed 20 August 2026)
-Day 29 is triggered by the same scheduler as every other lesson (pg_cron + delivery route from Checkpoint 3) — no special scheduling logic needed. The difference is only in *what gets sent*: instead of the normal picture → text → audio → activity message sequence, Day 29 sends a short Kiki-style buildup (see below), ending in a button that opens the living comic as a Telegram Web App.
+## Bot trigger sequence (confirmed 20 August 2026; reconfirmed 22 August 2026)
+Day 29 is triggered by the same scheduler as every other lesson (pg_cron + delivery route from Checkpoint 3) — no special scheduling logic needed, and **no manual "tap Start" or any other learner-initiated action required.** The difference is only in *what gets sent*: instead of the normal picture → text → audio → activity message sequence, Day 29 sends a short Kiki-style buildup (see below), ending in a button that opens the living comic as a Telegram Web App. The only thing the learner actively does is tap that one button when it arrives — everything before it (the buildup messages) is sent automatically, exactly like Days 1–28's content arrives automatically.
 
 ## Entry message sequence (Kiki-style buildup, draft)
 Matching the anticipation-building pattern from the Kiki reference — a few short messages before the button, framing this as a quest:
@@ -72,23 +73,29 @@ A hidden 9th "page" appears after the 8 story pages — not part of the narrativ
 - **Unlimited wrong attempts** — the learner can keep answering incorrectly with no penalty or lockout.
 - **Once answered correctly, the question locks permanently** — it cannot be answered again after the first correct answer.
 
-**Completion reward (confirmed 20 August 2026):** upon the correct answer, the question locks and shows a 2-panel congratulations comic — silent, **no audio attached**:
-- **Panel 1:** a Thai monkey mascot character, celebrating, saying something congratulatory (English, draft: "You did it! 🎉") — a new character introduced specifically for this celebratory moment, distinct from the story's human cast.
-- **Panel 2:** same monkey, speech bubble showing the Karaoke text "**gèng-mâak**" (เก่งมาก — "you're doing great / well done!") — teaching one small bonus phrase as part of the celebration itself, consistent with the product never missing a chance to teach something real, even in a reward moment.
+**Completion reward — replaced 22 August 2026, monkey mascot concept removed entirely.** Upon the correct answer, the question locks and shows a warm, personal **text-only completion message** — no illustration, no audio, no new character:
 
-This means the page count and indicator become **9 pages total**, not 8 — worth reflecting in the navigation UI's page counter from the start rather than bolting it on later.
+> ✨ It's been 29 days since you started the course!
+>
+> I really hope you've gotten to try out some of these phrases with real people along the way — even one small conversation makes it worth it.
+>
+> There's just one more day to go... and I am so looking forward to it. 👀🎉
+
+*(Confirmed by Joule, 22 August 2026 — locked, unlike the entry message and quest question wording, which are still draft.)*
+
+This means the page count and indicator become **9 pages total**, not 8 — Page 9 is the Surprise Quest interaction itself (question → unlimited attempts → lock on correct answer → this text message), not a separate illustrated reward. Worth reflecting in the navigation UI's page counter from the start rather than bolting it on later.
 
 
 ## Resolved (previously open, now confirmed 20 August 2026)
 - ~~Exact navigation mechanic~~ — circular triangle prev/next buttons, page indicator at bottom center, high-end polished spacing.
 - ~~What "restart from first speech" means for current view~~ — resolved: scoped per-current-page, not global. Audio always matches whatever page is visible.
 - ~~How Day 29 integrates with existing bot architecture~~ — same scheduler trigger as any lesson; only the message content differs (buildup + Web App button instead of the normal picture/text/audio/activity sequence).
-- ~~Surprise Quest lock-state display~~ — 2-panel silent congratulations comic featuring a new Thai monkey mascot character, teaching "เก่งมาก" (gèng-mâak) as a bonus phrase.
+- ~~Surprise Quest lock-state display~~ — **superseded 22 August 2026:** the monkey mascot concept was removed entirely; the correct-answer reward is now a text-only completion message (see "Completion reward" above), no illustration or new character.
 - ~~Hosting~~ — alongside the existing Vercel app from Checkpoints 1–3, not a separate GitHub Pages site (simpler: one hosting stack, reusing what's already built).
 - ~~Distractor place names~~ — Chiang Dao, Mae Kam Pong, Doi Pui (correct), Doi Inthanon.
 
 ## Open questions for the next design pass (remaining)
-None currently outstanding — this spec is now fully specified pending your review of the drafted copy (entry message, Surprise Quest question wording, monkey's Panel 1 line) and the actual technical build, which hasn't started.
+None currently outstanding — this spec is now fully specified pending your review of the remaining drafted copy (entry message, Surprise Quest question wording — the completion message is now confirmed) and the actual technical build, which hasn't started.
 
 ## Explicitly not decided yet
 This document captures the *style spec* and *prototype analysis* only. No locked decision has been made about exact technical implementation, hosting, or how this integrates with the existing Checkpoint 1–3 architecture. That's the next real conversation, once Joule is ready for it.

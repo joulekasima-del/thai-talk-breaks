@@ -109,7 +109,7 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Day 29 narration audio | 🟡 **8 of 18 lines have a dedicated recording; 10 need fresh recording under LDTKB-045** (no more cross-lesson audio reuse — even the 9 lines with text identical to existing pilot/Week 2/4 audio need their own Day 29-specific file). See `day29-audio-map.md` for the full per-panel list of what's needed. Page 8's audio file was also renamed from `panel2` to `panel1` (naming fix — the story only ever specified one panel for that page). |
 | Day 30 quiz content (10 questions) | ✅ Complete — all 30 audio files recorded (10 correct + 20 distractors, LDTKB-045), distractor pairing fixed, button wording (English text, LDTKB-046) locked. See `day30-quiz-content.md` and `day30-button-wording.md` |
 | Day 30 completion badge (text/emoji) | ✅ Drafted ("🏅 Thai Talk Breaks Graduate") — draft only, not yet finalized/reviewed |
-| Day 29 monkey mascot celebration image | ⬜ Not generated — part of the unbuilt Day 29 living comic Web App, not Day 30; see `day29-living-comic-spec.md` |
+| Day 29 Surprise Quest completion message | ✅ Confirmed 22 Aug 2026 (text-only, no illustration — monkey mascot concept removed); see `day29-living-comic-spec.md` |
 | Day 30 quiz functionality | ✅ Complete 22 Aug 2026 — implemented and tested in Checkpoint 4 (46/46 tests passing), pushed |
 
 ### Category 2 — Technical/operational systems (code)
