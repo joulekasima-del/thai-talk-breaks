@@ -4,12 +4,16 @@
 // by callback taps (like onboarding_step's progression), all within
 // whatever single cron tick first reaches Day 30 for a learner.
 //
-// Per day30-quiz-content.md's own worked example, only the CORRECT answer's
-// audio plays — see day30Content.ts's header comment for why the 20
-// distractor files aren't loaded here. Per LDTKB-045, none of this reuses
-// Checkpoint 3's dynamic distractor-selection logic (distractors.ts) —
-// Day 30's three options per question are the fixed, pre-authored set from
-// day30-button-wording.md, not randomly drawn from other lessons.
+// Per LDTKB-046's 22 August 2026 amendment (Checkpoint 4 follow-up): the
+// upfront prompt always plays the correct answer's audio (unchanged), and
+// on tap, the TAPPED button also plays its own real audio — correct button
+// -> correct-answer clip, each distractor button -> its own distractor
+// clip. Every button's audio is always the true audio for its own English
+// label; no "lying label" scheme (considered and explicitly rejected, see
+// LDTKB-046). Per LDTKB-045, none of this reuses Checkpoint 3's dynamic
+// distractor-selection logic (distractors.ts) — Day 30's three options per
+// question are the fixed, pre-authored set from day30-button-wording.md,
+// not randomly drawn from other lessons.
 
 import type { MediaFile, TelegramCallbackQuery, TelegramClient } from "@/lib/telegram";
 import type { LearnerStore } from "@/lib/onboarding/learnerStore";
@@ -42,19 +46,32 @@ function shuffle<T>(items: T[], rng: Rng): T[] {
   return copy;
 }
 
+// Option "kind" identifies which of a question's 3 audio files a button is
+// truthfully paired with — encoded in callback_data so a tap can play back
+// that exact file (LDTKB-046's 22 August amendment), not just report
+// correct/incorrect.
+type OptionKind = "c" | "d1" | "d2";
+
+function audioFileForKind(question: ReturnType<typeof getDay30Question>, kind: OptionKind): string {
+  if (kind === "c") return question.correctAudioFile;
+  if (kind === "d1") return question.distractorAudioFiles[0];
+  return question.distractorAudioFiles[1];
+}
+
 async function sendQuestion(chatId: number, questionIndex: number, deps: Day30QuizDeps): Promise<void> {
   const rng = deps.rng ?? Math.random;
   const question = getDay30Question(questionIndex);
-
   const loadAudio = deps.loadAudio ?? loadDay30Audio;
-  const audio = await loadAudio(question.correctAudioFile);
-  await deps.telegram.sendAudio(chatId, audio, `Question ${questionIndex}/${DAY30_QUESTION_COUNT}`);
+
+  // Upfront prompt audio — unchanged from before this fix.
+  const promptAudio = await loadAudio(question.correctAudioFile);
+  await deps.telegram.sendAudio(chatId, promptAudio, `Question ${questionIndex}/${DAY30_QUESTION_COUNT}`);
 
   const options = shuffle(
     [
-      { text: question.correctButtonText, correct: true },
-      { text: question.distractorButtonTexts[0], correct: false },
-      { text: question.distractorButtonTexts[1], correct: false },
+      { text: question.correctButtonText, kind: "c" as OptionKind },
+      { text: question.distractorButtonTexts[0], kind: "d1" as OptionKind },
+      { text: question.distractorButtonTexts[1], kind: "d2" as OptionKind },
     ],
     rng,
   );
@@ -62,7 +79,7 @@ async function sendQuestion(chatId: number, questionIndex: number, deps: Day30Qu
   await deps.telegram.sendMessage(
     chatId,
     "What did you hear?",
-    [options.map((o) => ({ text: o.text, callback_data: `quiz:${questionIndex}:${o.correct ? 1 : 0}` }))],
+    [options.map((o) => ({ text: o.text, callback_data: `quiz:${questionIndex}:${o.kind}` }))],
   );
 }
 
@@ -96,10 +113,12 @@ export async function handleDay30QuizCallback(
   const chatId = callbackQuery.message?.chat.id;
   if (chatId === undefined) return;
 
-  const parts = data.split(":"); // "quiz", questionIndex, correctness
+  const parts = data.split(":"); // "quiz", questionIndex, optionKind ("c"|"d1"|"d2")
   if (parts.length !== 3) return;
   const questionIndex = Number(parts[1]);
-  const isCorrect = parts[2] === "1";
+  const kind = parts[2];
+  if (kind !== "c" && kind !== "d1" && kind !== "d2") return;
+  const isCorrect = kind === "c";
 
   const learner = await deps.learnerStore.findByTelegramId(callbackQuery.from.id);
   if (!learner) return;
@@ -110,6 +129,14 @@ export async function handleDay30QuizCallback(
   }
 
   const question = getDay30Question(questionIndex);
+
+  // The tapped button's own real audio — LDTKB-046's 22 August amendment.
+  // Plays before the feedback message, in addition to (not instead of) the
+  // upfront prompt audio already sent when the question was shown.
+  const loadAudio = deps.loadAudio ?? loadDay30Audio;
+  const tappedAudio = await loadAudio(audioFileForKind(question, kind));
+  await deps.telegram.sendAudio(chatId, tappedAudio);
+
   const updated = await deps.quizStore.recordAnswer(progress.id, isCorrect);
   await deps.telegram.sendMessage(chatId, isCorrect ? POSITIVE_FEEDBACK : negativeFeedback(question.correctButtonText));
 
