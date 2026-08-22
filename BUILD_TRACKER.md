@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Build Tracker
 
-**Tracker version:** 1.9  
-**Last updated:** 21 August 2026  
+**Tracker version:** 2.0  
+**Last updated:** 22 August 2026  
 **Project owner:** Joule  
 **Current stage:** Stage 3 — Complete (Week 1 only). Full 30-day delivery tracked via new checklist below.  
 **Overall status:** See Full 30-Day Delivery Checklist for real progress across all 4 categories
@@ -120,7 +120,7 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Checkpoint 2 (onboarding webhook) | ✅ Done |
 | Checkpoint 3 (scheduler + delivery) | ✅ Done |
 | Checkpoint 4 (activity handling, Lessons 2–7 + Day 30 quiz-ladder) | ✅ Done 22 Aug 2026 — 46/46 tests passing, pushed (`5cb1129`) |
-| Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ⬜ Not started — scoped out of Checkpoint 4 (21 days, 4-way male/female × younger/older branching on Days 15/17/21); unblocked now that Weeks 2–4 audio is complete, but not yet prompted |
+| Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ✅ Done 22 Aug 2026 — 62/62 tests passing, pushed (`e144b5f`). Word-set activity pattern for Days 8/10/16/26 (Day 10 corrected into scope after being missed in original planning); Day 25 uses example #1; Days 15/17/21/22 use younger form only (LDTKB-047), with representative examples (Dtôm/Nók/ดูหนัง/รถติด) now documented in `week3-lessons-15-21.md` and correctly delivered in code |
 | Day 29 living comic Web App | 🟡 Spec done, zero code written |
 
 ### Category 3 — Deployment & real-world verification
