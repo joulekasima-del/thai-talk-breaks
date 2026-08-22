@@ -49,6 +49,38 @@ test("Days 15, 17, 21, 22 use only the younger-speaker form (ผม/หนู) �
   }
 });
 
+// --- Checkpoint 5 follow-up: Days 15/17/21 delivered text -----------------
+
+test("Days 15, 17, 21 deliver the resolved representative-example text, not the literal '...' placeholder", () => {
+  const expected = {
+    15: {
+      karaoke: { male: "phǒm chêu Dtôm kráp", female: "nǔu chêu Nók kâ" },
+      script: { male: "ผมชื่อต้อมครับ", female: "หนูชื่อนกค่ะ" },
+    },
+    17: {
+      karaoke: { male: "phǒm chôrp duu-nǎng kráp", female: "nǔu chôrp duu-nǎng kâ" },
+      script: { male: "ผมชอบดูหนังครับ", female: "หนูชอบดูหนังค่ะ" },
+    },
+    21: {
+      karaoke: { male: "phǒm mâi-chôrp rót-dtìt kráp", female: "nǔu mâi-chôrp rót-dtìt kâ" },
+      script: { male: "ผมไม่ชอบรถติดครับ", female: "หนูไม่ชอบรถติดค่ะ" },
+    },
+  } as const;
+
+  for (const day of [15, 17, 21] as const) {
+    const lesson = getLesson(day);
+    if (lesson.kind !== "phrase") throw new Error(`expected day ${day} to be a phrase lesson`);
+    assert.equal(lesson.karaoke.male, expected[day].karaoke.male);
+    assert.equal(lesson.karaoke.female, expected[day].karaoke.female);
+    assert.equal(lesson.script.male, expected[day].script.male);
+    assert.equal(lesson.script.female, expected[day].script.female);
+    assert.ok(!lesson.karaoke.male.includes("..."), `day ${day} karaoke.male must not contain literal "..."`);
+    assert.ok(!lesson.karaoke.female.includes("..."), `day ${day} karaoke.female must not contain literal "..."`);
+    assert.ok(!lesson.script.male.includes("..."), `day ${day} script.male must not contain literal "..."`);
+    assert.ok(!lesson.script.female.includes("..."), `day ${day} script.female must not contain literal "..."`);
+  }
+});
+
 test("no age-branching logic exists: content.ts has no 'older'/'younger' input parameter anywhere", () => {
   // Structural check: getLesson takes only a lessonNumber, no age/relative-age
   // argument. This is implicit in getLesson's signature already being

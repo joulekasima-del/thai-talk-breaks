@@ -200,18 +200,14 @@ const DAY_14: GenderBranchedLesson = {
   script: { male: "เจอกันใหม่ครับ", female: "เจอกันใหม่ค่ะ" },
 };
 
-// Day 15 — template phrase (name inserted after "chêu"). Per LDTKB-047,
-// only the younger-speaker form is delivered/tested (ผม/หนู, never พี่).
-// The literal template text (with "..." where a name goes) is used as-is
-// from the source file — the exact name/example actually spoken in the
-// recorded audio is not documented anywhere in the repo; flagged in the
-// report rather than guessed at.
+// Day 15 — representative example "Dtôm"/"Nók", per week3-lessons-15-21.md.
+// Younger-speaker form only, per LDTKB-047 (ผม/หนู, never พี่).
 const DAY_15: GenderBranchedLesson = {
   kind: "phrase",
   lessonNumber: 15,
   englishMeaning: "My name is...",
-  karaoke: { male: "phǒm chêu ... kráp", female: "nǔu chêu ... kâ" },
-  script: { male: "ผมชื่อ...ครับ", female: "หนูชื่อ...ค่ะ" },
+  karaoke: { male: "phǒm chêu Dtôm kráp", female: "nǔu chêu Nók kâ" },
+  script: { male: "ผมชื่อต้อมครับ", female: "หนูชื่อนกค่ะ" },
 };
 
 const DAY_16: WordSetLesson = {
@@ -224,14 +220,14 @@ const DAY_16: WordSetLesson = {
   ],
 };
 
-// Day 17 — template phrase (activity inserted after "chôrp"). Younger form
-// only, per LDTKB-047 — same flagged-template caveat as Day 15.
+// Day 17 — representative example "ดูหนัง" (watching movies), per
+// week3-lessons-15-21.md. Younger form only, per LDTKB-047.
 const DAY_17: GenderBranchedLesson = {
   kind: "phrase",
   lessonNumber: 17,
   englishMeaning: "I like...",
-  karaoke: { male: "phǒm chôrp ... kráp", female: "nǔu chôrp ... kâ" },
-  script: { male: "ผมชอบ...ครับ", female: "หนูชอบ...ค่ะ" },
+  karaoke: { male: "phǒm chôrp duu-nǎng kráp", female: "nǔu chôrp duu-nǎng kâ" },
+  script: { male: "ผมชอบดูหนังครับ", female: "หนูชอบดูหนังค่ะ" },
 };
 
 const DAY_18: GenderBranchedLesson = {
@@ -258,14 +254,14 @@ const DAY_20: GenderBranchedLesson = {
   script: { male: "ขอโทษครับ", female: "ขอโทษค่ะ" },
 };
 
-// Day 21 — template phrase (activity inserted after "chôrp"). Younger form
-// only, per LDTKB-047 — same flagged-template caveat as Days 15/17.
+// Day 21 — representative example "รถติด" (traffic), per
+// week3-lessons-15-21.md. Younger form only, per LDTKB-047.
 const DAY_21: GenderBranchedLesson = {
   kind: "phrase",
   lessonNumber: 21,
   englishMeaning: "I don't like it",
-  karaoke: { male: "phǒm mâi chôrp ... kráp", female: "nǔu mâi chôrp ... kâ" },
-  script: { male: "ผมไม่ชอบ...ครับ", female: "หนูไม่ชอบ...ค่ะ" },
+  karaoke: { male: "phǒm mâi-chôrp rót-dtìt kráp", female: "nǔu mâi-chôrp rót-dtìt kâ" },
+  script: { male: "ผมไม่ชอบรถติดครับ", female: "หนูไม่ชอบรถติดค่ะ" },
 };
 
 // Day 22 — headache phrase, LDTKB-048's named canonical phrase for this
