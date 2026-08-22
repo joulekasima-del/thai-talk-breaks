@@ -110,7 +110,7 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Day 30 quiz content (10 questions) | ✅ Complete — all 30 audio files recorded (10 correct + 20 distractors, LDTKB-045), distractor pairing fixed, button wording (English text, LDTKB-046) locked. See `day30-quiz-content.md` and `day30-button-wording.md` |
 | Day 30 completion badge (text/emoji) | ✅ Drafted ("🏅 Thai Talk Breaks Graduate") — draft only, not yet finalized/reviewed |
 | Day 29 monkey mascot celebration image | ⬜ Not generated — part of the unbuilt Day 29 living comic Web App, not Day 30; see `day29-living-comic-spec.md` |
-| Day 30 quiz functionality | 🟡 Content unblocked 22 Aug 2026 — all 30 audio files + button wording complete; awaiting Checkpoint 4 implementation |
+| Day 30 quiz functionality | ✅ Complete 22 Aug 2026 — implemented and tested in Checkpoint 4 (46/46 tests passing), pushed |
 
 ### Category 2 — Technical/operational systems (code)
 
@@ -119,7 +119,7 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Checkpoint 1 (foundation) | ✅ Done |
 | Checkpoint 2 (onboarding webhook) | ✅ Done |
 | Checkpoint 3 (scheduler + delivery) | ✅ Done |
-| Checkpoint 4 (activity handling, Lessons 2–7 + Day 30 quiz-ladder) | 🟡 Prompt written, not yet run |
+| Checkpoint 4 (activity handling, Lessons 2–7 + Day 30 quiz-ladder) | ✅ Done 22 Aug 2026 — 46/46 tests passing, pushed (`5cb1129`) |
 | Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ⬜ Not started — scoped out of Checkpoint 4 (21 days, 4-way male/female × younger/older branching on Days 15/17/21); unblocked now that Weeks 2–4 audio is complete, but not yet prompted |
 | Day 29 living comic Web App | 🟡 Spec done, zero code written |
 

@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.0  
+**Register version:** 4.2  
 **Last updated:** 22 August 2026  
 **Authority:** Joule
 
@@ -492,6 +492,23 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Amended 22 August 2026 — button audio playback clarified:** Checkpoint 4's first implementation only played the correct answer's audio once, upfront, as the question prompt, and never played the 2 distractor audio files at all. **Clarified:** each of the 3 buttons plays its own real, true audio when tapped — the correct button plays the correct-answer clip, each distractor button plays its own distractor clip — in addition to (not instead of) the existing upfront prompt audio and the existing correctness logic. **Explicitly rejected:** a "lying label" variant where a button's English text might not match its own audio (find the one that's truthful) — this was considered and rejected as materially more complex to build correctly (needs a scheme to guarantee exactly one truthful pairing per question, more state, more per-question content-design judgment) for a marginal gameplay difference. The simpler, already-tested correct/distractor design and its correctness logic are unchanged; this amendment only adds audio playback to the 2 previously-unused distractor files.  
 **Locked by:** Joule's confirmation, 22 August 2026.
 
+## LDTKB-047 — Age-relative pronoun default: younger form for everyone
+
+**Status:** Locked  
+**Decision:** Resolves LDTKB-040's flagged open question ("does the app determine whether a learner is younger or older than whoever they're speaking to?"). **Answer: it doesn't ask — every learner is taught and tested on the younger-speaker form** (ผม for male, หนู for female), regardless of their actual age or the age of who they're talking to in real life.  
+**Scope:** Applies to every day using LDTKB-040's four-way branching — currently Days 15, 17, 21, and Day 22's headache phrase. The older form (พี่) is still taught as reference content within the lesson (learners see all 4 forms in the lesson material), but only the younger-form audio/answer is used for delivery and the recognition-tap activity's correct answer.  
+**Rationale:** Simpler to build and test than an onboarding question or per-lesson choice, at the cost of personalization. All 4 audio variants already exist for the affected days (`_male_younger`, `_male_older`, `_female_younger`, `_female_older` — see `week3-audio/`, `week4-audio/`), so nothing produced is wasted; the older-form files remain available if a future onboarding question is added.  
+**Boundary:** This is a v1/pilot-simplicity choice, not a claim that the younger form is more "correct" or more commonly needed — a future onboarding question asking real age-relative context remains a reasonable enhancement, not precluded by this decision.  
+**Locked by:** Joule's confirmation, 22 August 2026.
+
+## LDTKB-048 — Weeks 2-4 activity design: word-set days and Day 25's canonical example
+
+**Status:** Locked  
+**Decision:** Two activity-design gaps for Checkpoint 5, resolved:
+1. **Days 8, 16, 26 (word-set lessons, no gender branch)** use the same activity pattern as Lesson 2's numbers: the learner hears one word spoken aloud and taps the matching English meaning from the other words in that day's set, rather than the standard single-sentence recognition-tap used elsewhere.
+2. **Day 25 ("Asking permission," 5 valid example sentences)** uses example #1 — "may I park here?" (ขอจอดรถตรงนี้ได้ไหมครับ/คะ) — as the canonical tested phrase for its recognition-tap activity. The other 4 examples remain in the lesson as teaching content/reference but aren't the activity's correct answer. All 5 examples' audio already exists and nothing produced is wasted.  
+**Locked by:** Joule's confirmation, 22 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -532,3 +549,5 @@ These are not locked decisions, not open questions blocking current work, and no
 | 20 Aug 2026 | LDTKB-044 | Scheduler day-window temporarily extended to 30 for testing only; explicitly not a change to the 7-day pilot's commercial scope; must be marked as a testing bypass in code | Joule |
 | 22 Aug 2026 | LDTKB-045 | No audio reuse rule scoped to Day 29 and Day 30 only (corrected same day from an initial "everywhere" scope) — Lessons 2-28 keep the original reuse-based distractor design | Joule |
 | 22 Aug 2026 | LDTKB-046 | Day 30 quiz audio drops ครับ/ค่ะ/คะ and gendered pronouns; on-screen buttons show English meaning, not Thai text — deliberate audio/text mismatch for genuine listening comprehension; Day 30 only | Joule |
+| 22 Aug 2026 | LDTKB-047 | Resolves LDTKB-040's open question: no onboarding question added; every learner is taught/tested the younger-speaker form (ผม/หนู) for Days 15, 17, 21, 22 — older form remains reference content only | Joule |
+| 22 Aug 2026 | LDTKB-048 | Weeks 2-4 activity design: Days 8/16/26 (word-sets) use Lesson 2's word-matching pattern; Day 25 uses example #1 ("may I park here?") as its canonical tested phrase | Joule |
