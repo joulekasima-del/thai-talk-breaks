@@ -3,10 +3,10 @@
 // All I/O (Telegram, DB, file reads) is behind injected interfaces, so this
 // is unit-testable the same way handleUpdate.ts was in Checkpoint 2.
 
-import { getLesson, type GenderBranch, type Lesson } from "@/lib/curriculum/content";
+import { getLesson, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
 import type { MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
-import { pickCrossLessonDistractors, pickNumberDistractors, type Rng } from "@/lib/delivery/distractors";
+import { pickCrossLessonDistractors, pickNumberDistractors, pickWordSetDistractors, type Rng } from "@/lib/delivery/distractors";
 
 export interface MediaLoader {
   loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
@@ -14,6 +14,9 @@ export interface MediaLoader {
   loadNumberAudio(numberValue: number): Promise<MediaFile>;
   loadNumberImage(numberValue: number): Promise<MediaFile>;
   loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
+  /** Checkpoint 5 — Weeks 2-4 word-set days (8, 10, 16, 26). */
+  loadWordSetAudio(dayNumber: number, wordIndex: number): Promise<MediaFile>;
+  loadWordSetImage(dayNumber: number): Promise<MediaFile>;
 }
 
 export interface DeliverLessonInput {
@@ -71,8 +74,10 @@ export async function deliverLesson(input: DeliverLessonInput, deps: DeliverLess
 
   if (lesson.kind === "phrase") {
     await deliverPhraseLesson(input, lesson, deps, now);
-  } else {
+  } else if (lesson.kind === "numbers") {
     await deliverNumbersLesson(input, deps, now);
+  } else {
+    await deliverWordSetLesson(input, lesson, deps, now);
   }
 
   return await deliverActivity(input, lesson, deps, rng);
@@ -135,6 +140,35 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
 }
 
 /**
+ * Word-set days (8, 10, 16, 26 — Checkpoint 5, LDTKB-048). Same overall
+ * shape as deliverNumbersLesson (text summary -> guard -> per-word audio),
+ * but with exactly ONE shared image (confirmed against the actual
+ * week{2,3,4}-images/ files — see content.ts's WordSetLesson doc), sent
+ * once upfront rather than one image per word.
+ */
+async function deliverWordSetLesson(
+  input: DeliverLessonInput,
+  lesson: WordSetLesson,
+  deps: DeliverLessonDeps,
+  now: Date,
+): Promise<void> {
+  const image = await deps.media.loadWordSetImage(input.lessonNumber);
+  await deps.telegram.sendPhoto(input.chatId, image);
+
+  const summary = lesson.words.map((w) => `${w.karaoke} — ${w.meaning}`).join("\n");
+  await deps.telegram.sendMessage(input.chatId, `Day ${input.lessonNumber}\n\n${summary}`);
+
+  // Guard point, same rule as the other two delivery paths: text/visual first.
+  const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, input.lessonNumber, input.deliveryDate, now.toISOString());
+
+  for (const w of lesson.words) {
+    const audio = await deps.media.loadWordSetAudio(input.lessonNumber, w.index);
+    await deps.telegram.sendAudio(input.chatId, audio, w.meaning);
+  }
+  await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
+}
+
+/**
  * LDTKB-026: 2-3 audio clips as inline buttons, one correct. Sent as
  * separate labeled audio messages (A/B/[C]) followed by one message with
  * inline buttons — Telegram has no single "audio quiz" message type.
@@ -167,6 +201,29 @@ async function deliverActivity(
       input.chatId,
       "Which one was it?",
       [options.map((o, i) => ({ text: labels[i], callback_data: `activity:num:${correct}:${o.value === correct ? 1 : 0}` }))],
+    );
+    return { status: "delivered" };
+  }
+
+  if (lesson.kind === "wordset") {
+    const correctWord = lesson.words[Math.floor(rng() * lesson.words.length)];
+    const distractorIndexes = pickWordSetDistractors(correctWord.index, lesson.words.length, rng);
+    const options = shuffleWithCorrectMarked([correctWord.index, ...distractorIndexes], correctWord.index, rng);
+
+    await deps.telegram.sendMessage(input.chatId, "Which word did you hear? Listen to each clip:");
+    for (let i = 0; i < options.length; i++) {
+      const audio = await deps.media.loadWordSetAudio(input.lessonNumber, options[i].value);
+      await deps.telegram.sendAudio(input.chatId, audio, `Option ${labels[i]}`);
+    }
+    await deps.telegram.sendMessage(
+      input.chatId,
+      "Which one was it?",
+      [
+        options.map((o, i) => ({
+          text: labels[i],
+          callback_data: `activity:wordset:${input.lessonNumber}:${correctWord.index}:${o.value === correctWord.index ? 1 : 0}`,
+        })),
+      ],
     );
     return { status: "delivered" };
   }

@@ -50,3 +50,15 @@ export function pickNumberDistractors(correctNumber: number, rng: Rng = Math.ran
   const others = Array.from({ length: 10 }, (_, i) => i + 1).filter((n) => n !== correctNumber);
   return shuffle(others, rng).slice(0, 2);
 }
+
+/**
+ * Word-set days (8, 10, 16, 26 — LDTKB-048): distractors are OTHER words
+ * from the same day's own set — exactly analogous to pickNumberDistractors
+ * (an intra-lesson concern, not cross-lesson), but parameterized by set
+ * size since word sets range from 3 to 4 words (Lesson 2's numbers are
+ * always fixed at 10, so pickNumberDistractors doesn't need this param).
+ */
+export function pickWordSetDistractors(correctIndex: number, wordSetSize: number, rng: Rng = Math.random): number[] {
+  const others = Array.from({ length: wordSetSize }, (_, i) => i + 1).filter((n) => n !== correctIndex);
+  return shuffle(others, rng).slice(0, 2);
+}
