@@ -32,8 +32,11 @@
 Example — Question 1:
 > **Prompt:** Play `Q1_correct_answer.mp3` (the learner hears "สวัสดี," no particle).
 > **Options shown as 3 buttons, English text only** (per LDTKB-046): "Hello" / "Sorry" / "See you again" — order randomized per LDTKB-043's spirit of not telegraphing the answer position.
-> **On correct tap:** brief positive feedback, advance to Question 2.
-> **On incorrect tap:** brief gentle feedback (e.g. "Not quite — that was 'Hello'"), still advance (no retry loop, keeps the ladder moving).
+> **On tap (amended 22 August 2026):** the tapped button plays **its own real audio** — tapping "Hello" plays `Q1_correct_answer.mp3` again, tapping "Sorry" plays `Q1_distractor-1.mp3`, tapping "See you again" plays `Q1_distractor-2.mp3` — then feedback follows based on whether the tapped button was correct.
+> **On correct tap:** its own audio plays, then brief positive feedback, advance to Question 2.
+> **On incorrect tap:** its own (wrong) audio plays, then brief gentle feedback (e.g. "Not quite — that was 'Hello'"), still advance (no retry loop, keeps the ladder moving).
+
+**Note:** this means all 30 audio files are used — the correct-answer clip plays twice (once as the upfront prompt, once again if the learner taps the correct button) and each distractor clip plays once, if and when its button is tapped. No button's label is ever false to its own audio — see LDTKB-046's amendment for why a "lying label" variant was considered and rejected.
 
 **Full distractor pairing (fixed set, resolved 22 August 2026 — see Open Items):**
 
