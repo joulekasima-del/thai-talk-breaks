@@ -35,9 +35,9 @@
 > เอากาแฟเย็นหนึ่งแก้วค่ะ หวานน้อยนะคะ *(ao-gaa-fae-yen-nèung-gâew-kâ, wǎan-nói-ná-ká)*
 
 **Panel 2:** Barista nods.
-> 🟡 ได้ค่ะ *(dâi-kâ)*
+> 🟡 ได้ครับ *(dâi-kráp)*
 
-*🟡 "ได้ค่ะ" = "Sure / can do." One of the single most common everyday replies in Thai — never explicitly taught, but heard constantly once you start speaking.*
+*🟡 "ได้ครับ" = "Sure / can do." One of the single most common everyday replies in Thai — never explicitly taught, but heard constantly once you start speaking. **Corrected 21 August 2026:** the barista in the illustration is male; the script previously used the female particle ค่ะ (dâi-kâ), a gender-agreement error caught during review. Now correctly ครับ.*
 
 ---
 

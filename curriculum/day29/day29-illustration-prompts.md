@@ -1,7 +1,7 @@
 # Day 29 — Illustration Prompts (All 17 Panels)
 For Adobe Firefly (per LDTKB-027). Each prompt includes the exact Karaoke text to render inside the speech bubble — review every result carefully, since AI text rendering (especially Latin diacritics) is genuinely unreliable and may come out garbled.
 
-**Base style (implicit in every prompt):** semi-comic-book illustration style, clean bold outlines, flat color shading, warm and friendly tone, speech bubble with clearly legible sans-serif text, vertical or landscape composition suitable for video.
+**Base style (implicit in every prompt):** semi-comic-book illustration style, clean bold outlines, flat color shading, warm and friendly tone, speech bubble with clearly legible sans-serif text. **Vertical single-column page composition, panels stacked top-to-bottom** (not side-by-side/landscape) — this is the established format for all 8 pages. **No page title or heading text, and no Thai script anywhere in the image other than the exact speech bubble text specified for each panel.** Small, decorative ambient English text (e.g. a generic cafe menu board, a shop sign) is fine and helps the scene feel real — keep it small, secondary, and legible-but-generic (not a large invented heading, and not competing visually with the speech bubbles). **Corrected 21 August 2026:** the previous wording ("vertical or landscape composition suitable for video") was ambiguous and produced a side-by-side layout with an invented page title and prominent menu-board text on a Page 2 regeneration; "suitable for video" is also a known risky phrase with Firefly (per the pilot's illustration gotchas — it can get misread as an instruction to render actual video-player UI chrome). Use neutral, explicit dimensional language instead: "tall vertical aspect ratio, panels stacked top-to-bottom," and avoid "suitable for video/mobile app" phrasing entirely. **Production/audio notes for each page belong in that page's own "Production notes" subsection, never inline in the panel description itself** — mixing metadata into the visual prompt is what caused Firefly to render extra text on the Page 2 regeneration.
 
 ---
 
@@ -19,9 +19,15 @@ For Adobe Firefly (per LDTKB-027). Each prompt includes the exact Karaoke text t
 ## Page 2 — Coffee Shop
 *Character: same woman*
 
-**Panel 1:** Semi-comic-book illustration style, clean bold outlines, flat color shading, warm tone. The woman stands at a small Thai cafe counter, ordering. Two small speech bubbles above her, in sequence: the first contains the text "ao-gaa-fae-yen-nèung-gâew-kâ" in a clear sans-serif font, the second contains the text "wǎan-nói-ná-ká" in a clear sans-serif font. Cafe menu board visible in background.
+**Panel 1:** Semi-comic-book illustration style, clean bold outlines, flat color shading, warm tone. The woman stands at a small Thai cafe counter, ordering. Two small speech bubbles above her, in sequence: the first contains the text "ao-gaa-fae-yen-nèung-gâew-kâ" in a clear sans-serif font, the second contains the text "wǎan-nói-ná-ká" in a clear sans-serif font. Cafe menu board visible in background with small, generic, decorative English cafe signage (menu-style text is fine) — no Thai script, no large heading.
 
-**Panel 2:** Same style. A barista behind the counter nods, smiling. Speech bubble above the barista contains the text "dâi-kâ" in a clear sans-serif font.
+**Panel 2:** Same style. A male barista behind the counter nods, smiling. Speech bubble above the barista contains the text "dâi-kráp" in a clear sans-serif font. Ambient cafe details (equipment, jars, small signage) welcome; no Thai script, no page title.
+
+**Production notes (reference only — do not include in the image generation prompt):**
+- Bubble 1 audio reuses `week2_day13_female.mp3` exactly — no new recording needed.
+- Bubble 2, "wǎan-nói-ná-ká," is distinct from the standalone "หวานน้อย" word-set clip (Day 13) — no existing audio, needs a fresh recording.
+- **Corrected 21 August 2026:** original prompt/generated image used "dâi-kâ" (female particle), a gender-agreement error against the male barista. Now "dâi-kráp." Any existing audio for this line needs regenerating in a male voice reading "ได้ครับ."
+- **Corrected 21 August 2026 (second pass):** a regeneration attempt came out landscape/side-by-side with an invented page title and menu-board text, because production notes were previously written inline in the panel description above, and the base-style vertical/no-extra-text instructions weren't explicit enough. Both fixed at the base-style level (top of this file) and by moving these notes here.
 
 ---
 
