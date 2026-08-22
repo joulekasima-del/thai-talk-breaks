@@ -24,10 +24,8 @@ For Adobe Firefly (per LDTKB-027). Each prompt includes the exact Karaoke text t
 **Panel 2:** Same style. A male barista behind the counter nods, smiling. Speech bubble above the barista contains the text "dâi-kráp" in a clear sans-serif font. Ambient cafe details (equipment, jars, small signage) welcome; no Thai script, no page title.
 
 **Production notes (reference only — do not include in the image generation prompt):**
-- Bubble 1 audio reuses `week2_day13_female.mp3` exactly — no new recording needed.
-- Bubble 2, "wǎan-nói-ná-ká," is distinct from the standalone "หวานน้อย" word-set clip (Day 13) — no existing audio, needs a fresh recording.
-- **Corrected 21 August 2026:** original prompt/generated image used "dâi-kâ" (female particle), a gender-agreement error against the male barista. Now "dâi-kráp." Any existing audio for this line needs regenerating in a male voice reading "ได้ครับ."
-- **Corrected 21 August 2026 (second pass):** a regeneration attempt came out landscape/side-by-side with an invented page title and menu-board text, because production notes were previously written inline in the panel description above, and the base-style vertical/no-extra-text instructions weren't explicit enough. Both fixed at the base-style level (top of this file) and by moving these notes here.
+- ✅ **Resolved 22 August 2026.** Image regenerated correctly (vertical layout, correct "dâi-kráp" text, no invented title/Thai script, ambient English signage present). Audio complete: bubble 1 reuses `week2_day13_female.mp3` as planned; bubble 2 ("wǎan-nói-ná-ká") recorded as `day29_page02_panel1_bubble2.mp3`; panel 2 ("dâi-kráp") recorded in a male voice as `day29_page02_panel2.mp3`.
+- Prior history: original image/audio used "dâi-kâ" (female particle) against a male barista — a gender-agreement error. First regeneration attempt came out landscape with an invented title and menu text, because production notes were written inline in the panel description and the base-style guidance wasn't explicit enough about layout/text. Both fixed at the base-style level (top of this file).
 
 ---
 
