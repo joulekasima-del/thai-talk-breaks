@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 3.8  
-**Last updated:** 21 August 2026  
+**Register version:** 4.0  
+**Last updated:** 22 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -470,6 +470,29 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Boundary:** This is explicitly **not** a change to the real pilot's commercial scope — the 7-day free pilot (per the product's core pricing model) is unaffected. The extension must be clearly marked in code as a testing bypass (e.g. a flagged constant or comment identifying it as non-production), so it cannot be mistaken for a real scope change during later review or by Claude Code in a future checkpoint.  
 **Locked by:** Joule's confirmation, 20 August 2026.
 
+## LDTKB-045 — No audio reuse across lessons/pages; every occurrence gets its own dedicated file
+
+**Status:** Locked  
+**Decision:** Audio files are never shared or referenced across lessons, days, or pages, even when the spoken phrase is textually identical to one already recorded elsewhere. Every place a phrase is spoken — a lesson's core teaching audio, a Day 29 story panel, a Day 30 quiz question, and every quiz distractor option — gets its own dedicated audio file, recorded and stored specifically for that occurrence.  
+**Reason:** A cross-referencing "reuse map" (a phrase in one lesson pointing to an audio file that physically lives in a different lesson/day's folder) proved confusing to manage and added real complexity to the bot's delivery logic, which would otherwise need to know how to fetch audio from arbitrary other locations rather than always reading from the current lesson/day's own folder.  
+**Scope — explicitly confirmed broad:** this applies everywhere, not just Day 29. In particular:
+- Day 29's living comic: all 9 previously-planned "reuse" lines (see the now-superseded `day29-audio-map.md` reuse column) need their own fresh Day-29-specific recordings, even though the text matches an existing lesson phrase exactly.
+- Day 30's quiz-ladder: both the correct-answer clip and every distractor option for all 10 questions need dedicated recordings — the quiz cannot play back a lesson's original audio file directly, even though the phrase is identical.
+**Practical effect:** this materially increases the audio production scope for both Day 29 (10 missing clips, up from 1) and Day 30 (roughly 20-30 new clips: ~10 correct-answer + ~10-20 distractor recordings, none of which exist yet), and re-blocks Day 30's quiz functionality on new audio production.  
+**Locked by:** Joule's confirmation, 22 August 2026.
+
+## LDTKB-046 — Day 30 quiz text/audio design: no particles, no pronouns, English button text, mismatched from audio on purpose
+
+**Status:** Locked  
+**Decision:** Day 30's quiz-ladder deliberately diverges from every other lesson's audio/text conventions, in three ways specific to Day 30 only:
+1. **Spoken audio drops the ครับ/ค่ะ/คะ ending particle** that every other lesson's audio includes.
+2. **Spoken audio also drops the gendered pronoun (ผม/หนู)** where the phrase would normally have one.
+3. **The on-screen button text shows the English meaning, not the Thai/Karaoke text or a repeat of the particle-stripped Thai.** The learner hears the stripped-down Thai audio and taps the English meaning that matches it.  
+**Rationale:** makes the quiz a genuine listening-comprehension test (matching sound to meaning) rather than a text-matching or particle/pronoun-recognition exercise, and deliberately keeps the written button label and the spoken audio non-identical so the learner can't just pattern-match text.  
+**Scope:** Day 30 only. Lessons 1–7 and Days 8–28 are unaffected — their audio keeps the full particle and pronoun, per LDTKB-024/040, and their activities (per LDTKB-026) remain audio-option based, not English-text-button based.  
+**Reference:** the full 30-slot Thai-audio-to-English-button mapping lives in `curriculum/day30-quiz-content.md`.  
+**Locked by:** Joule's confirmation, 22 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -508,3 +531,5 @@ These are not locked decisions, not open questions blocking current work, and no
 | 20 Aug 2026 | LDTKB-042 | Day 30 wrap-up game format locked as a 10-question quiz ladder, reusing the existing recognition-tap mechanic | Joule |
 | 20 Aug 2026 | LDTKB-043 | Day 30 quiz question selection locked as fixed curated set (not random), spanning all 4 weeks; completion shows both score and badge | Joule |
 | 20 Aug 2026 | LDTKB-044 | Scheduler day-window temporarily extended to 30 for testing only; explicitly not a change to the 7-day pilot's commercial scope; must be marked as a testing bypass in code | Joule |
+| 22 Aug 2026 | LDTKB-045 | No audio reuse across lessons/pages/quiz — every occurrence (including Day 30 quiz distractors) gets its own dedicated recording, even for identical text; re-blocks Day 30 quiz functionality on new audio production | Joule |
+| 22 Aug 2026 | LDTKB-046 | Day 30 quiz audio drops ครับ/ค่ะ/คะ and gendered pronouns; on-screen buttons show English meaning, not Thai text — deliberate audio/text mismatch for genuine listening comprehension; Day 30 only | Joule |

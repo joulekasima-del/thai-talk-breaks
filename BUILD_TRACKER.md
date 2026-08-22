@@ -106,11 +106,11 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Weeks 2–4 audio | ✅ Done (79 files: Week 2 = 25, Week 3 = 21, Week 4 = 33) — female voice recordings updated 21 Aug 2026 |
 | Weeks 2–4 images | ✅ Done (38 images: Week 2 = 12, Week 3 = 13, Week 4 = 13) |
 | Day 29 story + 8-page illustration | ✅ 8 of 8 pages confirmed correct — Page 2 regenerated 22 Aug 2026 with corrected "dâi-kráp" text, vertical layout, no invented Thai script/title |
-| Day 29 narration audio | 🟡 Partial — **7 of 8 pages have audio file(s)** (01, 02, 05, 06, 08 all confirmed; Page 2 completed 22 Aug 2026 with `day29_page02_panel1_bubble2.mp3` + `day29_page02_panel2.mp3`, male voice for panel 2). Pages 3, 4, 7 still have zero. Confirmed missing (flagged by `day29-page5-new-audio.md`, never produced): `day29_page05_panel1_dtom.mp3`. **Still unclear, needs Joule's confirmation, not assumed:** whether Page 1 panels 1–2 intentionally reuse existing pilot/Week 2 audio. `day29_page08_panel2.mp3` also exists despite `day29-story-draft.md`'s Page 8 section describing only a single "Panel 1" — naming inconsistency, unresolved. Per `day29-page5-new-audio.md`'s own note, reuse-vs-new status was only ever checked for Page 5, not the other 7 pages. |
-| Day 30 quiz content (10 questions) | ✅ Drafted, all 10 questions' audio dependencies now resolved (Weeks 2–4 audio complete) — see `day30-quiz-content.md` |
+| Day 29 narration audio | 🟡 **8 of 18 lines have a dedicated recording; 10 need fresh recording under LDTKB-045** (no more cross-lesson audio reuse — even the 9 lines with text identical to existing pilot/Week 2/4 audio need their own Day 29-specific file). See `day29-audio-map.md` for the full per-panel list of what's needed. Page 8's audio file was also renamed from `panel2` to `panel1` (naming fix — the story only ever specified one panel for that page). |
+| Day 30 quiz content (10 questions) | ✅ Complete — all 30 audio files recorded (10 correct + 20 distractors, LDTKB-045), distractor pairing fixed, button wording (English text, LDTKB-046) locked. See `day30-quiz-content.md` and `day30-button-wording.md` |
 | Day 30 completion badge (text/emoji) | ✅ Drafted ("🏅 Thai Talk Breaks Graduate") — draft only, not yet finalized/reviewed |
 | Day 29 monkey mascot celebration image | ⬜ Not generated — part of the unbuilt Day 29 living comic Web App, not Day 30; see `day29-living-comic-spec.md` |
-| Day 30 quiz functionality | 🟡 Unblocked — Weeks 2–4 audio now complete; awaiting Checkpoint 4 |
+| Day 30 quiz functionality | 🟡 Content unblocked 22 Aug 2026 — all 30 audio files + button wording complete; awaiting Checkpoint 4 implementation |
 
 ### Category 2 — Technical/operational systems (code)
 
