@@ -13,6 +13,8 @@ export interface DeliveryRecord {
   delivery_date: string;
   delivered_at: string;
   audio_delivered_at: string | null;
+  activity_answered_at: string | null;
+  activity_correct: boolean | null;
 }
 
 export interface DeliveryStore {
@@ -22,6 +24,9 @@ export interface DeliveryStore {
   markAudioSent(deliveryId: number, audioDeliveredAt: string): Promise<void>;
   /** All lesson_number values already delivered to this learner (any date) — for distractor selection. */
   listDeliveredLessonNumbers(learnerId: string): Promise<number[]>;
+  /** Most recent delivery row for this learner/lesson that hasn't had its activity answered yet (Checkpoint 4). */
+  findUnansweredActivity(learnerId: string, lessonNumber: number): Promise<DeliveryRecord | null>;
+  markActivityAnswered(deliveryId: number, correct: boolean, answeredAt: string): Promise<void>;
 }
 
 export function supabaseDeliveryStore(client: SupabaseClient): DeliveryStore {
@@ -68,6 +73,28 @@ export function supabaseDeliveryStore(client: SupabaseClient): DeliveryStore {
         .eq("learner_id", learnerId);
       if (error) throw error;
       return (data as { lesson_number: number }[]).map((row) => row.lesson_number);
+    },
+
+    async findUnansweredActivity(learnerId, lessonNumber) {
+      const { data, error } = await client
+        .from("lesson_deliveries")
+        .select("*")
+        .eq("learner_id", learnerId)
+        .eq("lesson_number", lessonNumber)
+        .is("activity_answered_at", null)
+        .order("delivered_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as DeliveryRecord | null) ?? null;
+    },
+
+    async markActivityAnswered(deliveryId, correct, answeredAt) {
+      const { error } = await client
+        .from("lesson_deliveries")
+        .update({ activity_answered_at: answeredAt, activity_correct: correct })
+        .eq("id", deliveryId);
+      if (error) throw error;
     },
   };
 }

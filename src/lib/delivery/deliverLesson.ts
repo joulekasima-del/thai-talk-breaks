@@ -139,16 +139,11 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
  * separate labeled audio messages (A/B/[C]) followed by one message with
  * inline buttons — Telegram has no single "audio quiz" message type.
  *
- * NOT implemented here: recording which button the learner presses.
- * LDTKB-026's rationale is about capturing completion/accuracy data, but
- * that requires the webhook (handleUpdate.ts) to recognize a new
- * "activity:*" callback — modifying Checkpoint 2's onboarding code wasn't
- * justified as "strictly necessary for integration" for a feature that
- * wasn't in this checkpoint's required outputs (which say "presents...as
- * inline buttons", not "records the response"). Flagged clearly in
- * SCHEDULER.md and the checkpoint report as a real, known gap — an
- * unanswered button today does nothing, silently, same as any other
- * unrecognized callback.
+ * callback_data is self-describing (`activity:phrase:<lessonNumber>:<0|1>`
+ * or `activity:num:<correctNumber>:<0|1>`) — Checkpoint 4 (see
+ * src/lib/activities/lessonActivity.ts) routes on the `activity:` prefix
+ * and reads correctness straight out of the tapped button, rather than
+ * re-deriving it from lesson content at answer time.
  */
 async function deliverActivity(
   input: DeliverLessonInput,
@@ -171,7 +166,7 @@ async function deliverActivity(
     await deps.telegram.sendMessage(
       input.chatId,
       "Which one was it?",
-      [options.map((o, i) => ({ text: labels[i], callback_data: `activity:${o.value === correct}` }))],
+      [options.map((o, i) => ({ text: labels[i], callback_data: `activity:num:${correct}:${o.value === correct ? 1 : 0}` }))],
     );
     return { status: "delivered" };
   }
@@ -205,7 +200,12 @@ async function deliverActivity(
   await deps.telegram.sendMessage(
     input.chatId,
     "Which one was it?",
-    [optionLessonNumbers.map((o, i) => ({ text: labels[i], callback_data: `activity:${o.value === input.lessonNumber}` }))],
+    [
+      optionLessonNumbers.map((o, i) => ({
+        text: labels[i],
+        callback_data: `activity:phrase:${input.lessonNumber}:${o.value === input.lessonNumber ? 1 : 0}`,
+      })),
+    ],
   );
   return { status: "delivered" };
 }

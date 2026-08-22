@@ -39,6 +39,8 @@ export class FakeDeliveryStore implements DeliveryStore {
       delivery_date: deliveryDate,
       delivered_at: deliveredAt,
       audio_delivered_at: null,
+      activity_answered_at: null,
+      activity_correct: null,
     };
     this.rows.push(row);
     this.log?.push(`delivered_at:${learnerId}:${lessonNumber}`);
@@ -54,6 +56,21 @@ export class FakeDeliveryStore implements DeliveryStore {
 
   async listDeliveredLessonNumbers(learnerId: string): Promise<number[]> {
     return this.rows.filter((r) => r.learner_id === learnerId).map((r) => r.lesson_number);
+  }
+
+  async findUnansweredActivity(learnerId: string, lessonNumber: number): Promise<DeliveryRecord | null> {
+    const row = this.rows.find(
+      (r) => r.learner_id === learnerId && r.lesson_number === lessonNumber && r.activity_answered_at === null,
+    );
+    return row ? { ...row } : null;
+  }
+
+  async markActivityAnswered(deliveryId: number, correct: boolean, answeredAt: string): Promise<void> {
+    const row = this.rows.find((r) => r.id === deliveryId);
+    if (!row) throw new Error(`no delivery row ${deliveryId}`);
+    row.activity_answered_at = answeredAt;
+    row.activity_correct = correct;
+    this.log?.push(`activity_answered_at:${row.learner_id}:${row.lesson_number}:${correct}`);
   }
 }
 

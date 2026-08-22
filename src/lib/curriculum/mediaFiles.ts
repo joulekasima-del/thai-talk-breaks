@@ -14,6 +14,7 @@ import type { GenderBranch } from "@/lib/curriculum/content";
 import type { MediaFile } from "@/lib/telegram";
 
 const CURRICULUM_ROOT = path.join(process.cwd(), "curriculum", "pilot");
+const DAY30_AUDIO_ROOT = path.join(process.cwd(), "curriculum", "day30-audio");
 
 function lessonCode(lessonNumber: number): string {
   return String(lessonNumber).padStart(2, "0");
@@ -58,4 +59,16 @@ export async function loadNumberImage(numberValue: number): Promise<MediaFile> {
 export async function loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
   if (lessonNumber === 2) return loadNumberAudio(5);
   return loadPhraseLessonAudio(lessonNumber, gender);
+}
+
+/**
+ * Day 30 quiz audio (curriculum/day30-audio/) — a separate root from the
+ * pilot's curriculum/pilot/audio/, per LDTKB-045's Day 30-only dedicated
+ * recordings. Only correct-answer files are actually loaded by the quiz
+ * delivery code (see day30Content.ts) — distractor files exist on disk but
+ * aren't read by this module.
+ */
+export async function loadDay30Audio(filename: string): Promise<MediaFile> {
+  const buffer = await readFile(path.join(DAY30_AUDIO_ROOT, filename));
+  return { buffer, filename, contentType: "audio/mpeg" };
 }

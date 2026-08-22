@@ -48,20 +48,39 @@ function daysBetween(fromDate: string, toDate: string): number {
 }
 
 /**
- * Day 1 of the pilot (the day pilot_start_date falls on) = lesson 1, day 2 =
- * lesson 2, ... day 7 = lesson 7. Day 8+ = past the pilot window, no lesson.
- * A negative "day" (today before pilot_start_date) is defensive-only — it
- * shouldn't occur, since pilot_start_date is only ever set to "today" at
- * onboarding completion (handleUpdate.ts) — but is treated the same as
- * "no lesson due" rather than throwing, since a clock skew or retry
- * shouldn't crash the whole delivery run over one learner.
+ * Day 1 of the pilot (the day pilot_start_date falls on) = day-number 1,
+ * day 2 = day-number 2, etc., up to `maxDay`. Beyond `maxDay` = past the
+ * window, no delivery. A negative day (today before pilot_start_date) is
+ * defensive-only — it shouldn't occur, since pilot_start_date is only ever
+ * set to "today" at onboarding completion (handleUpdate.ts) — but is
+ * treated the same as "nothing due" rather than throwing, since a clock
+ * skew or retry shouldn't crash the whole delivery run over one learner.
+ *
+ * `maxDay` defaults to the real 7-day pilot (LDTKB-013). Checkpoint 4's
+ * TESTING-ONLY extension to 30 (LDTKB-044) is applied by the caller passing
+ * a larger `maxDay` — see TESTING_EXTENDED_DAY_WINDOW in this file. This
+ * function has no opinion on which is "real"; it just bounds a range.
  */
-export function lessonNumberForDay(pilotStartDate: string, todayCalendarDate: string): number | null {
+export function dayNumberForLearner(pilotStartDate: string, todayCalendarDate: string, maxDay: number): number | null {
   const elapsedDays = daysBetween(pilotStartDate, todayCalendarDate);
-  const lessonNumber = elapsedDays + 1;
-  if (lessonNumber < 1 || lessonNumber > PILOT_LESSON_COUNT) return null;
-  return lessonNumber;
+  const dayNumber = elapsedDays + 1;
+  if (dayNumber < 1 || dayNumber > maxDay) return null;
+  return dayNumber;
 }
+
+/** @deprecated Checkpoint 3 name, kept for its existing tests. Equivalent to `dayNumberForLearner(..., PILOT_LESSON_COUNT)`. */
+export function lessonNumberForDay(pilotStartDate: string, todayCalendarDate: string): number | null {
+  return dayNumberForLearner(pilotStartDate, todayCalendarDate, PILOT_LESSON_COUNT);
+}
+
+// -----------------------------------------------------------------------
+// TEMPORARY TESTING BYPASS — see LDTKB-044. Real pilot scope is 7 days
+// (LDTKB-013). Do NOT treat this as the production day-window. Gated behind
+// an environment variable that defaults OFF, so a deployment without it
+// explicitly set behaves exactly like the real 7-day pilot.
+// -----------------------------------------------------------------------
+export const TESTING_EXTENDED_DAY_WINDOW = process.env.TESTING_EXTENDED_WINDOW === "true";
+export const DAY_WINDOW_MAX_DAY = TESTING_EXTENDED_DAY_WINDOW ? 30 : PILOT_LESSON_COUNT;
 
 function timeStringToMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number);
@@ -88,23 +107,29 @@ export function isWithinDeliveryWindow(
 export interface FindDueLearnersOptions {
   now: Date;
   lookbackMinutes: number;
+  /** Defaults to the real 7-day pilot. Pass DAY_WINDOW_MAX_DAY for Checkpoint 4's testing-only extension. */
+  maxDay?: number;
 }
 
 /**
- * Filters a list of fully-onboarded learners down to those due for a lesson
- * right now, and which lesson number is due. Learners with a null
- * pilot_start_date must never appear in `learners` in the first place (see
- * report item on this edge case) — this function doesn't special-case null
- * because the type doesn't allow it: callers are expected to only pass
- * learners already known to have completed onboarding.
+ * Filters a list of fully-onboarded learners down to those due right now,
+ * and which day-number is due (1-7 = an actual lesson; 8+ only reachable
+ * under the testing extension, and callers must not assume every returned
+ * lessonNumber maps to a real lesson — see cron/deliver/route.ts). Learners
+ * with a null pilot_start_date must never appear in `learners` in the first
+ * place (see report item on this edge case) — this function doesn't
+ * special-case null because the type doesn't allow it: callers are
+ * expected to only pass learners already known to have completed
+ * onboarding.
  */
 export function findDueLearners(learners: OnboardedLearner[], options: FindDueLearnersOptions): DueLearner[] {
   const { calendarDate, minutesSinceMidnight } = bangkokNow(options.now);
+  const maxDay = options.maxDay ?? PILOT_LESSON_COUNT;
   const due: DueLearner[] = [];
 
   for (const learner of learners) {
     if (!isWithinDeliveryWindow(learner.schedule_time, minutesSinceMidnight, options.lookbackMinutes)) continue;
-    const lessonNumber = lessonNumberForDay(learner.pilot_start_date, calendarDate);
+    const lessonNumber = dayNumberForLearner(learner.pilot_start_date, calendarDate, maxDay);
     if (lessonNumber === null) continue;
     due.push({ learner, lessonNumber });
   }
