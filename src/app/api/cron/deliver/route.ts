@@ -6,6 +6,7 @@ import { findDueLearners, bangkokNow, DAY_WINDOW_MAX_DAY } from "@/lib/delivery/
 import { deliverLesson, type MediaLoader } from "@/lib/delivery/deliverLesson";
 import { supabaseDay30QuizStore } from "@/lib/quiz/day30QuizStore";
 import { startDay30Quiz } from "@/lib/quiz/day30Quiz";
+import { deliverDay29Entry, DAY29_LESSON_NUMBER } from "@/lib/day29/deliverDay29Entry";
 import { WEEKS234_LAST_DAY } from "@/lib/curriculum/content";
 import {
   loadNumberAudio,
@@ -26,9 +27,9 @@ import {
 
 const LOOKBACK_MINUTES = 30; // see SCHEDULER.md "Cron interval and window"
 
-// Day-number 30 = the fixed slot for the quiz-ladder. Day 29's living comic
-// is separate, unbuilt scope and has no content — it alone must skip
-// gracefully now that Days 8-28 (Checkpoint 5) deliver real content.
+// Day-number 30 = the fixed slot for the quiz-ladder. Day 29 = the living
+// comic entry message + Web App button (Checkpoint 6) — DAY29_LESSON_NUMBER
+// is imported from deliverDay29Entry.ts rather than redefined here.
 const DAY30_QUIZ_DAY_NUMBER = 30;
 
 const media: MediaLoader = {
@@ -102,14 +103,22 @@ export async function POST(request: Request): Promise<Response> {
           { telegram, deliveryStore, media, now: () => now },
         );
         results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: result.status });
+      } else if (dayNumber === DAY29_LESSON_NUMBER) {
+        const appUrl = process.env.APP_URL;
+        if (!appUrl) throw new Error("APP_URL must be set to deliver Day 29's living comic button");
+        const result = await deliverDay29Entry(
+          { learnerId: learner.id, chatId: learner.telegram_user_id, deliveryDate: calendarDate },
+          { telegram, deliveryStore, appUrl, now: () => now },
+        );
+        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: result.status });
       } else if (dayNumber === DAY30_QUIZ_DAY_NUMBER) {
         await startDay30Quiz(learner.id, learner.telegram_user_id, { telegram, learnerStore, quizStore, now: () => now });
         results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "day30_quiz_started_or_already_in_progress" });
       } else {
-        // Day 29 only (living comic — unbuilt, separate scope). Graceful
-        // no-op, per LDTKB-044's "must not crash" requirement — only
-        // reachable at all under the testing-only extended window.
-        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "skipped_no_content_yet" });
+        // Defensive fallback only — every value findDueLearners can return
+        // (1..DAY_WINDOW_MAX_DAY, capped at 30) is now handled by one of the
+        // branches above. Kept per LDTKB-044's "must not crash" requirement.
+        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "skipped_unrecognized_day_number" });
       }
     } catch (error) {
       console.error(`Delivery failed for learner ${learner.id}, day ${dayNumber}`, error);

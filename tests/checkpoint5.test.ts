@@ -151,6 +151,7 @@ test("word-set activity distractors come only from the same day's own words, not
   const activityButtons = telegram.sent.at(-1)?.keyboard?.[0] ?? [];
   assert.equal(activityButtons.length, 3);
   for (const button of activityButtons) {
+    assert.ok("callback_data" in button, "word-set activity buttons must use callback_data, not web_app");
     assert.match(button.callback_data, /^activity:wordset:16:\d:[01]$/);
   }
 });

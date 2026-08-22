@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/syncDay29Assets.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/syncDay29Assets.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/onboarding.test.ts tests/delivery.test.ts tests/checkpoint4.test.ts tests/checkpoint5.test.ts tests/schema.test.ts"
+    "test": "tsx --test tests/onboarding.test.ts tests/delivery.test.ts tests/checkpoint4.test.ts tests/checkpoint5.test.ts tests/schema.test.ts tests/day29.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

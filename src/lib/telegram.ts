@@ -2,10 +2,13 @@
 // the Checkpoint 2 report for why: onboarding only needs sendMessage and
 // answerCallbackQuery, so a full SDK dependency isn't earning its place yet.
 
-export interface InlineKeyboardButton {
-  text: string;
-  callback_data: string;
-}
+// Telegram's actual API: a button has either callback_data OR web_app, never
+// both (https://core.telegram.org/bots/api#inlinekeyboardbutton). web_app is
+// Checkpoint 6 — Day 29's living comic is the first thing in this project
+// that opens as a genuine Telegram Web App rather than driving a callback.
+export type InlineKeyboardButton =
+  | { text: string; callback_data: string }
+  | { text: string; web_app: { url: string } };
 
 export type InlineKeyboard = InlineKeyboardButton[][];
 

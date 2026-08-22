@@ -23,3 +23,8 @@ next-env.d.ts
 
 # test coverage
 /coverage
+
+# Day 29 living comic assets — synced at build time from
+# curriculum/day29/assets/ (scripts/syncDay29Assets.mjs), not hand-maintained
+# here, so this stays a derived build artifact rather than a second tracked copy.
+/public/day29/
