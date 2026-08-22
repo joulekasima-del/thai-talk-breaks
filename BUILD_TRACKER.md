@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Build Tracker
 
-**Tracker version:** 2.0  
+**Tracker version:** 2.1  
 **Last updated:** 22 August 2026  
 **Project owner:** Joule  
 **Current stage:** Stage 3 — Complete (Week 1 only). Full 30-day delivery tracked via new checklist below.  
@@ -120,8 +120,8 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Checkpoint 2 (onboarding webhook) | ✅ Done |
 | Checkpoint 3 (scheduler + delivery) | ✅ Done |
 | Checkpoint 4 (activity handling, Lessons 2–7 + Day 30 quiz-ladder) | ✅ Done 22 Aug 2026 — 46/46 tests passing, pushed (`5cb1129`) |
-| Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ✅ Done 22 Aug 2026 — 62/62 tests passing, pushed (`e144b5f`). Word-set activity pattern for Days 8/10/16/26 (Day 10 corrected into scope after being missed in original planning); Day 25 uses example #1; Days 15/17/21/22 use younger form only (LDTKB-047), with representative examples (Dtôm/Nók/ดูหนัง/รถติด) now documented in `week3-lessons-15-21.md` and correctly delivered in code |
-| Day 29 living comic Web App | 🟡 Spec done, zero code written |
+| Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ✅ Done 22 Aug 2026 — 62/62 tests passing, pushed (`e144b5f`). Word-set activity pattern for Days 8/10/16/26 (Day 10 corrected into scope after being missed in original planning); Day 25 uses example #1; Days 15/17/21/22 use younger form only (LDTKB-047), with representative examples (Dtôm/Nók/ดูหนัง/รถติด) now documented in `week3-lessons-15-21.md` and correctly delivered in code. **Bug found and fixed 22 Aug 2026 during Checkpoint 6 scoping:** `lesson_deliveries.lesson_number`'s DB CHECK constraint was never widened past `1-7` when this checkpoint extended delivery to Days 8–28 — invisible only because nothing had been deployed against a real database yet. Fixed in a standalone hotfix (`918a514`), widened to `1-29` to also cover Day 29's entry-message tracking. |
+| Checkpoint 6 (Day 29 living comic Web App) | ✅ Done 22 Aug 2026 — 80/80 tests passing, pushed (`d47f7d5`). Scroll-synced audio (2s/3s timing per the locked spec), sound toggle, server-persisted Surprise Quest (page 9) with `initData` validated server-side via HMAC against the bot token (LDTKB-049 — not a client-trusted id). Triggered by the same scheduler as every other day, no manual start. Assets consolidated in `curriculum/day29/assets/`, synced to `public/day29/` at build time. |
 
 ### Category 3 — Deployment & real-world verification
 
