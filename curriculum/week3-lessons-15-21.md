@@ -15,7 +15,8 @@ All lessons follow the locked six-step structure (LDTKB-006), the 5-tone diacrit
 | Female, younger than listener | nǔu chêu ... kâ | rising – falling – (name) – falling | หนูชื่อ...ค่ะ |
 | Female, older than listener | phîi chêu ... kâ | falling – falling – (name) – falling | พี่ชื่อ...ค่ะ |
 
-**Note:** this is the first lesson where the pronoun itself changes (ผม/พี่/หนู), not just the krap/kha ending — per LDTKB-040. How the app determines "younger/older than listener" for a given learner is still an open technical question (see LDTKB-040's boundary note).
+**Note:** this is the first lesson where the pronoun itself changes (ผม/พี่/หนู), not just the krap/kha ending — per LDTKB-040. How the app determines "younger/older than listener" for a given learner is resolved by LDTKB-047 (younger form only, no per-learner branching) — the "older than listener" rows above remain reference/teaching content only.
+**Representative example used for the recorded audio/delivered text (documented here 22 August 2026 — previously only in `SESSION_HANDOFF.md`, never in this file):** the name "Dtôm" (male) / "Nók" (female) — i.e. the actual delivered text is ผมชื่อต้อมครับ / หนูชื่อนกค่ะ (younger form, per LDTKB-047), not the literal "..." placeholder shown in the table above. The table's "..." is a template illustration only.
 
 ## Day 16 — Family words
 **Type:** word set (no gender branch)
@@ -36,6 +37,8 @@ All lessons follow the locked six-step structure (LDTKB-006), the 5-tone diacrit
 | Male, older than listener | phîi chôrp ... kráp | falling – falling – (activity) – high | พี่ชอบ...ครับ |
 | Female, younger than listener | nǔu chôrp ... kâ | rising – falling – (activity) – falling | หนูชอบ...ค่ะ |
 | Female, older than listener | phîi chôrp ... kâ | falling – falling – (activity) – falling | พี่ชอบ...ค่ะ |
+
+**Representative example used for the recorded audio/delivered text:** "ดูหนัง" (watching movies) — the actual delivered text is ผมชอบดูหนังครับ / หนูชอบดูหนังค่ะ (younger form, per LDTKB-047). The table's "..." is a template illustration only.
 
 ## Day 18 — Making plans
 **Phrase:** Let's meet tomorrow (statement — ค่ะ, but ends in นะ so uses นะคะ per LDTKB-041)
@@ -84,9 +87,11 @@ Script: ขอโทษครับ / ขอโทษค่ะ
 
 To make a complete, natural sentence: pick your form from the table above (matching your gender and relative age), then insert the verb+object or object phrase in place of "...".
 
+**Representative example used for the recorded audio/delivered text:** "รถติด" (traffic) — the actual delivered text is ผมไม่ชอบรถติดครับ / หนูไม่ชอบรถติดค่ะ (younger form, per LDTKB-047), using the simpler "Object" form from the two patterns above. The table's "..." is a template illustration only.
+
 ---
 
 ## Open items (all Week 3 lessons)
 1. Native-speaker pronunciation/tone review — none checked yet.
-2. Days 15, 17, and 21 use LDTKB-040's four-way age-relative pronoun system (ผม/พี่ for male, หนู/พี่ for female) — a new pattern not used in Weeks 1–2. Flag for explicit review of whether this is handled correctly in both content and (eventually) delivery logic, and whether Days 16, 18–20 correctly omit it (those phrases don't require explicit self-reference in natural Thai — worth confirming this judgment is right, not just assumed).
+2. Days 15, 17, and 21 use LDTKB-040's four-way age-relative pronoun system (ผม/พี่ for male, หนู/พี่ for female) — a new pattern not used in Weeks 1–2. **Partially resolved 22 Aug 2026:** LDTKB-047 fixes delivery to the younger form only (no age-branching logic needed), and each day's representative example (Dtôm/Nók for names, ดูหนัง for hobbies, รถติด for dislikes — previously only documented in `SESSION_HANDOFF.md`) is now written into this file directly. Still open: whether Days 16, 18–20 correctly omit the pronoun system (those phrases don't require explicit self-reference in natural Thai — worth confirming this judgment is right, not just assumed), and native-speaker review of the representative examples themselves.
 3. ~~Audio and image production — not started.~~ **Resolved** — audio and images are complete for all of Weeks 2–4 (79 audio files, 38 images; see `BUILD_TRACKER.md`).

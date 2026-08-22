@@ -505,7 +505,7 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 
 **Status:** Locked  
 **Decision:** Two activity-design gaps for Checkpoint 5, resolved:
-1. **Days 8, 16, 26 (word-set lessons, no gender branch)** use the same activity pattern as Lesson 2's numbers: the learner hears one word spoken aloud and taps the matching English meaning from the other words in that day's set, rather than the standard single-sentence recognition-tap used elsewhere.
+1. **Days 8, 10, 16, 26 (word-set lessons, no gender branch)** use the same activity pattern as Lesson 2's numbers: the learner hears one word spoken aloud and taps the matching English meaning from the other words in that day's set, rather than the standard single-sentence recognition-tap used elsewhere. **Corrected 22 August 2026** — Day 10 ("Days of the week / today, tomorrow, yesterday") was missed in the original scoping of this decision; Checkpoint 5's implementation correctly caught and included it, and this record is corrected to match.
 2. **Day 25 ("Asking permission," 5 valid example sentences)** uses example #1 — "may I park here?" (ขอจอดรถตรงนี้ได้ไหมครับ/คะ) — as the canonical tested phrase for its recognition-tap activity. The other 4 examples remain in the lesson as teaching content/reference but aren't the activity's correct answer. All 5 examples' audio already exists and nothing produced is wasted.  
 **Locked by:** Joule's confirmation, 22 August 2026.
 
