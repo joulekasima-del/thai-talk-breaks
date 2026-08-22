@@ -1,6 +1,6 @@
 # Day 29 — Living Comic: Interaction Spec & Prototype Analysis
 
-**Status:** Full interaction spec confirmed by Joule, 20 August 2026 — all open questions resolved. Technical design and build not yet started. Completion message confirmed 22 August 2026; entry message and Surprise Quest question wording still draft, need review.
+**Status:** Full interaction spec confirmed by Joule, 20 August 2026 — all open questions resolved. **All copy now confirmed as of 22 August 2026** (entry message, Surprise Quest question, completion message). Technical design and build not yet started.
 
 ## What changed
 Day 29 was originally planned as a single rendered video file (Joule edits together the 8 illustrated pages + narration in a video editor, bot sends one `.mp4`). **This is now replaced** with a "living comic" — an interactive experience where the learner scrolls through the 8 pages themselves, with speech-bubble audio playing in sync as they go.
@@ -45,26 +45,24 @@ Learner taps Start → bot sends scripted messages → bot sends a button
 ## Bot trigger sequence (confirmed 20 August 2026; reconfirmed 22 August 2026)
 Day 29 is triggered by the same scheduler as every other lesson (pg_cron + delivery route from Checkpoint 3) — no special scheduling logic needed, and **no manual "tap Start" or any other learner-initiated action required.** The difference is only in *what gets sent*: instead of the normal picture → text → audio → activity message sequence, Day 29 sends a short Kiki-style buildup (see below), ending in a button that opens the living comic as a Telegram Web App. The only thing the learner actively does is tap that one button when it arrives — everything before it (the buildup messages) is sent automatically, exactly like Days 1–28's content arrives automatically.
 
-## Entry message sequence (Kiki-style buildup, draft)
+## Entry message sequence (confirmed 22 August 2026)
 Matching the anticipation-building pattern from the Kiki reference — a few short messages before the button, framing this as a quest:
 
 > 🗺️ *knock knock*
 >
-> Hey, ka! Remember everything you've learned this month?
+> Heyy! Remember everything you've learned this month?
 >
 > I put together something special — a little story, a little journey, a few surprises along the way...
 >
-> Ready for your Day 29 quest? 🎒
->
-> [🎁 Start the quest] *(button — opens the living comic Web App)*
+> [🎁 Start the story] *(button — opens the living comic Web App)*
 
-*(Draft only, same review status as all other Thai/English copy — needs your read before locking.)*
+*(Confirmed by Joule, 22 August 2026 — locked. Note: intentionally drops the usual "ka" narrator tic (LDTKB-030) for this quest-framing moment — a deliberate stylistic exception, not an inconsistency to fix.)*
 
 ## Surprise Quest — Page 9 (new, 20 August 2026)
 A hidden 9th "page" appears after the 8 story pages — not part of the narrative, a bonus mini-quiz tying Day 29 directly into Day 30's quiz format as a preview/teaser.
 
-**Question (draft, needs refinement):** references ต้อม, the Thai boy from Page 5's motorbike shop scene, and his answer earlier in the story ("ดอยปุยครับ" — Doi Pui).
-> Draft: "🎁 Surprise! Do you remember... where does Dtôm like to travel? 🏔️"
+**Question (confirmed 22 August 2026):** references ต้อม, the Thai boy from Page 5's motorbike shop scene, and his answer earlier in the story ("ดอยปุยครับ" — Doi Pui).
+> Do you remember... where does Dtôm like to travel? 🏔️
 
 **Answer:** Doi Pui (matches Page 5's established story content directly — not new information, a genuine recall check).
 
@@ -81,7 +79,7 @@ A hidden 9th "page" appears after the 8 story pages — not part of the narrativ
 >
 > There's just one more day to go... and I am so looking forward to it. 👀🎉
 
-*(Confirmed by Joule, 22 August 2026 — locked, unlike the entry message and quest question wording, which are still draft.)*
+*(Confirmed by Joule, 22 August 2026 — locked, same as the entry message and quest question wording above.)*
 
 This means the page count and indicator become **9 pages total**, not 8 — Page 9 is the Surprise Quest interaction itself (question → unlimited attempts → lock on correct answer → this text message), not a separate illustrated reward. Worth reflecting in the navigation UI's page counter from the start rather than bolting it on later.
 
@@ -95,7 +93,7 @@ This means the page count and indicator become **9 pages total**, not 8 — Page
 - ~~Distractor place names~~ — Chiang Dao, Mae Kam Pong, Doi Pui (correct), Doi Inthanon.
 
 ## Open questions for the next design pass (remaining)
-None currently outstanding — this spec is now fully specified pending your review of the remaining drafted copy (entry message, Surprise Quest question wording — the completion message is now confirmed) and the actual technical build, which hasn't started.
+None. All copy (entry message, Surprise Quest question, completion message) is confirmed. The only remaining work is the actual technical build, which hasn't started.
 
 ## Explicitly not decided yet
 This document captures the *style spec* and *prototype analysis* only. No locked decision has been made about exact technical implementation, hosting, or how this integrates with the existing Checkpoint 1–3 architecture. That's the next real conversation, once Joule is ready for it.
