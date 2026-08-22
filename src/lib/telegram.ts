@@ -95,6 +95,12 @@ export function createTelegramClient(botToken: string): TelegramClient {
 // https://core.telegram.org/bots/api#update
 
 export interface TelegramUpdate {
+  // Unique, monotonically-increasing per update — Telegram's own dedup key.
+  // See processedUpdatesStore.ts / webhook/route.ts for why this now
+  // matters: Telegram retries delivery of the same update_id if it doesn't
+  // get a timely 200 OK, and until this hotfix nothing tracked update_id at
+  // all, so a retry was silently processed twice.
+  update_id: number;
   message?: TelegramMessage;
   callback_query?: TelegramCallbackQuery;
 }

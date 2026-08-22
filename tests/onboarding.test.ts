@@ -60,12 +60,15 @@ function makeDeps(now = new Date("2026-08-21T03:00:00.000Z")) {
   };
 }
 
+let nextUpdateId = 1;
+
 function startUpdate(telegramUserId: number, chatId = telegramUserId): TelegramUpdate {
-  return { message: { text: "/start", chat: { id: chatId }, from: { id: telegramUserId } } };
+  return { update_id: nextUpdateId++, message: { text: "/start", chat: { id: chatId }, from: { id: telegramUserId } } };
 }
 
 function callbackUpdate(telegramUserId: number, data: string, chatId = telegramUserId): TelegramUpdate {
   return {
+    update_id: nextUpdateId++,
     callback_query: {
       id: `cb-${data}`,
       data,
