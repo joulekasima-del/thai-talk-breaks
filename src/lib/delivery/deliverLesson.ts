@@ -258,7 +258,7 @@ async function deliverActivity(
     // invent content or violate "teach before testing" — flagged for review.
     await deps.telegram.sendMessage(
       input.chatId,
-      "Nice work! Recognition-tap activities start from tomorrow's lesson, once there's more to compare against.",
+      "Nice work, ka! 🎉 From tomorrow, you'll get a fun little activity with each lesson to help things stick.",
     );
     return { status: "no_activity_content", reason: "lesson 1 has no eligible distractor pool" };
   }
