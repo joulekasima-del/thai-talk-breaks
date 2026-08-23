@@ -18,9 +18,21 @@
 // question instead of restarting from the welcome message. Both are
 // implementation-level design choices, not locked decisions — see
 // ONBOARDING_FLOW.md and the Checkpoint 2 report.
+//
+// /oops issue reporting (added later, independent of the onboarding state
+// machine above — see learners.awaiting_oops_report_since):
+//   /oops (no report pending)      -> sends the prompt, sets the pending flag
+//   /oops (report already pending) -> re-sends the same prompt, no state change
+//   /start (report pending)        -> clears the pending flag, then proceeds
+//                                      with /start's existing behavior exactly
+//                                      as above
+//   any plain text (report pending)-> captured verbatim as the report, flag
+//                                      cleared, confirmation sent, admin DMed
+//   any plain text (nothing pending)-> silently ignored, same as before /oops existed
 
 import type { TelegramClient, TelegramUpdate } from "@/lib/telegram";
 import type { Learner, LearnerStore, SchedulePeriod } from "@/lib/onboarding/learnerStore";
+import type { OopsReportsStore } from "@/lib/oops/oopsReportsStore";
 import {
   ALREADY_ONBOARDED_MESSAGE,
   GENDER_QUESTION_KEYBOARD,
@@ -34,10 +46,14 @@ import {
   isValidTimeForPeriod,
   scheduleTimeKeyboard,
 } from "@/lib/onboarding/content";
+import { OOPS_CONFIRMATION_MESSAGE, OOPS_PROMPT_MESSAGE } from "@/lib/oops/content";
 
 export interface HandleUpdateDeps {
   store: LearnerStore;
   telegram: TelegramClient;
+  oopsReportsStore: OopsReportsStore;
+  /** Telegram user id to DM new /oops reports to. Null if ADMIN_TELEGRAM_USER_ID isn't set — the report is still saved, just no DM is attempted. */
+  adminTelegramUserId: number | null;
   /** Injectable clock, for deterministic tests. Defaults to `new Date()`. */
   now?: () => Date;
 }
@@ -46,17 +62,29 @@ const VALID_GENDERS = new Set(["male", "female"]);
 const VALID_PERIODS = new Set(["morning", "afternoon", "evening"]);
 
 export async function handleUpdate(update: TelegramUpdate, deps: HandleUpdateDeps): Promise<void> {
-  if (update.message?.text?.startsWith("/start")) {
-    await handleStart(update.message, deps);
+  const text = update.message?.text;
+
+  if (text?.startsWith("/start")) {
+    await handleStart(update.message!, deps);
+    return;
+  }
+  if (text?.startsWith("/oops")) {
+    await handleOops(update.message!, deps);
     return;
   }
   if (update.callback_query) {
     await handleCallbackQuery(update.callback_query, deps);
     return;
   }
-  // Anything else (other commands, plain text, etc.) is silently ignored in
-  // this checkpoint — no free-text or non-onboarding command handling is in
-  // scope here.
+  if (update.message && text !== undefined) {
+    // Only meaningful when a report is pending (captured below); otherwise
+    // silently ignored, exactly as before /oops existed.
+    await maybeCaptureOopsReport(update.message, deps);
+    return;
+  }
+  // Anything else (non-text messages, other commands, etc.) is silently
+  // ignored — no free-text or non-onboarding command handling beyond /oops
+  // is in scope here.
 }
 
 async function handleStart(
@@ -75,6 +103,13 @@ async function handleStart(
     return;
   }
 
+  if (learner.awaiting_oops_report_since) {
+    // /start while a report is pending: don't leave the learner stuck
+    // unable to /start normally — clear it, then fall through to /start's
+    // existing behavior exactly as if nothing had been pending.
+    learner = await deps.store.update(learner.id, { awaiting_oops_report_since: null });
+  }
+
   if (learner.onboarding_step === "complete") {
     // Design choice — not a locked message. See report item 9.
     await deps.telegram.sendMessage(chatId, ALREADY_ONBOARDED_MESSAGE);
@@ -83,6 +118,53 @@ async function handleStart(
 
   // Mid-onboarding: resume at the current step rather than restarting.
   await resendCurrentStep(learner, chatId, deps);
+}
+
+async function handleOops(message: NonNullable<TelegramUpdate["message"]>, deps: HandleUpdateDeps): Promise<void> {
+  const chatId = message.chat.id;
+  const telegramUserId = message.from.id;
+
+  const learner = await deps.store.findByTelegramId(telegramUserId);
+  if (!learner) return; // /oops before ever /start-ing — no learner row to attach a report to
+
+  if (!learner.awaiting_oops_report_since) {
+    const now = deps.now ? deps.now() : new Date();
+    await deps.store.update(learner.id, { awaiting_oops_report_since: now.toISOString() });
+  }
+  // Already pending: fall through and re-send the same prompt without
+  // touching state again — no stacking, no duplicate pending state.
+
+  await deps.telegram.sendMessage(chatId, OOPS_PROMPT_MESSAGE);
+}
+
+async function maybeCaptureOopsReport(
+  message: NonNullable<TelegramUpdate["message"]>,
+  deps: HandleUpdateDeps,
+): Promise<void> {
+  const chatId = message.chat.id;
+  const telegramUserId = message.from.id;
+  const text = message.text;
+  if (text === undefined) return;
+
+  const learner = await deps.store.findByTelegramId(telegramUserId);
+  if (!learner || !learner.awaiting_oops_report_since) return; // no pending report — silently ignored
+
+  await deps.store.update(learner.id, { awaiting_oops_report_since: null });
+  await deps.oopsReportsStore.create(learner.id, text);
+  await deps.telegram.sendMessage(chatId, OOPS_CONFIRMATION_MESSAGE);
+
+  if (deps.adminTelegramUserId !== null) {
+    try {
+      await deps.telegram.sendMessage(
+        deps.adminTelegramUserId,
+        `🐛 New /oops report\nFrom learner (Telegram ID: ${learner.telegram_user_id})\n\n${text}`,
+      );
+    } catch (error) {
+      // The report is already saved and the learner already confirmed —
+      // a DM failure (e.g. a stale/invalid admin id) must not undo that.
+      console.error("Failed to DM admin about /oops report", error);
+    }
+  }
 }
 
 async function resendCurrentStep(learner: Learner, chatId: number, deps: HandleUpdateDeps): Promise<void> {

@@ -8,6 +8,7 @@ import { supabaseDay30QuizStore } from "@/lib/quiz/day30QuizStore";
 import { handleDay30QuizCallback } from "@/lib/quiz/day30Quiz";
 import { supabaseProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
 import { dedupeAndProcess } from "@/lib/webhook/dedupeAndProcess";
+import { supabaseOopsReportsStore } from "@/lib/oops/oopsReportsStore";
 
 // Telegram webhook endpoint. Verifies the shared secret, dedups on
 // update_id (hotfix — Telegram retries delivery of the same update if it
@@ -40,6 +41,13 @@ export async function POST(request: Request): Promise<Response> {
   const telegram = createTelegramClient(botToken);
   const store = supabaseLearnerStore(supabase);
   const processedUpdatesStore = supabaseProcessedUpdatesStore(supabase);
+  const oopsReportsStore = supabaseOopsReportsStore(supabase);
+
+  // Missing/unset -> null: /oops reports are still saved, the admin DM is
+  // just skipped (see handleUpdate.ts's maybeCaptureOopsReport).
+  const adminTelegramUserIdRaw = process.env.ADMIN_TELEGRAM_USER_ID;
+  const parsedAdminTelegramUserId = adminTelegramUserIdRaw ? Number(adminTelegramUserIdRaw) : NaN;
+  const adminTelegramUserId = Number.isFinite(parsedAdminTelegramUserId) ? parsedAdminTelegramUserId : null;
 
   try {
     // Dedup guard — dedupeAndProcess() marks update_id processed BEFORE
@@ -65,7 +73,7 @@ export async function POST(request: Request): Promise<Response> {
           quizStore,
         });
       } else {
-        await handleUpdate(update, { store, telegram });
+        await handleUpdate(update, { store, telegram, oopsReportsStore, adminTelegramUserId });
       }
     });
   } catch (error) {

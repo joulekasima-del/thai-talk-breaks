@@ -23,6 +23,12 @@ export interface Learner {
   onboarding_step: OnboardingStep;
   onboarding_completed_at: string | null;
   pilot_start_date: string | null;
+  /**
+   * Set while waiting for a learner's next message to be captured as an
+   * /oops report; null otherwise. Deliberately independent of
+   * onboarding_step — see supabase/migrations/20260826000000_oops_reports.sql.
+   */
+  awaiting_oops_report_since: string | null;
 }
 
 export type LearnerPatch = Partial<
@@ -34,6 +40,7 @@ export type LearnerPatch = Partial<
     | "onboarding_step"
     | "onboarding_completed_at"
     | "pilot_start_date"
+    | "awaiting_oops_report_since"
   >
 >;
 

@@ -22,6 +22,7 @@ export class FakeLearnerStore implements LearnerStore {
       onboarding_step: "gender_pending",
       onboarding_completed_at: null,
       pilot_start_date: null,
+      awaiting_oops_report_since: null,
     };
     this.learners.set(id, learner);
     this.byTelegramId.set(telegramUserId, id);

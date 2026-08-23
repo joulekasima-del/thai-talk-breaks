@@ -15,6 +15,7 @@ import {
   WELCOME_MESSAGE,
 } from "@/lib/onboarding/content";
 import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
+import { FakeOopsReportsStore } from "./oopsFakes";
 import type { TelegramUpdate } from "@/lib/telegram";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -56,6 +57,8 @@ function makeDeps(now = new Date("2026-08-21T03:00:00.000Z")) {
   return {
     store: new FakeLearnerStore(),
     telegram: new FakeTelegramClient(),
+    oopsReportsStore: new FakeOopsReportsStore(),
+    adminTelegramUserId: null,
     now: () => now,
   };
 }
