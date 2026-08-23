@@ -11,17 +11,33 @@
 
 import type { InlineKeyboard } from "@/lib/telegram";
 
-// onboarding/welcome-message.md (LDTKB-031)
+// onboarding/welcome-message.md (LDTKB-031, superseded by LDTKB-050)
 export const WELCOME_MESSAGE =
-  "Sawasdee ka! 🙏 Welcome to Thai Talk Breaks.\n" +
+  "Sawasdee ka! 🙏 *Welcome to Thai Talk Breaks*.\n" +
   "\n" +
-  "This is a 30-day conversational Thai course — the first 7 days are a free trial. \n" +
+  "We're happy to have you here. 🌿\n" +
   "\n" +
-  "Every lesson is short and simple: one picture, one phrase, native audio, and a quick activity. No reading Thai script required.\n" +
+  "Thai Talk Breaks is a 30-day conversational Thai course designed to help you build useful Thai little by little — without overwhelming study sessions.\n" +
   "\n" +
-  "Ready to begin? \n" +
+  "Your first 7 days are free.\n" +
   "\n" +
-  "Have fun! 😊";
+  "Each daily break is short and practical:\n" +
+  "🖼️ one picture\n" +
+  "💬 one useful Thai phrase\n" +
+  "🔊 clear native Thai pronunciation\n" +
+  "✨ one quick activity to help it stick\n" +
+  "\n" +
+  "No Thai script required. We'll focus first on Thai you can understand, say, and use in everyday life.\n" +
+  "\n" +
+  "If something ever seems confusing or doesn't work properly, just type /oops anytime, ka. We'll take a look.\n" +
+  "\n" +
+  "And if you'd like a little more Thai between lessons, you can join Thai Talk Newsletter. We share useful expressions, everyday language, and small insights into how Thai is actually spoken — and how it changes over time.\n" +
+  "\n" +
+  "👉 https://t.me/thaitalk_newsletter\n" +
+  "\n" +
+  "That's it. No preparation needed.\n" +
+  "\n" +
+  "Ready to begin?";
 
 // onboarding/gender-question.md (LDTKB-033)
 export const GENDER_QUESTION_MESSAGE =

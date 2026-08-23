@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.3  
-**Last updated:** 22 August 2026  
+**Register version:** 4.4  
+**Last updated:** 23 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -517,6 +517,17 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 2. **The monkey mascot concept is removed entirely** — no new character, no illustration, no audio for the Surprise Quest's completion moment. Replaced with a text-only completion message (see `day29-living-comic-spec.md`'s "Completion reward" section for the drafted copy). The page count remains **9 pages total** — Page 9 is still the Surprise Quest interaction itself, just without an illustrated reward.  
 **Locked by:** Joule's confirmation, 22 August 2026.
 
+## LDTKB-050 — Welcome message finalized: /oops, the newsletter channel, and corrected audio claim
+
+**Status:** Locked  
+**Decision:** The welcome message (LDTKB-031) is superseded with a fuller rewrite, confirmed 23 August 2026. Key changes from the original:
+1. **`/oops`** mentioned — the bug-report command, now actually built and verified working (unlike an earlier draft of this same decision, paused mid-session specifically because `/oops` didn't exist yet at the time).
+2. **Thai Talk Newsletter** (`https://t.me/thaitalk_newsletter`) — a Telegram channel for weekly bonus Thai content, replacing an earlier "Thai Talk Breaks Community" channel concept (renamed/repurposed before ever being referenced in a locked message).
+3. **"Native-speaker audio" corrected to "clear native Thai pronunciation."** The original wording implied a human speaker personally recorded the audio; the actual audio is AI-voiced (ElevenLabs, per LDTKB-025's production notes), not a literal native-speaker recording. Caught during a truthfulness review Joule specifically requested before locking this message — flagged as the most important fix in that review.
+4. **Voice shift to "we"** — a deliberate, confirmed exception to the fixed first-person "I" narrator voice used everywhere else in the product (LDTKB-030). Not an inconsistency; see the note in `onboarding/welcome-message.md`.  
+**Exact copy:** see `onboarding/welcome-message.md`.  
+**Locked by:** Joule's confirmation, 23 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -560,3 +571,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 22 Aug 2026 | LDTKB-047 | Resolves LDTKB-040's open question: no onboarding question added; every learner is taught/tested the younger-speaker form (ผม/หนู) for Days 15, 17, 21, 22 — older form remains reference content only | Joule |
 | 22 Aug 2026 | LDTKB-048 | Weeks 2-4 activity design: Days 8/16/26 (word-sets) use Lesson 2's word-matching pattern; Day 25 uses example #1 ("may I park here?") as its canonical tested phrase | Joule |
 | 22 Aug 2026 | LDTKB-049 | Day 29 Surprise Quest lock-state stored server-side (Supabase), consistent with all other learner progress; monkey mascot concept removed entirely, replaced with text-only completion message | Joule |
+| 23 Aug 2026 | LDTKB-050 | Welcome message finalized: adds /oops (now built) and Thai Talk Newsletter channel link; corrects "native-speaker audio" to "clear native Thai pronunciation" (audio is AI-voiced, not human-recorded); confirmed deliberate "we" voice exception | Joule |
