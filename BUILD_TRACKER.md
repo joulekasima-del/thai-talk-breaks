@@ -1,9 +1,9 @@
 # Thai Talk Breaks — Build Tracker
 
-**Tracker version:** 2.1  
-**Last updated:** 22 August 2026  
+**Tracker version:** 3.0  
+**Last updated:** 23 August 2026  
 **Project owner:** Joule  
-**Current stage:** Stage 3 — Complete (Week 1 only). Full 30-day delivery tracked via new checklist below.  
+**Current stage:** Stage 4 — In progress (real deployment live as of 23 August 2026; testing underway with Joule's own account, no external pilot learners yet). Full 30-day delivery tracked via new checklist below.  
 **Overall status:** See Full 30-Day Delivery Checklist for real progress across all 4 categories
 
 ## Status key
@@ -23,7 +23,7 @@
 | 1 | Lock the revised product direction | ✅ Complete | Product, audience, format, price intention, delivery behavior and founder role explicitly confirmed by Joule | `LOCKED_DECISIONS.md` |
 | 2 | Interview five European and five Russian Telegram-using expats | ⏸ Deferred (LDTKB-022) | No longer required before Stage 3; may resume at Joule's discretion | Method/templates remain ready in `research/` if resumed |
 | 3 | Create seven sample lessons | ✅ Complete | Seven reviewed lessons follow the locked content structure; Thai Karaoke is consistent; native audio and images complete | `curriculum/pilot/` (lesson files, `audio/`, `images/`) |
-| 4 | Run a free pilot with notification testing | ⬜ Not started | Pilot learners onboarded; notification test completed; seven-day delivery measured; learner feedback and completion data summarized | To be created: `pilot/` |
+| 4 | Run a free pilot with notification testing | 🟡 In progress — real deployment live 23 Aug 2026 (Supabase, Vercel, real bot token, `pg_cron` all running); onboarding, Lesson 1 delivery, and `/oops` all verified end-to-end with Joule's own test account. **No external pilot learners yet** — notification-test/7-day-delivery/feedback exit criteria not yet met | `BUILD_TRACKER.md` Category 3 below |
 | 5 | Verify the 500-Star checkout and withdrawal process | ⬜ Not started | Test purchase checked on relevant Telegram clients; buyer-visible cost recorded; refund/support path tested; withdrawal availability and net receipt documented | To be created: `payments/500-star-test.md` |
 | 6 | Complete individual commercial registration | ⬜ Not started | Local authority confirms the correct registration; registration completed before regular public paid sales; tax-recording method established | To be created: `operations/registration-checklist.md` |
 | 7 | Publish privacy, payment-support and refund information | ⬜ Not started | Public policies reviewed, accessible from the bot and consistent with actual data/payment behavior | To be created: `policies/` |
@@ -100,7 +100,7 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 
 | Item | Status |
 |---|---|
-| Onboarding (6 messages) | ✅ Done |
+| Onboarding (6 messages) | ✅ Done. Welcome message finalized 23 Aug 2026 (LDTKB-050) — adds /oops and the Thai Talk Newsletter channel, corrects an earlier "native-speaker audio" overclaim (audio is AI-voiced, not human-recorded) to "clear native Thai pronunciation," caught during a truthfulness review |
 | Week 1 content, audio, images (Days 1–7) | ✅ Done |
 | Weeks 2–4 content (Days 8–28) | ✅ Done, content-QA reviewed (tone-mark accuracy, staleness/consistency — see `curriculum-review-log.md`). **Native-speaker pronunciation/tone review has NOT happened yet** (each week file's own "Open items" confirms this) — do not read "reviewed" as equivalent to the pilot's Stage 3 native-speaker review |
 | Weeks 2–4 audio | ✅ Done (79 files: Week 2 = 25, Week 3 = 21, Week 4 = 33) — female voice recordings updated 21 Aug 2026 |
@@ -122,17 +122,19 @@ All seven lessons drafted, reviewed by Joule (native Thai speaker), fully voiced
 | Checkpoint 4 (activity handling, Lessons 2–7 + Day 30 quiz-ladder) | ✅ Done 22 Aug 2026 — 46/46 tests passing, pushed (`5cb1129`) |
 | Checkpoint 5 (Weeks 2–4 activities, Days 8–28) | ✅ Done 22 Aug 2026 — 62/62 tests passing, pushed (`e144b5f`). Word-set activity pattern for Days 8/10/16/26 (Day 10 corrected into scope after being missed in original planning); Day 25 uses example #1; Days 15/17/21/22 use younger form only (LDTKB-047), with representative examples (Dtôm/Nók/ดูหนัง/รถติด) now documented in `week3-lessons-15-21.md` and correctly delivered in code. **Bug found and fixed 22 Aug 2026 during Checkpoint 6 scoping:** `lesson_deliveries.lesson_number`'s DB CHECK constraint was never widened past `1-7` when this checkpoint extended delivery to Days 8–28 — invisible only because nothing had been deployed against a real database yet. Fixed in a standalone hotfix (`918a514`), widened to `1-29` to also cover Day 29's entry-message tracking. |
 | Checkpoint 6 (Day 29 living comic Web App) | ✅ Done 22 Aug 2026 — 80/80 tests passing, pushed (`d47f7d5`). Scroll-synced audio (2s/3s timing per the locked spec), sound toggle, server-persisted Surprise Quest (page 9) with `initData` validated server-side via HMAC against the bot token (LDTKB-049 — not a client-trusted id). Triggered by the same scheduler as every other day, no manual start. Assets consolidated in `curriculum/day29/assets/`, synced to `public/day29/` at build time. |
+| Webhook update-deduplication hotfix | ✅ Done 23 Aug 2026 — 87/87 tests passing, pushed (`1d49be1`). **Real production bug**, found during the very first live onboarding test: Telegram retried a slow `/start` response and the bot processed it twice, sending the gender-question message twice to a real learner. No `update_id` tracking existed anywhere in the codebase before this. Fixed with a `processed_telegram_updates` table and a `dedupeAndProcess` guard wrapping all webhook routing — a retried update never reaches any message-sending logic at all. |
+| `/oops` issue-reporting feature | ✅ Done 23 Aug 2026 — 98/98 tests passing, pushed (`dcc1567`, trailing-newline copy fix in `e336391`). Conversational flow (`/oops` alone → bot asks for details → next message captured as the report), independent of onboarding status. Reports stored permanently (`oops_reports` table) and DMed to the admin in real time via `ADMIN_TELEGRAM_USER_ID`; a failed DM never rolls back the saved report. **Verified working with a real end-to-end test report** on 23 Aug 2026. |
 
 ### Category 3 — Deployment & real-world verification
 
-Every checkpoint so far has explicitly avoided deploying live. None of this has run against a real bot yet.
+**Deployed and verified live as of 23 August 2026.** Every item below has actually run against the real world, not just been built and tested locally.
 
 | Item | Status |
 |---|---|
-| Real Supabase project connected | ⬜ Not done |
-| Real Telegram bot token + webhook set | ⬜ Not done |
-| Real Vercel deployment (live) | ⬜ Not done |
-| End-to-end test with an actual Telegram account | ⬜ Not done |
+| Real Supabase project connected | ✅ Done — 8 migrations applied (schema, delivery/cron, activity/quiz, the `lesson_number` range fix, Day 29 quest progress, `pg_cron`/`pg_net` extensions, the scheduled delivery job, webhook dedup, `/oops` reports) |
+| Real Telegram bot token + webhook set | ✅ Done — bot created via BotFather, webhook registered and confirmed (`{"ok":true,"result":true}`). **Both the bot token and webhook secret were rotated once** after an accidental exposure during setup — current live credentials are the rotated ones, confirmed clean |
+| Real Vercel deployment (live) | ✅ Done — `thai-talk-breaks.vercel.app`, all environment variables set including `TESTING_EXTENDED_WINDOW=true` for rapid full-course testing |
+| End-to-end test with an actual Telegram account | ✅ Done — full onboarding (gender → schedule → notification test → completion) completed cleanly; Lesson 1 delivered automatically at the real scheduled time; `/oops` tested with a real report reaching the admin DM. **Two real bugs found only by this live testing, both fixed same-day:** the `lesson_deliveries` DB constraint (see Checkpoint 5's row above) and the webhook update-deduplication gap (see its own row above) |
 
 ### Category 4 — Business/legal/commercial readiness (Stages 5–7 below, tracked in detail here)
 
@@ -188,3 +190,4 @@ The first commercial validation succeeds when:
 | 18 Aug 2026 | Implementation agent changed from Codex Desktop to Claude Code (LDTKB-023) after Codex reached a usage limit; no stage change | Joule |
 | 19 Aug 2026 | Stage 3 complete: all 7 lessons content-reviewed (native speaker), voiced (22 audio clips), and illustrated (22 images) | Joule |
 | 20 Aug 2026 | Added Full 30-Day Delivery Checklist (4 categories: materials, technical systems, deployment/verification, business/legal readiness) to track real progress beyond the 8-stage gate structure | Joule |
+| 23 Aug 2026 | **First real deployment.** Supabase, Vercel, and a real Telegram bot all live; Checkpoints 1–6 running for real for the first time. Two production bugs found and fixed same-day (lesson_deliveries constraint, webhook update-deduplication). New /oops feature built, deployed, and verified with a real report. Welcome message finalized (LDTKB-050) after a truthfulness review caught an inaccurate "native-speaker audio" claim. Stage 4 (free pilot) moved from Not Started to In Progress | Joule |
