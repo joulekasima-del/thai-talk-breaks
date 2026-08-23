@@ -43,7 +43,7 @@ export type DeliverLessonResult =
   | { status: "no_activity_content"; reason: string };
 
 const TONE_LEGEND_MESSAGE =
-  "Before your first phrase — Thai Karaoke uses 5 tone marks. Here's what they mean (LDTKB-025):\n\n" +
+  "Before your first phrase — Thai Karaoke uses 5 tone marks. Here's what they mean:\n\n" +
   "a = mid (flat, calm)\n" +
   "à = low (starts low, stays low)\n" +
   "â = falling (starts high, drops)\n" +
