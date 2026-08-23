@@ -1,4 +1,4 @@
-import type { InlineKeyboard, MediaFile, TelegramClient } from "@/lib/telegram";
+import type { InlineKeyboard, MediaFile, SendAudioOptions, TelegramClient } from "@/lib/telegram";
 import type { Learner, LearnerPatch, LearnerStore } from "@/lib/onboarding/learnerStore";
 
 export class FakeLearnerStore implements LearnerStore {
@@ -52,6 +52,9 @@ export interface SentMedia {
   chatId: number;
   filename: string;
   caption?: string;
+  /** sendAudio only — see SendAudioOptions. Never set on sentPhotos entries. */
+  title?: string;
+  performer?: string;
 }
 
 export class FakeTelegramClient implements TelegramClient {
@@ -75,8 +78,8 @@ export class FakeTelegramClient implements TelegramClient {
     this.sentPhotos.push({ chatId, filename: photo.filename, caption });
   }
 
-  async sendAudio(chatId: number, audio: MediaFile, caption?: string): Promise<void> {
-    this.sentAudio.push({ chatId, filename: audio.filename, caption });
+  async sendAudio(chatId: number, audio: MediaFile, options?: SendAudioOptions): Promise<void> {
+    this.sentAudio.push({ chatId, filename: audio.filename, title: options?.title, performer: options?.performer });
     this.log?.push(`sendAudio:${audio.filename}`);
   }
 }

@@ -63,9 +63,13 @@ async function sendQuestion(chatId: number, questionIndex: number, deps: Day30Qu
   const question = getDay30Question(questionIndex);
   const loadAudio = deps.loadAudio ?? loadDay30Audio;
 
-  // Upfront prompt audio — unchanged from before this fix.
+  // Upfront prompt audio — unchanged from before this fix. Rule B
+  // (anonymized): "Question N/10" reveals nothing, kept as the title.
   const promptAudio = await loadAudio(question.correctAudioFile);
-  await deps.telegram.sendAudio(chatId, promptAudio, `Question ${questionIndex}/${DAY30_QUESTION_COUNT}`);
+  await deps.telegram.sendAudio(chatId, promptAudio, {
+    title: `Question ${questionIndex}/${DAY30_QUESTION_COUNT}`,
+    performer: "Day 30 Quiz",
+  });
 
   const options = shuffle(
     [
@@ -135,7 +139,8 @@ export async function handleDay30QuizCallback(
   // upfront prompt audio already sent when the question was shown.
   const loadAudio = deps.loadAudio ?? loadDay30Audio;
   const tappedAudio = await loadAudio(audioFileForKind(question, kind));
-  await deps.telegram.sendAudio(chatId, tappedAudio);
+  // Rule B (anonymized) — generic title, nothing about which option this was.
+  await deps.telegram.sendAudio(chatId, tappedAudio, { title: "Day 30", performer: "Day 30 Quiz" });
 
   const updated = await deps.quizStore.recordAnswer(progress.id, isCorrect);
   await deps.telegram.sendMessage(chatId, isCorrect ? POSITIVE_FEEDBACK : negativeFeedback(question.correctButtonText));

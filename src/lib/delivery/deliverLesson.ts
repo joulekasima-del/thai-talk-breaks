@@ -3,10 +3,22 @@
 // All I/O (Telegram, DB, file reads) is behind injected interfaces, so this
 // is unit-testable the same way handleUpdate.ts was in Checkpoint 2.
 
-import { getLesson, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
+import { getLesson, PILOT_LESSON_COUNT, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
 import type { MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
 import { pickCrossLessonDistractors, pickNumberDistractors, pickWordSetDistractors, type Rng } from "@/lib/delivery/distractors";
+
+/**
+ * "Lesson {N}" for the pilot (1-7) / "Day {N}" for Weeks 2-4 (8-28) — the
+ * audio performer-label convention this project already uses elsewhere
+ * (deliverWordSetLesson's "Day {N}" summary, mediaFiles.ts's identical
+ * WEEKS234_PILOT_BOUNDARY split), applied here to sendAudio's `performer`
+ * field. Deliberately independent of composePhraseText's own "Lesson {N}"
+ * message body text, which this fix does not touch.
+ */
+function lessonOrDayLabel(lessonNumber: number): string {
+  return lessonNumber <= PILOT_LESSON_COUNT ? `Lesson ${lessonNumber}` : `Day ${lessonNumber}`;
+}
 
 export interface MediaLoader {
   loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
@@ -113,7 +125,11 @@ async function deliverPhraseLesson(
   );
 
   const audio = await deps.media.loadPhraseLessonAudio(input.lessonNumber, input.gender);
-  await deps.telegram.sendAudio(input.chatId, audio, `Lesson ${input.lessonNumber}`);
+  // Rule A (teaching audio) — reveal the pronunciation as the title.
+  await deps.telegram.sendAudio(input.chatId, audio, {
+    title: lesson.karaoke[input.gender],
+    performer: lessonOrDayLabel(input.lessonNumber),
+  });
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 
@@ -134,7 +150,8 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
 
   for (const n of lesson.numbers) {
     const audio = await deps.media.loadNumberAudio(n.value);
-    await deps.telegram.sendAudio(input.chatId, audio, `${n.value}: ${n.karaoke}`);
+    // Rule A (teaching audio) — reveal the pronunciation as the title.
+    await deps.telegram.sendAudio(input.chatId, audio, { title: n.karaoke, performer: "Lesson 2" });
   }
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
@@ -163,7 +180,8 @@ async function deliverWordSetLesson(
 
   for (const w of lesson.words) {
     const audio = await deps.media.loadWordSetAudio(input.lessonNumber, w.index);
-    await deps.telegram.sendAudio(input.chatId, audio, w.meaning);
+    // Rule A (teaching audio) — reveal the pronunciation as the title.
+    await deps.telegram.sendAudio(input.chatId, audio, { title: w.karaoke, performer: `Day ${input.lessonNumber}` });
   }
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
@@ -195,7 +213,8 @@ async function deliverActivity(
     await deps.telegram.sendMessage(input.chatId, "Which number did you hear? Listen to each clip:");
     for (let i = 0; i < options.length; i++) {
       const audio = await deps.media.loadNumberAudio(options[i].value);
-      await deps.telegram.sendAudio(input.chatId, audio, `Option ${labels[i]}`);
+      // Rule B (activity audio) — anonymized: never reveal the pronunciation.
+      await deps.telegram.sendAudio(input.chatId, audio, { title: `Option ${labels[i]}`, performer: "Lesson 2 Activity" });
     }
     await deps.telegram.sendMessage(
       input.chatId,
@@ -213,7 +232,11 @@ async function deliverActivity(
     await deps.telegram.sendMessage(input.chatId, "Which word did you hear? Listen to each clip:");
     for (let i = 0; i < options.length; i++) {
       const audio = await deps.media.loadWordSetAudio(input.lessonNumber, options[i].value);
-      await deps.telegram.sendAudio(input.chatId, audio, `Option ${labels[i]}`);
+      // Rule B (activity audio) — anonymized: never reveal the pronunciation.
+      await deps.telegram.sendAudio(input.chatId, audio, {
+        title: `Option ${labels[i]}`,
+        performer: `Day ${input.lessonNumber} Activity`,
+      });
     }
     await deps.telegram.sendMessage(
       input.chatId,
@@ -252,7 +275,15 @@ async function deliverActivity(
     const audio = isToday
       ? await deps.media.loadPhraseLessonAudio(input.lessonNumber, input.gender)
       : await deps.media.loadRepresentativeClip(optionLessonNumbers[i].value, input.gender);
-    await deps.telegram.sendAudio(input.chatId, audio, `Option ${labels[i]}`);
+    // Rule B (activity audio) — anonymized: never reveal the pronunciation.
+    // Performer follows today's lesson/day number, not each option's origin
+    // (an option's own audio might come from a different lesson/day — see
+    // loadRepresentativeClip above — but "today's activity" is what's
+    // actually being tested here, matching label #4/#5's own-day pattern).
+    await deps.telegram.sendAudio(input.chatId, audio, {
+      title: `Option ${labels[i]}`,
+      performer: `${lessonOrDayLabel(input.lessonNumber)} Activity`,
+    });
   }
   await deps.telegram.sendMessage(
     input.chatId,

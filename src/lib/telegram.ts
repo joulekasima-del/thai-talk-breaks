@@ -18,13 +18,23 @@ export interface MediaFile {
   contentType: string;
 }
 
+// Telegram's sendAudio has real `title`/`performer` fields specifically so a
+// caller doesn't have to expose the raw uploaded filename as the audio
+// player's displayed title (https://core.telegram.org/bots/api#sendaudio).
+// Replaces the old single `caption` parameter for sendAudio specifically —
+// sendPhoto has no equivalent concept and keeps its own caption unchanged.
+export interface SendAudioOptions {
+  title?: string;
+  performer?: string;
+}
+
 export interface TelegramClient {
   sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard): Promise<void>;
   answerCallbackQuery(callbackQueryId: string): Promise<void>;
   /** Uploads photo bytes directly (multipart) — Checkpoint 3, for lesson pictures. */
   sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void>;
   /** Uploads audio bytes directly (multipart) — Checkpoint 3, for lesson/activity audio. */
-  sendAudio(chatId: number, audio: MediaFile, caption?: string): Promise<void>;
+  sendAudio(chatId: number, audio: MediaFile, options?: SendAudioOptions): Promise<void>;
 }
 
 class HttpTelegramClient implements TelegramClient {
@@ -64,8 +74,11 @@ class HttpTelegramClient implements TelegramClient {
     await this.sendMultipart("sendPhoto", "photo", chatId, photo, caption);
   }
 
-  async sendAudio(chatId: number, audio: MediaFile, caption?: string): Promise<void> {
-    await this.sendMultipart("sendAudio", "audio", chatId, audio, caption);
+  async sendAudio(chatId: number, audio: MediaFile, options?: SendAudioOptions): Promise<void> {
+    const extraFields: Record<string, string> = {};
+    if (options?.title) extraFields.title = options.title;
+    if (options?.performer) extraFields.performer = options.performer;
+    await this.sendMultipart("sendAudio", "audio", chatId, audio, undefined, extraFields);
   }
 
   private async sendMultipart(
@@ -74,10 +87,16 @@ class HttpTelegramClient implements TelegramClient {
     chatId: number,
     file: MediaFile,
     caption?: string,
+    extraFields?: Record<string, string>,
   ): Promise<void> {
     const form = new FormData();
     form.set("chat_id", String(chatId));
     if (caption) form.set("caption", caption);
+    if (extraFields) {
+      for (const [key, value] of Object.entries(extraFields)) {
+        form.set(key, value);
+      }
+    }
     form.set(field, new Blob([new Uint8Array(file.buffer)], { type: file.contentType }), file.filename);
 
     const res = await fetch(`${this.baseUrl}/${method}`, { method: "POST", body: form });
