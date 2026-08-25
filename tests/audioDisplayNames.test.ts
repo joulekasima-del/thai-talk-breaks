@@ -95,89 +95,10 @@ test("word-set day (Day 8) audio: each word's title = its own karaoke, performer
   }
 });
 
-// --- Rule B: activity/quiz audio stays anonymized ---------------------------
-
-function assertNeverRevealsPronunciation(entries: { title?: string }[], forbiddenTexts: string[]) {
-  for (const entry of entries) {
-    for (const forbidden of forbiddenTexts) {
-      assert.notEqual(entry.title, forbidden, `activity/quiz audio title must never equal the actual pronunciation ("${forbidden}")`);
-    }
-  }
-}
-
-test("Lesson 2 numbers activity distractor audio: title = 'Option A/B/C', performer = 'Lesson 2 Activity' — never the number's karaoke", async () => {
-  const deps = makeDeliverDeps();
-  const lesson = getLesson(2);
-  if (lesson.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
-
-  await deliverLesson(
-    { learnerId: "l5", chatId: 5, gender: "male", lessonNumber: 2, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1] },
-    deps,
-  );
-
-  const activityAudio = deps.telegram.sentAudio.slice(10); // after the 10 teaching clips
-  assert.ok(activityAudio.length >= 2);
-  for (const entry of activityAudio) {
-    assert.match(entry.title!, /^Option [A-C]$/);
-    assert.equal(entry.performer, "Lesson 2 Activity");
-  }
-  assertNeverRevealsPronunciation(activityAudio, lesson.numbers.map((n) => n.karaoke));
-});
-
-test("word-set (Day 8) activity distractor audio: title = 'Option A/B/C', performer = 'Day 8 Activity' — never a word's karaoke", async () => {
-  const deps = makeDeliverDeps();
-  const lesson = getLesson(8);
-  if (lesson.kind !== "wordset") throw new Error("expected day 8 to be a word-set day");
-
-  await deliverLesson(
-    { learnerId: "l6", chatId: 6, gender: "female", lessonNumber: 8, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7] },
-    deps,
-  );
-
-  const activityAudio = deps.telegram.sentAudio.slice(lesson.words.length);
-  assert.ok(activityAudio.length >= 2);
-  for (const entry of activityAudio) {
-    assert.match(entry.title!, /^Option [A-C]$/);
-    assert.equal(entry.performer, "Day 8 Activity");
-  }
-  assertNeverRevealsPronunciation(activityAudio, lesson.words.map((w) => w.karaoke));
-});
-
-test("pilot phrase (Lesson 3) activity distractor audio: performer = 'Lesson 3 Activity', title never the karaoke", async () => {
-  const deps = makeDeliverDeps();
-  const lesson = getLesson(3);
-  if (lesson.kind !== "phrase") throw new Error("expected lesson 3 to be a phrase lesson");
-
-  await deliverLesson(
-    { learnerId: "l7", chatId: 7, gender: "male", lessonNumber: 3, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2] },
-    deps,
-  );
-
-  // sentAudio[0] is the teaching clip; the activity's distractor clips follow.
-  const activityAudio = deps.telegram.sentAudio.slice(1);
-  assert.ok(activityAudio.length >= 2);
-  for (const entry of activityAudio) {
-    assert.match(entry.title!, /^Option [A-C]$/);
-    assert.equal(entry.performer, "Lesson 3 Activity");
-    assert.notEqual(entry.title, lesson.karaoke.male);
-  }
-});
-
-test("Weeks 2-4 phrase (Day 9) activity distractor audio: performer = 'Day 9 Activity', not 'Lesson 9 Activity'", async () => {
-  const deps = makeDeliverDeps();
-
-  await deliverLesson(
-    { learnerId: "l8", chatId: 8, gender: "female", lessonNumber: 9, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8] },
-    deps,
-  );
-
-  const activityAudio = deps.telegram.sentAudio.slice(1);
-  assert.ok(activityAudio.length >= 2);
-  for (const entry of activityAudio) {
-    assert.match(entry.title!, /^Option [A-C]$/);
-    assert.equal(entry.performer, "Day 9 Activity");
-  }
-});
+// Rule B's activity-distractor coverage (Lesson 2 / word-set / phrase
+// activity audio) was removed along with the recognition-tap activity
+// feature itself — see deliverLesson.ts. Day 30 quiz audio (below) is the
+// only remaining rule-B (anonymized) audio in the app.
 
 // --- Day 30 quiz: anonymized throughout --------------------------------
 

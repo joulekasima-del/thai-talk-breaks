@@ -2,7 +2,6 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { lessonNumberForDay, findDueLearners, isWithinDeliveryWindow, type OnboardedLearner } from "@/lib/delivery/dueLearners";
-import { pickCrossLessonDistractors, pickNumberDistractors } from "@/lib/delivery/distractors";
 import { deliverLesson } from "@/lib/delivery/deliverLesson";
 import { FakeTelegramClient } from "./fakes";
 import { EventLog, FakeDeliveryStore, FakeMediaLoader } from "./deliveryFakes";
@@ -65,32 +64,6 @@ test("findDueLearners returns the correct lesson number for an in-window, in-pil
   assert.equal(due[0].lessonNumber, 4);
 });
 
-// --- Distractor selection (explicitly a design choice, not a locked rule) -
-
-test("pickCrossLessonDistractors: lesson 1 has no eligible pool", () => {
-  assert.deepEqual(pickCrossLessonDistractors(1, []), []);
-});
-
-test("pickCrossLessonDistractors: only draws from lessons before today, at most 2, no duplicates", () => {
-  const rng = () => 0.999; // deterministic
-  const result = pickCrossLessonDistractors(5, [1, 2, 3, 4], rng);
-  assert.equal(result.length, 2);
-  assert.equal(new Set(result).size, 2);
-  for (const n of result) assert.ok(n < 5);
-});
-
-test("pickCrossLessonDistractors: with only one prior lesson, returns exactly one distractor", () => {
-  const result = pickCrossLessonDistractors(2, [1], () => 0.5);
-  assert.deepEqual(result, [1]);
-});
-
-test("pickNumberDistractors: two distinct numbers, never the correct one", () => {
-  const result = pickNumberDistractors(5, () => 0.3);
-  assert.equal(result.length, 2);
-  assert.ok(!result.includes(5));
-  assert.equal(new Set(result).size, 2);
-});
-
 // --- deliverLesson: gender-branch file selection --------------------------
 
 test("deliverLesson selects the male audio/image files for a male learner (phrase lesson)", async () => {
@@ -141,7 +114,7 @@ test("duplicate-send guard: a second delivery attempt for the same learner/lesso
   const input = { learnerId: "l1", chatId: 1, gender: "male" as const, lessonNumber: 1, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [] };
 
   const first = await deliverLesson(input, deps);
-  assert.equal(first.status, "no_activity_content"); // lesson 1 has no distractor pool
+  assert.equal(first.status, "delivered");
   const photosAfterFirst = telegram.sentPhotos.length;
   const audioAfterFirst = telegram.sentAudio.length;
 
@@ -197,16 +170,4 @@ test("text-before-audio: delivered_at is recorded before the lesson's native aud
   assert.ok(record?.delivered_at);
   assert.ok(record?.audio_delivered_at);
   assert.notEqual(record?.delivered_at, undefined);
-});
-
-// --- Lesson 1's structural distractor gap ----------------------------------
-
-test("lesson 1 has no eligible distractor pool and skips the recognition-tap activity, without inventing content", async () => {
-  const media = new FakeMediaLoader();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
-  const result = await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 1, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [] },
-    deps,
-  );
-  assert.equal(result.status, "no_activity_content");
 });

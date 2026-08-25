@@ -1,12 +1,19 @@
 // Orchestrates one lesson delivery: guard check, picture -> text -> native
-// audio (LDTKB-006 order), then the recognition-tap activity (LDTKB-026).
+// audio (LDTKB-006 order). A lesson simply ends once its audio is sent — the
+// recognition-tap activity that used to follow (LDTKB-026) was removed as a
+// deliberate product decision; a different, text-only, non-testing feature
+// may replace it later, but that's separate, unbuilt scope.
 // All I/O (Telegram, DB, file reads) is behind injected interfaces, so this
 // is unit-testable the same way handleUpdate.ts was in Checkpoint 2.
 
 import { getLesson, PILOT_LESSON_COUNT, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
 import type { MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
-import { pickCrossLessonDistractors, pickNumberDistractors, pickWordSetDistractors, type Rng } from "@/lib/delivery/distractors";
+
+// Kept as a local type (not imported from the now-deleted distractors.ts) so
+// DeliverLessonDeps.rng and existing callers that still pass an `rng` stay
+// source-compatible even though nothing in this file reads it anymore.
+type Rng = () => number;
 
 /**
  * "Lesson {N}" for the pilot (1-7) / "Day {N}" for Weeks 2-4 (8-28) — the
@@ -37,7 +44,13 @@ export interface DeliverLessonInput {
   gender: GenderBranch;
   lessonNumber: number;
   deliveryDate: string; // "YYYY-MM-DD", Thailand calendar date for this delivery
-  /** lesson_number values already delivered to this learner, for distractor selection. */
+  /**
+   * lesson_number values already delivered to this learner. Unused now that
+   * the recognition-tap activity (its only consumer) is removed — kept on
+   * the interface so the cron route's existing call site stays
+   * source-compatible; not touched here since that route is out of scope
+   * for this removal.
+   */
   previouslyDeliveredLessonNumbers: number[];
 }
 
@@ -49,10 +62,7 @@ export interface DeliverLessonDeps {
   rng?: Rng;
 }
 
-export type DeliverLessonResult =
-  | { status: "delivered" }
-  | { status: "already_delivered" }
-  | { status: "no_activity_content"; reason: string };
+export type DeliverLessonResult = { status: "delivered" } | { status: "already_delivered" };
 
 const TONE_LEGEND_MESSAGE =
   "Before your first phrase — Thai Karaoke uses 5 tone marks. Here's what they mean:\n\n" +
@@ -73,7 +83,6 @@ function composePhraseText(lessonNumber: number, lesson: Extract<Lesson, { kind:
 
 export async function deliverLesson(input: DeliverLessonInput, deps: DeliverLessonDeps): Promise<DeliverLessonResult> {
   const now = deps.now ? deps.now() : new Date();
-  const rng = deps.rng ?? Math.random;
 
   const existing = await deps.deliveryStore.findExisting(input.learnerId, input.lessonNumber, input.deliveryDate);
   if (existing) {
@@ -92,7 +101,8 @@ export async function deliverLesson(input: DeliverLessonInput, deps: DeliverLess
     await deliverWordSetLesson(input, lesson, deps, now);
   }
 
-  return await deliverActivity(input, lesson, deps, rng);
+  // The lesson simply ends here now — no further message. See file header.
+  return { status: "delivered" };
 }
 
 async function deliverPhraseLesson(
@@ -186,124 +196,3 @@ async function deliverWordSetLesson(
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 
-/**
- * LDTKB-026: 2-3 audio clips as inline buttons, one correct. Sent as
- * separate labeled audio messages (A/B/[C]) followed by one message with
- * inline buttons — Telegram has no single "audio quiz" message type.
- *
- * callback_data is self-describing (`activity:phrase:<lessonNumber>:<0|1>`
- * or `activity:num:<correctNumber>:<0|1>`) — Checkpoint 4 (see
- * src/lib/activities/lessonActivity.ts) routes on the `activity:` prefix
- * and reads correctness straight out of the tapped button, rather than
- * re-deriving it from lesson content at answer time.
- */
-async function deliverActivity(
-  input: DeliverLessonInput,
-  lesson: Lesson,
-  deps: DeliverLessonDeps,
-  rng: Rng,
-): Promise<DeliverLessonResult> {
-  const labels = ["A", "B", "C"];
-
-  if (lesson.kind === "numbers") {
-    const correct = lesson.numbers[Math.floor(rng() * lesson.numbers.length)].value;
-    const distractors = pickNumberDistractors(correct, rng);
-    const options = shuffleWithCorrectMarked([correct, ...distractors], correct, rng);
-
-    await deps.telegram.sendMessage(input.chatId, "Which number did you hear? Listen to each clip:");
-    for (let i = 0; i < options.length; i++) {
-      const audio = await deps.media.loadNumberAudio(options[i].value);
-      // Rule B (activity audio) — anonymized: never reveal the pronunciation.
-      await deps.telegram.sendAudio(input.chatId, audio, { title: `Option ${labels[i]}`, performer: "Lesson 2 Activity" });
-    }
-    await deps.telegram.sendMessage(
-      input.chatId,
-      "Which one was it?",
-      [options.map((o, i) => ({ text: labels[i], callback_data: `activity:num:${correct}:${o.value === correct ? 1 : 0}` }))],
-    );
-    return { status: "delivered" };
-  }
-
-  if (lesson.kind === "wordset") {
-    const correctWord = lesson.words[Math.floor(rng() * lesson.words.length)];
-    const distractorIndexes = pickWordSetDistractors(correctWord.index, lesson.words.length, rng);
-    const options = shuffleWithCorrectMarked([correctWord.index, ...distractorIndexes], correctWord.index, rng);
-
-    await deps.telegram.sendMessage(input.chatId, "Which word did you hear? Listen to each clip:");
-    for (let i = 0; i < options.length; i++) {
-      const audio = await deps.media.loadWordSetAudio(input.lessonNumber, options[i].value);
-      // Rule B (activity audio) — anonymized: never reveal the pronunciation.
-      await deps.telegram.sendAudio(input.chatId, audio, {
-        title: `Option ${labels[i]}`,
-        performer: `Day ${input.lessonNumber} Activity`,
-      });
-    }
-    await deps.telegram.sendMessage(
-      input.chatId,
-      "Which one was it?",
-      [
-        options.map((o, i) => ({
-          text: labels[i],
-          callback_data: `activity:wordset:${input.lessonNumber}:${correctWord.index}:${o.value === correctWord.index ? 1 : 0}`,
-        })),
-      ],
-    );
-    return { status: "delivered" };
-  }
-
-  const distractorLessons = pickCrossLessonDistractors(input.lessonNumber, input.previouslyDeliveredLessonNumbers, rng);
-  if (distractorLessons.length === 0) {
-    // Lesson 1: no prior taught material exists to draw a distractor from
-    // (see distractors.ts, SCHEDULER.md). Skip the tap activity rather than
-    // invent content or violate "teach before testing" — flagged for review.
-    await deps.telegram.sendMessage(
-      input.chatId,
-      "Nice work, ka! 🎉 From tomorrow, you'll get a fun little activity with each lesson to help things stick.",
-    );
-    return { status: "no_activity_content", reason: "lesson 1 has no eligible distractor pool" };
-  }
-
-  const optionLessonNumbers = shuffleWithCorrectMarked(
-    [input.lessonNumber, ...distractorLessons],
-    input.lessonNumber,
-    rng,
-  );
-
-  await deps.telegram.sendMessage(input.chatId, "Which clip matches today's phrase? Listen to each one:");
-  for (let i = 0; i < optionLessonNumbers.length; i++) {
-    const isToday = optionLessonNumbers[i].value === input.lessonNumber;
-    const audio = isToday
-      ? await deps.media.loadPhraseLessonAudio(input.lessonNumber, input.gender)
-      : await deps.media.loadRepresentativeClip(optionLessonNumbers[i].value, input.gender);
-    // Rule B (activity audio) — anonymized: never reveal the pronunciation.
-    // Performer follows today's lesson/day number, not each option's origin
-    // (an option's own audio might come from a different lesson/day — see
-    // loadRepresentativeClip above — but "today's activity" is what's
-    // actually being tested here, matching label #4/#5's own-day pattern).
-    await deps.telegram.sendAudio(input.chatId, audio, {
-      title: `Option ${labels[i]}`,
-      performer: `${lessonOrDayLabel(input.lessonNumber)} Activity`,
-    });
-  }
-  await deps.telegram.sendMessage(
-    input.chatId,
-    "Which one was it?",
-    [
-      optionLessonNumbers.map((o, i) => ({
-        text: labels[i],
-        callback_data: `activity:phrase:${input.lessonNumber}:${o.value === input.lessonNumber ? 1 : 0}`,
-      })),
-    ],
-  );
-  return { status: "delivered" };
-}
-
-function shuffleWithCorrectMarked<T extends number>(values: T[], correct: T, rng: Rng): { value: T }[] {
-  const items = values.map((value) => ({ value }));
-  for (let i = items.length - 1; i > 0; i--) {
-    const j = Math.floor(rng() * (i + 1));
-    [items[i], items[j]] = [items[j], items[i]];
-  }
-  void correct; // correctness is read from `value` at use sites; kept for clarity
-  return items;
-}

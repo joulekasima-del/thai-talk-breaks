@@ -4,14 +4,12 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { handleLessonActivityCallback } from "@/lib/activities/lessonActivity";
 import { startDay30Quiz, handleDay30QuizCallback } from "@/lib/quiz/day30Quiz";
 import { DAY30_QUESTIONS, day30ScoreMessage, DAY30_BADGE_MESSAGE } from "@/lib/curriculum/day30Content";
 import { dayNumberForLearner, findDueLearners, type OnboardedLearner } from "@/lib/delivery/dueLearners";
 import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
-import { FakeDeliveryStore } from "./deliveryFakes";
 import { FakeDay30QuizStore } from "./quizFakes";
-import type { TelegramCallbackQuery, MediaFile } from "@/lib/telegram";
+import type { MediaFile } from "@/lib/telegram";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -34,75 +32,6 @@ test("Day 30 quiz content matches day30-button-wording.md verbatim", () => {
 test("day30ScoreMessage and badge match day30-quiz-content.md's locked format", () => {
   assert.equal(day30ScoreMessage(7), "You got **7/10**! 🎉");
   assert.equal(DAY30_BADGE_MESSAGE, "🏅 **Thai Talk Breaks Graduate**");
-});
-
-// --- Part A: recognition-tap response handling (Lessons 2-7) --------------
-
-function makeActivityDeps() {
-  return {
-    telegram: new FakeTelegramClient(),
-    learnerStore: new FakeLearnerStore(),
-    deliveryStore: new FakeDeliveryStore(),
-    now: () => new Date("2026-08-23T01:00:00.000Z"),
-  };
-}
-
-function activityCallback(telegramUserId: number, id = "cb1"): TelegramCallbackQuery {
-  return { id, from: { id: telegramUserId }, message: { chat: { id: telegramUserId } } };
-}
-
-test("correct lesson activity tap: records completion and sends positive feedback", async () => {
-  const deps = makeActivityDeps();
-  const learner = await deps.learnerStore.create(100);
-  await deps.deliveryStore.insertTextSent(learner.id, 3, "2026-08-23", new Date().toISOString());
-
-  await handleLessonActivityCallback(activityCallback(100), "activity:phrase:3:1", deps);
-
-  assert.equal(deps.telegram.answeredCallbackIds.length, 1);
-  assert.equal(deps.telegram.sent.length, 1);
-  assert.match(deps.telegram.sent[0].text, /right/i);
-
-  const delivery = await deps.deliveryStore.findExisting(learner.id, 3, "2026-08-23");
-  assert.equal(delivery?.activity_correct, true);
-  assert.ok(delivery?.activity_answered_at);
-});
-
-test("incorrect lesson activity tap: names the correct answer in feedback", async () => {
-  const deps = makeActivityDeps();
-  const learner = await deps.learnerStore.create(101);
-  await deps.deliveryStore.insertTextSent(learner.id, 3, "2026-08-23", new Date().toISOString());
-
-  await handleLessonActivityCallback(activityCallback(101), "activity:phrase:3:0", deps);
-
-  assert.match(deps.telegram.sent[0].text, /Not quite/i);
-  assert.match(deps.telegram.sent[0].text, /take this one|take one/i); // lesson 3's English meaning
-
-  const delivery = await deps.deliveryStore.findExisting(learner.id, 3, "2026-08-23");
-  assert.equal(delivery?.activity_correct, false);
-});
-
-test("lesson 2 (numbers) activity tap: feedback names the correct number", async () => {
-  const deps = makeActivityDeps();
-  const learner = await deps.learnerStore.create(102);
-  await deps.deliveryStore.insertTextSent(learner.id, 2, "2026-08-23", new Date().toISOString());
-
-  await handleLessonActivityCallback(activityCallback(102), "activity:num:7:0", deps);
-
-  assert.match(deps.telegram.sent[0].text, /"7\./);
-});
-
-test("a second tap on an already-answered activity is ignored (no double recording)", async () => {
-  const deps = makeActivityDeps();
-  const learner = await deps.learnerStore.create(103);
-  await deps.deliveryStore.insertTextSent(learner.id, 4, "2026-08-23", new Date().toISOString());
-
-  await handleLessonActivityCallback(activityCallback(103), "activity:phrase:4:1", deps);
-  const countAfterFirst = deps.telegram.sent.length;
-  await handleLessonActivityCallback(activityCallback(103), "activity:phrase:4:0", deps);
-
-  assert.equal(deps.telegram.sent.length, countAfterFirst, "no new feedback message for the stale second tap");
-  const delivery = await deps.deliveryStore.findExisting(learner.id, 4, "2026-08-23");
-  assert.equal(delivery?.activity_correct, true, "first (correct) answer must not be overwritten");
 });
 
 // --- Part B: Day 30 quiz-ladder --------------------------------------------

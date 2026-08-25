@@ -2,11 +2,9 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 
 import { getLesson, isWordSetDay, LESSONS, WEEKS234_LAST_DAY } from "@/lib/curriculum/content";
-import { pickCrossLessonDistractors, pickWordSetDistractors } from "@/lib/delivery/distractors";
 import { deliverLesson } from "@/lib/delivery/deliverLesson";
-import { handleLessonActivityCallback } from "@/lib/activities/lessonActivity";
 import { loadPhraseLessonAudio, loadWordSetAudio, loadWordSetImage } from "@/lib/curriculum/mediaFiles";
-import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
+import { FakeTelegramClient } from "./fakes";
 import { FakeDeliveryStore, FakeMediaLoader } from "./deliveryFakes";
 
 // --- Content coverage: all 21 days (8-28) have deliverable content --------
@@ -99,30 +97,9 @@ test("Day 25 uses example #1 (\"may I park here?\") as its canonical phrase", ()
   assert.equal(lesson.script.female, "ขอจอดรถตรงนี้ได้ไหมคะ");
 });
 
-// --- pickCrossLessonDistractors reused unmodified --------------------------
+// --- Word-set day delivery: one image, per-word audio ----------------------
 
-test("pickCrossLessonDistractors generalizes to Weeks 2-4 day numbers without modification", () => {
-  // Day 20's pool includes both pilot lessons and earlier Weeks 2-4 days.
-  const pool = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19];
-  const result = pickCrossLessonDistractors(20, pool, () => 0.5);
-  assert.equal(result.length, 2);
-  for (const n of result) assert.ok(n < 20 && pool.includes(n));
-});
-
-test("pickWordSetDistractors: two distinct words from the same set, never the correct one, respects set size", () => {
-  const day8 = pickWordSetDistractors(2, 4, () => 0.4); // Day 8 has 4 words
-  assert.equal(day8.length, 2);
-  assert.ok(!day8.includes(2));
-  for (const n of day8) assert.ok(n >= 1 && n <= 4);
-
-  const day16 = pickWordSetDistractors(1, 3, () => 0.4); // Day 16 has 3 words
-  assert.equal(day16.length, 2);
-  assert.deepEqual(new Set(day16), new Set([2, 3]));
-});
-
-// --- Word-set day delivery: one image, per-word audio, intra-set activity -
-
-test("word-set day delivery sends exactly ONE image (not one per word) and one audio per word", async () => {
+test("word-set day delivery sends exactly ONE image (not one per word) and exactly one audio per word", async () => {
   const media = new FakeMediaLoader();
   const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
 
@@ -133,74 +110,8 @@ test("word-set day delivery sends exactly ONE image (not one per word) and one a
 
   assert.equal(deps.telegram.sentPhotos.length, 1, "exactly one photo for the whole day, not per word");
   assert.equal(deps.telegram.sentPhotos[0].filename, "day8.png");
-  // 4 words' audio for lesson content + up to 2 more for the activity.
   const contentAudio = media.requested.filter((f) => f.startsWith("day8_") && !f.startsWith("representative:"));
-  assert.ok(contentAudio.length >= 4);
-});
-
-test("word-set activity distractors come only from the same day's own words, not other days", async () => {
-  const media = new FakeMediaLoader();
-  const telegram = new FakeTelegramClient();
-  const deps = { telegram, deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.1 };
-
-  await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "female", lessonNumber: 16, deliveryDate: "2026-09-01", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8] },
-    deps,
-  );
-
-  const activityButtons = telegram.sent.at(-1)?.keyboard?.[0] ?? [];
-  assert.equal(activityButtons.length, 3);
-  for (const button of activityButtons) {
-    assert.ok("callback_data" in button, "word-set activity buttons must use callback_data, not web_app");
-    assert.match(button.callback_data, /^activity:wordset:16:\d:[01]$/);
-  }
-});
-
-// --- Word-set activity response handling -----------------------------------
-
-test("word-set activity tap: correct answer feedback names the correct word's meaning", async () => {
-  const deps = {
-    telegram: new FakeTelegramClient(),
-    learnerStore: new FakeLearnerStore(),
-    deliveryStore: new FakeDeliveryStore(),
-    now: () => new Date("2026-09-01T01:00:00.000Z"),
-  };
-  const learner = await deps.learnerStore.create(300);
-  await deps.deliveryStore.insertTextSent(learner.id, 26, "2026-09-01", new Date().toISOString());
-
-  // Day 26, word index 2 = "mâi châi" = "No/incorrect".
-  await handleLessonActivityCallback(
-    { id: "cb1", from: { id: 300 }, message: { chat: { id: 300 } } },
-    "activity:wordset:26:2:0",
-    deps,
-  );
-
-  assert.match(deps.telegram.sent[0].text, /No\/incorrect/);
-  const delivery = await deps.deliveryStore.findExisting(learner.id, 26, "2026-09-01");
-  assert.equal(delivery?.activity_correct, false);
-});
-
-// --- Standard phrase days plug into the existing (Checkpoint 4) handler ---
-
-test("a standard Weeks 2-4 phrase day (e.g. Day 20) uses the same activity handler path as Lessons 3-7, unmodified", async () => {
-  const deps = {
-    telegram: new FakeTelegramClient(),
-    learnerStore: new FakeLearnerStore(),
-    deliveryStore: new FakeDeliveryStore(),
-    now: () => new Date("2026-09-01T01:00:00.000Z"),
-  };
-  const learner = await deps.learnerStore.create(301);
-  await deps.deliveryStore.insertTextSent(learner.id, 20, "2026-09-01", new Date().toISOString());
-
-  await handleLessonActivityCallback(
-    { id: "cb2", from: { id: 301 }, message: { chat: { id: 301 } } },
-    "activity:phrase:20:1",
-    deps,
-  );
-
-  assert.match(deps.telegram.sent[0].text, /right/i);
-  const delivery = await deps.deliveryStore.findExisting(learner.id, 20, "2026-09-01");
-  assert.equal(delivery?.activity_correct, true);
+  assert.equal(contentAudio.length, 4, "one audio clip per word, no more (no activity distractors anymore)");
 });
 
 // --- Section 5E: "main, not extended" assumption for Days 9, 13, 24 -------
@@ -248,14 +159,3 @@ test("real media files: word-set audio and single shared image are readable for 
   }
 });
 
-// --- Confirm Lessons 1-7 / Day 29 / Day 30 code paths unaffected ----------
-
-test("Lesson 1 still has no activity (unaffected by Checkpoint 5)", async () => {
-  const media = new FakeMediaLoader();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
-  const result = await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 1, deliveryDate: "2026-09-01", previouslyDeliveredLessonNumbers: [] },
-    deps,
-  );
-  assert.equal(result.status, "no_activity_content");
-});

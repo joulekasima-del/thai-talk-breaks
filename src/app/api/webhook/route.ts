@@ -2,8 +2,6 @@ import { createTelegramClient, type TelegramUpdate } from "@/lib/telegram";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { supabaseLearnerStore } from "@/lib/onboarding/learnerStore";
 import { handleUpdate } from "@/lib/onboarding/handleUpdate";
-import { supabaseDeliveryStore } from "@/lib/delivery/deliveryStore";
-import { handleLessonActivityCallback } from "@/lib/activities/lessonActivity";
 import { supabaseDay30QuizStore } from "@/lib/quiz/day30QuizStore";
 import { handleDay30QuizCallback } from "@/lib/quiz/day30Quiz";
 import { supabaseProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
@@ -13,9 +11,10 @@ import { supabaseOopsReportsStore } from "@/lib/oops/oopsReportsStore";
 // Telegram webhook endpoint. Verifies the shared secret, dedups on
 // update_id (hotfix — Telegram retries delivery of the same update if it
 // doesn't get a timely 200 OK; see processedUpdatesStore.ts), then routes:
-//   - "activity:*" callbacks -> lessonActivity.ts (Lessons 2-7's recognition-tap responses, Checkpoint 4)
-//   - "quiz:*" callbacks     -> day30Quiz.ts (Day 30 quiz-ladder progression, Checkpoint 4)
-//   - everything else        -> handleUpdate() (onboarding, Checkpoint 2 — untouched)
+//   - "quiz:*" callbacks -> day30Quiz.ts (Day 30 quiz-ladder progression, Checkpoint 4)
+//   - everything else    -> handleUpdate() (onboarding, Checkpoint 2 — untouched)
+// The "activity:*" callback route (Lessons 2-28's recognition-tap responses)
+// was removed along with the feature itself — see lib/delivery/deliverLesson.ts.
 // No lesson-DELIVERY or scheduling logic lives here — that's the cron route (Checkpoint 3/4).
 
 export async function POST(request: Request): Promise<Response> {
@@ -58,14 +57,7 @@ export async function POST(request: Request): Promise<Response> {
     // stops retrying.
     await dedupeAndProcess(update.update_id, processedUpdatesStore, async () => {
       const callbackData = update.callback_query?.data;
-      if (callbackData?.startsWith("activity:")) {
-        const deliveryStore = supabaseDeliveryStore(supabase);
-        await handleLessonActivityCallback(update.callback_query!, callbackData, {
-          telegram,
-          learnerStore: store,
-          deliveryStore,
-        });
-      } else if (callbackData?.startsWith("quiz:")) {
+      if (callbackData?.startsWith("quiz:")) {
         const quizStore = supabaseDay30QuizStore(supabase);
         await handleDay30QuizCallback(update.callback_query!, callbackData, {
           telegram,
