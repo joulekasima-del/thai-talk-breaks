@@ -1,8 +1,8 @@
 // Orchestrates one lesson delivery: guard check, picture -> text -> native
-// audio (LDTKB-006 order). A lesson simply ends once its audio is sent — the
-// recognition-tap activity that used to follow (LDTKB-026) was removed as a
-// deliberate product decision; a different, text-only, non-testing feature
-// may replace it later, but that's separate, unbuilt scope.
+// audio (LDTKB-006 order), then a plain-text explanation (LDTKB-051). The
+// recognition-tap activity that used to occupy this final slot (LDTKB-026)
+// was removed as a deliberate product decision; LDTKB-051's explanation
+// message is its replacement, now built (see LESSON_EXPLANATIONS import).
 // All I/O (Telegram, DB, file reads) is behind injected interfaces, so this
 // is unit-testable the same way handleUpdate.ts was in Checkpoint 2.
 
