@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.4  
-**Last updated:** 23 August 2026  
+**Register version:** 4.5  
+**Last updated:** 24 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -528,6 +528,18 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Exact copy:** see `onboarding/welcome-message.md`.  
 **Locked by:** Joule's confirmation, 23 August 2026.
 
+## LDTKB-051 — Lesson explanations (Days 1–28) replace the removed testing activity
+
+**Status:** Locked  
+**Decision:** Every lesson (1–28) now ends with a plain-text explanation message, replacing the recognition-tap testing activity removed earlier (24 August 2026). Content originally drafted with ChatGPT, then reviewed and adjusted by Joule. Key rules, confirmed:
+1. Starts fresh from the "how it works" content — never repeats the phrase/meaning header the learner already saw earlier in the same day's delivery.
+2. Where a lesson has multiple valid grammatical forms (age-relative pronouns: Days 15, 17, 21, 22), all forms are shown for learning value, with a ✅ marking which one matches that day's actual delivered audio — since the app itself only ever uses the younger form (LDTKB-047), showing both without this marker would risk a learner thinking the "older" form is something they can select.
+3. Real names/values used throughout, never a generic placeholder — e.g. Day 15 uses the actual delivered names (Dtôm/Nók), not a `[NAME]` template.
+4. Plain text only, no Markdown — confirmed the delivery system does not render Markdown syntax; any such syntax would show as literal asterisks/etc. in the real chat.
+5. Not gender-branched — one universal version per lesson.
+**Exact copy:** see `curriculum/lesson-explanations.md`.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -572,3 +584,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 22 Aug 2026 | LDTKB-048 | Weeks 2-4 activity design: Days 8/16/26 (word-sets) use Lesson 2's word-matching pattern; Day 25 uses example #1 ("may I park here?") as its canonical tested phrase | Joule |
 | 22 Aug 2026 | LDTKB-049 | Day 29 Surprise Quest lock-state stored server-side (Supabase), consistent with all other learner progress; monkey mascot concept removed entirely, replaced with text-only completion message | Joule |
 | 23 Aug 2026 | LDTKB-050 | Welcome message finalized: adds /oops (now built) and Thai Talk Newsletter channel link; corrects "native-speaker audio" to "clear native Thai pronunciation" (audio is AI-voiced, not human-recorded); confirmed deliberate "we" voice exception | Joule |
+| 24 Aug 2026 | LDTKB-051 | All 28 lessons get a plain-text explanation as their final message, replacing the removed recognition-tap testing activity; content drafted with ChatGPT, reviewed and adjusted by Joule | Joule |
