@@ -9,7 +9,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/onboarding.test.ts tests/delivery.test.ts tests/checkpoint4.test.ts tests/checkpoint5.test.ts tests/schema.test.ts tests/day29.test.ts tests/webhookDedup.test.ts tests/oops.test.ts tests/audioDisplayNames.test.ts"
+    "test": "tsx --test tests/onboarding.test.ts tests/delivery.test.ts tests/checkpoint4.test.ts tests/checkpoint5.test.ts tests/schema.test.ts tests/day29.test.ts tests/webhookDedup.test.ts tests/oops.test.ts tests/audioDisplayNames.test.ts tests/lessonExplanations.test.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",

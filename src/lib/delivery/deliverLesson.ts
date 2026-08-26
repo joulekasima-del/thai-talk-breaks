@@ -7,6 +7,7 @@
 // is unit-testable the same way handleUpdate.ts was in Checkpoint 2.
 
 import { getLesson, PILOT_LESSON_COUNT, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
+import { LESSON_EXPLANATIONS } from "@/lib/curriculum/lessonExplanations";
 import type { MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
 
@@ -101,7 +102,10 @@ export async function deliverLesson(input: DeliverLessonInput, deps: DeliverLess
     await deliverWordSetLesson(input, lesson, deps, now);
   }
 
-  // The lesson simply ends here now — no further message. See file header.
+  // LDTKB-051: the lesson explanation, sent as the final message — replaces
+  // the gap left by the removed recognition-tap activity.
+  await deps.telegram.sendMessage(input.chatId, LESSON_EXPLANATIONS[input.lessonNumber]);
+
   return { status: "delivered" };
 }
 
