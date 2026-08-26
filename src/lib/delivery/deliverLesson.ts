@@ -65,8 +65,9 @@ export interface DeliverLessonDeps {
 
 export type DeliverLessonResult = { status: "delivered" } | { status: "already_delivered" };
 
+// curriculum/tone-mark-explainer.md (LDTKB-052)
 const TONE_LEGEND_MESSAGE =
-  "Before your first phrase — Thai Karaoke uses 5 tone marks. Here's what they mean:\n\n" +
+  "Before your first phrase — Thai Talk Breaks uses its own romanization with 5 tone marks, made specifically to help you pronounce Thai correctly here in @ThaiTalkBreaksBot. Thai has an official romanization for writing (called RTGS) but it doesn't include tone marks, so it's not what you'll see here. Here's what our tone marks mean:\n\n" +
   "a = mid (flat, calm)\n" +
   "à = low (starts low, stays low)\n" +
   "â = falling (starts high, drops)\n" +
