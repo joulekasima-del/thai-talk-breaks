@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.5  
+**Register version:** 4.6  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -540,6 +540,15 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Exact copy:** see `curriculum/lesson-explanations.md`.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-052 — Three previously-unlocked messages/behaviors formally reviewed and locked
+
+**Status:** Locked  
+**Decision:** During a dedicated review pass of everything flagged 🟡 unlocked in the master chat script (23 August 2026), three items were reviewed and confirmed, 24 August 2026:
+1. **Already-onboarded message** (unchanged, locked as-is) — see `onboarding/already-onboarded-message.md`.
+2. **Mid-onboarding `/start` repeat behavior** — confirmed correct as a design choice (re-shows the learner's current pending onboarding question rather than restarting from the welcome message). This is a behavior, not a fixed message with exact text to lock — no source file needed.
+3. **Lesson 1's tone-mark explainer — rewritten and locked**, replacing the earlier unlocked, implementation-only wording. The new version explicitly clarifies that this is Thai Talk Breaks' own pronunciation-focused romanization, distinct from Thailand's official RTGS (which omits tone marks and vowel length, and so cannot serve a pronunciation-teaching purpose) — see `curriculum/tone-mark-explainer.md`.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -585,3 +594,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 22 Aug 2026 | LDTKB-049 | Day 29 Surprise Quest lock-state stored server-side (Supabase), consistent with all other learner progress; monkey mascot concept removed entirely, replaced with text-only completion message | Joule |
 | 23 Aug 2026 | LDTKB-050 | Welcome message finalized: adds /oops (now built) and Thai Talk Newsletter channel link; corrects "native-speaker audio" to "clear native Thai pronunciation" (audio is AI-voiced, not human-recorded); confirmed deliberate "we" voice exception | Joule |
 | 24 Aug 2026 | LDTKB-051 | All 28 lessons get a plain-text explanation as their final message, replacing the removed recognition-tap testing activity; content drafted with ChatGPT, reviewed and adjusted by Joule | Joule |
+| 24 Aug 2026 | LDTKB-052 | Three previously-unlocked items formally reviewed: already-onboarded message locked as-is, mid-onboarding /start repeat behavior confirmed, Lesson 1 tone-mark explainer rewritten to clarify it's Thai Talk Breaks' own pronunciation romanization, not Thailand's official RTGS | Joule |
