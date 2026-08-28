@@ -29,7 +29,15 @@ export interface SendAudioOptions {
 }
 
 export interface TelegramClient {
-  sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard): Promise<void>;
+  /**
+   * `parseMode` is optional and defaults to unset — omitting it (every call
+   * site except the welcome message) sends exactly as before this existed,
+   * with no `parse_mode` field at all. Only "HTML" is supported: Telegram's
+   * actual tag set for it (`<b>`, `<i>`, etc. — not Markdown asterisks,
+   * which were the original bug here) is what LDTKB-053/054's welcome
+   * message uses.
+   */
+  sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard, parseMode?: "HTML"): Promise<void>;
   answerCallbackQuery(callbackQueryId: string): Promise<void>;
   /** Uploads photo bytes directly (multipart) — Checkpoint 3, for lesson pictures. */
   sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void>;
@@ -44,10 +52,13 @@ class HttpTelegramClient implements TelegramClient {
     this.baseUrl = `https://api.telegram.org/bot${botToken}`;
   }
 
-  async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard): Promise<void> {
+  async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard, parseMode?: "HTML"): Promise<void> {
     const body: Record<string, unknown> = { chat_id: chatId, text };
     if (keyboard) {
       body.reply_markup = { inline_keyboard: keyboard };
+    }
+    if (parseMode) {
+      body.parse_mode = parseMode;
     }
     const res = await fetch(`${this.baseUrl}/sendMessage`, {
       method: "POST",

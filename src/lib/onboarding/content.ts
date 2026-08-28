@@ -11,29 +11,35 @@
 
 import type { InlineKeyboard } from "@/lib/telegram";
 
-// onboarding/welcome-message.md (LDTKB-031, superseded by LDTKB-050)
+// onboarding/welcome-message.md (LDTKB-031, superseded by LDTKB-050,
+// formatting fixed and content revised LDTKB-053/054). The only message in
+// the product sent with parse_mode "HTML" — see handleUpdate.ts's one
+// sendMessage call for WELCOME_MESSAGE, and telegram.ts's sendMessage
+// signature. Every other message stays plain text.
 export const WELCOME_MESSAGE =
-  "Sawasdee ka! 🙏 *Welcome to Thai Talk Breaks*.\n" +
+  "Sawasdee ka! 🙏 \n" +
+  "\n" +
+  "Welcome to <b>Thai Talk Breaks</b>.\n" +
   "\n" +
   "We're happy to have you here. 🌿\n" +
   "\n" +
-  "Thai Talk Breaks is a 30-day conversational Thai course designed to help you build useful Thai little by little — without overwhelming study sessions.\n" +
+  "Thai Talk Breaks is a <b><i>30-day conversational Thai course</i></b> designed to help you build useful Thai little by little — without overwhelming study sessions.\n" +
   "\n" +
-  "Your first 7 days are free.\n" +
+  "<i>Your first 7 days are free.</i>\n" +
   "\n" +
   "Each daily break is short and practical:\n" +
   "🖼️ one picture\n" +
   "💬 one useful Thai phrase\n" +
   "🔊 clear native Thai pronunciation\n" +
-  "✨ one quick activity to help it stick\n" +
+  "✨ explanation for daily use\n" +
   "\n" +
   "No Thai script required. We'll focus first on Thai you can understand, say, and use in everyday life.\n" +
   "\n" +
-  "If something ever seems confusing or doesn't work properly, just type /oops anytime, ka. We'll take a look.\n" +
+  "<i>If something ever seems confusing or doesn't work properly, just type <b>/oops</b> anytime ka. We'll take a look.</i>\n" +
   "\n" +
-  "And if you'd like a little more Thai between lessons, you can join Thai Talk Newsletter. We share useful expressions, everyday language, and small insights into how Thai is actually spoken — and how it changes over time.\n" +
   "\n" +
-  "👉 https://t.me/thaitalk_newsletter\n" +
+  "And if you'd like to put your Thai into practice, join our <b>Thai Talk: Jot It Down</b> community. Every Saturday morning, <i>Chaa-yen</i> brings you a new little exercise to practise everyday Thai, improve your sentences, and learn together with the community.\n" +
+  "👉 https://t.me/thaitalk_jot_it_down\n" +
   "\n" +
   "That's it. No preparation needed.\n" +
   "\n" +

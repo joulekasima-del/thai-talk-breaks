@@ -98,7 +98,9 @@ async function handleStart(
 
   if (!learner) {
     learner = await deps.store.create(telegramUserId);
-    await deps.telegram.sendMessage(chatId, WELCOME_MESSAGE);
+    // LDTKB-053/054: the only message in the product sent with HTML
+    // formatting — see telegram.ts's sendMessage signature.
+    await deps.telegram.sendMessage(chatId, WELCOME_MESSAGE, undefined, "HTML");
     await deps.telegram.sendMessage(chatId, GENDER_QUESTION_MESSAGE, GENDER_QUESTION_KEYBOARD);
     return;
   }

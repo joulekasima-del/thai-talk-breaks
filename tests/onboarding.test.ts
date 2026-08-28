@@ -88,8 +88,14 @@ test("new learner: /start sends welcome + gender question, creates row in gender
   assert.equal(deps.telegram.sent.length, 2);
   assert.equal(deps.telegram.sent[0].text, WELCOME_MESSAGE);
   assert.equal(deps.telegram.sent[0].keyboard, undefined);
+  // LDTKB-053/054: the welcome message is the only one sent with HTML
+  // formatting — its <b>/<i> tags never rendered until this fix.
+  assert.equal(deps.telegram.sent[0].parseMode, "HTML");
   assert.equal(deps.telegram.sent[1].text, GENDER_QUESTION_MESSAGE);
   assert.ok(deps.telegram.sent[1].keyboard);
+  // Guard against an accidental global change: every other message (the
+  // gender question here) must still send with no formatting parameter.
+  assert.equal(deps.telegram.sent[1].parseMode, undefined);
 
   const learner = await deps.store.findByTelegramId(111);
   assert.equal(learner?.onboarding_step, "gender_pending");

@@ -46,6 +46,8 @@ export interface SentMessage {
   chatId: number;
   text: string;
   keyboard?: InlineKeyboard;
+  /** Only the welcome message (LDTKB-053/054) ever sets this — see telegram.ts's sendMessage signature. */
+  parseMode?: "HTML";
 }
 
 export interface SentMedia {
@@ -66,8 +68,8 @@ export class FakeTelegramClient implements TelegramClient {
   /** Optional shared event log (see tests/deliveryFakes.ts EventLog), for cross-fake ordering assertions. */
   constructor(private log?: { push(event: string): void }) {}
 
-  async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard): Promise<void> {
-    this.sent.push({ chatId, text, keyboard });
+  async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard, parseMode?: "HTML"): Promise<void> {
+    this.sent.push({ chatId, text, keyboard, parseMode });
   }
 
   async answerCallbackQuery(callbackQueryId: string): Promise<void> {
