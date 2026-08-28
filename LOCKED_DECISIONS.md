@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.7  
+**Register version:** 4.8  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -556,6 +556,16 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Exact copy:** see `onboarding/welcome-message.md`.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-054 — Welcome message content revised: heavier formatting, new community channel
+
+**Status:** Locked  
+**Decision:** Confirmed 24 August 2026, superseding LDTKB-053's simpler formatting. Key changes:
+1. **Multiple, sometimes-nested `<b>`/`<i>` tags** added throughout — reviewed and corrected against Telegram's actual supported HTML tag set before locking (the draft had used a non-existent `<italic>` tag and unclosed tags in several places; corrected to real `<b>`/`<i>` with proper `</tag>` closes).
+2. **Community channel substantially revised** — new name ("Thai Talk: Jot It Down," replacing "Thai Talk Newsletter"), new link (`https://t.me/thaitalk_jot_it_down`), a named host ("Chaa-yen"), reframed from a passive newsletter to a weekly Saturday practice-exercise format.
+3. **Fixed a stale reference** to the removed testing activity — "one quick activity to help it stick" → "explanation for daily use," matching the actual current product (LDTKB-051).  
+**Exact copy:** see `onboarding/welcome-message.md`.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -603,3 +613,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-051 | All 28 lessons get a plain-text explanation as their final message, replacing the removed recognition-tap testing activity; content drafted with ChatGPT, reviewed and adjusted by Joule | Joule |
 | 24 Aug 2026 | LDTKB-052 | Three previously-unlocked items formally reviewed: already-onboarded message locked as-is, mid-onboarding /start repeat behavior confirmed, Lesson 1 tone-mark explainer rewritten to clarify it's Thai Talk Breaks' own pronunciation romanization, not Thailand's official RTGS | Joule |
 | 24 Aug 2026 | LDTKB-053 | Fixed a real bug: the welcome message's asterisks never actually rendered as bold (no parse_mode was ever set); converted to real HTML bold, enabled only for this one message | Joule |
+| 24 Aug 2026 | LDTKB-054 | Welcome message content revised: heavier bold/italic formatting (corrected against Telegram's real HTML tag set), new community channel ("Thai Talk: Jot It Down," host "Chaa-yen," weekly Saturday format, replacing Thai Talk Newsletter), fixed a stale reference to the removed activity feature | Joule |
