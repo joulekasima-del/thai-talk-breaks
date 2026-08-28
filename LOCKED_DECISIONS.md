@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.6  
+**Register version:** 4.7  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -549,6 +549,13 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 3. **Lesson 1's tone-mark explainer — rewritten and locked**, replacing the earlier unlocked, implementation-only wording. The new version explicitly clarifies that this is Thai Talk Breaks' own pronunciation-focused romanization, distinct from Thailand's official RTGS (which omits tone marks and vowel length, and so cannot serve a pronunciation-teaching purpose) — see `curriculum/tone-mark-explainer.md`.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-053 — Welcome message formatting bug fixed: real bold, not literal asterisks
+
+**Status:** Locked  
+**Decision:** Found and fixed 24 August 2026: the welcome message's `*Welcome to Thai Talk Breaks*` was written as Markdown, but no `parse_mode` was ever set anywhere in the codebase — every learner has been seeing literal asterisks, not bold text, since LDTKB-050 was pushed. Fixed by converting to real HTML `<b>` tags and enabling Telegram's HTML parse mode specifically for this one message. Every other message in the product remains plain text — this is a targeted, per-message fix, not a global formatting change, to avoid the risk of MarkdownV2-style escaping requirements breaking any of the many already-locked plain-text messages (lesson explanations, quiz feedback, `/oops`, etc.).  
+**Exact copy:** see `onboarding/welcome-message.md`.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -595,3 +602,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 23 Aug 2026 | LDTKB-050 | Welcome message finalized: adds /oops (now built) and Thai Talk Newsletter channel link; corrects "native-speaker audio" to "clear native Thai pronunciation" (audio is AI-voiced, not human-recorded); confirmed deliberate "we" voice exception | Joule |
 | 24 Aug 2026 | LDTKB-051 | All 28 lessons get a plain-text explanation as their final message, replacing the removed recognition-tap testing activity; content drafted with ChatGPT, reviewed and adjusted by Joule | Joule |
 | 24 Aug 2026 | LDTKB-052 | Three previously-unlocked items formally reviewed: already-onboarded message locked as-is, mid-onboarding /start repeat behavior confirmed, Lesson 1 tone-mark explainer rewritten to clarify it's Thai Talk Breaks' own pronunciation romanization, not Thailand's official RTGS | Joule |
+| 24 Aug 2026 | LDTKB-053 | Fixed a real bug: the welcome message's asterisks never actually rendered as bold (no parse_mode was ever set); converted to real HTML bold, enabled only for this one message | Joule |
