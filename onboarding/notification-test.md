@@ -1,6 +1,6 @@
 # Onboarding — Notification Test
 
-**Status:** Locked (LDTKB-035), 19 August 2026
+**Status:** Locked (LDTKB-035, naka removed LDTKB-055), 19 August 2026 / 24 August 2026
 **Sent:** During onboarding, after schedule selection, per LDTKB-005 (requirement) and LDTKB-028 (passive implementation)
 **Interaction:** None — no buttons, no confirm/retry, no gate on proceeding to the next step
 
@@ -9,7 +9,7 @@
 Exact approved text and spacing below. Implement verbatim, including blank lines.
 
 ```
-🔔 This is what your lesson notifications will look like, naka.
+🔔 This is what your lesson notifications will look like.
 
 If you saw or heard this, you're all set — your first lesson arrives at your chosen time.
 

@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.8  
+**Register version:** 4.9  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -566,6 +566,29 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Exact copy:** see `onboarding/welcome-message.md`.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-055 — "ka" narrator tic removed almost everywhere, one exception retained
+
+**Status:** Locked  
+**Decision:** Confirmed 24 August 2026: the narrator's recurring "ka" tic (and the related "naka" variant) is removed from every message in the product **except the very first "Sawasdee ka!"** in the welcome message, which remains as the sole surviving instance. This is a stylistic simplification, not a functional change.
+
+**One important exception carved out during this review:** "ka" inside the gender question's "krap for a male voice, ka for a female voice" is **not** a narrator tic — it's literally naming the vocabulary word being taught (the actual female polite ending). Removing it would make the sentence describe something without naming it. This instance is retained as-is.
+
+**Full list of changes, by message:**
+1. Welcome message — second "ka" (in the /oops line) removed; first "Sawasdee ka!" retained. See `onboarding/welcome-message.md`.
+2. Gender question — "before we start, ka!" → "before we start!"; the vocabulary-naming "ka" is retained. See `onboarding/gender-question.md`.
+3. Schedule period question — "ka?" removed. See `onboarding/schedule-selection.md`.
+4. Schedule time message — "ka:" removed. See `onboarding/schedule-selection.md`.
+5. Notification test — "naka" removed. See `onboarding/notification-test.md`.
+6. Onboarding complete — both instances removed. See `onboarding/onboarding-complete.md`.
+7. Already-onboarded message — "ka!" removed. See `onboarding/already-onboarded-message.md`.
+8. `/oops` prompt — "ka?" removed: "What's going on? Just type it out and send it — I'll take a look. 🐛" (no separate `.md` source, matching the existing precedent for this feature's copy).
+9. `/oops` confirmation — "ka!" removed: "Got it! 🙏 I've noted this down — no need to wait for a reply, just carry on with your lessons. Thank you for helping make Thai Talk Breaks better! 💛"
+10. Day 30 quiz, correct feedback — "ka!" removed: "Correct! 🎉"
+11. Day 30 quiz, incorrect feedback — "ka" removed: `Not quite — that was "{correct answer}."`
+
+**Confirmed out of scope:** none of the 28 lesson explanations (LDTKB-051), the actual Day 1–28 lesson delivery content, or Day 29's messages use this tic at all — verified via direct code search before locking this decision. This change touches onboarding, `/oops`, and Day 30 only.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -614,3 +637,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-052 | Three previously-unlocked items formally reviewed: already-onboarded message locked as-is, mid-onboarding /start repeat behavior confirmed, Lesson 1 tone-mark explainer rewritten to clarify it's Thai Talk Breaks' own pronunciation romanization, not Thailand's official RTGS | Joule |
 | 24 Aug 2026 | LDTKB-053 | Fixed a real bug: the welcome message's asterisks never actually rendered as bold (no parse_mode was ever set); converted to real HTML bold, enabled only for this one message | Joule |
 | 24 Aug 2026 | LDTKB-054 | Welcome message content revised: heavier bold/italic formatting (corrected against Telegram's real HTML tag set), new community channel ("Thai Talk: Jot It Down," host "Chaa-yen," weekly Saturday format, replacing Thai Talk Newsletter), fixed a stale reference to the removed activity feature | Joule |
+| 24 Aug 2026 | LDTKB-055 | "ka" narrator tic removed from every message except the welcome message's very first "Sawasdee ka!" — covers onboarding (6 messages), /oops (2 messages), Day 30 quiz feedback (2 messages); the vocabulary-naming "ka" in the gender question is retained as an exception; confirmed the 28 lesson explanations and Day 29 never used this tic | Joule |

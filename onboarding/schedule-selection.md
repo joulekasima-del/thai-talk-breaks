@@ -1,6 +1,6 @@
 # Onboarding — Schedule Selection
 
-**Status:** Locked (LDTKB-034), 19 August 2026
+**Status:** Locked (LDTKB-034, ka-tic removed LDTKB-055), 19 August 2026 / 24 August 2026
 **Sent:** During onboarding, per LDTKB-004
 **Timezone:** All times are Thailand time (UTC+7), stated explicitly in step 1 only
 
@@ -11,7 +11,7 @@ Two-step flow: period first, then a specific time within that period. Exact text
 ## Step 1 — period
 
 ```
-What time works best for your daily lesson, ka? (Thailand time 🇹🇭)
+What time works best for your daily lesson? (Thailand time 🇹🇭)
 ```
 
 **Buttons:**
@@ -22,7 +22,7 @@ What time works best for your daily lesson, ka? (Thailand time 🇹🇭)
 ## Step 2 — specific time (shown after step 1 selection)
 
 ```
-Pick your time, ka:
+Pick your time:
 ```
 
 **If Morning selected, buttons:**

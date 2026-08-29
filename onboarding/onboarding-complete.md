@@ -1,6 +1,6 @@
 # Onboarding — Complete Message
 
-**Status:** Locked (LDTKB-036), 19 August 2026
+**Status:** Locked (LDTKB-036, ka-tic removed LDTKB-055), 19 August 2026 / 24 August 2026
 **Sent:** Final onboarding step, immediately after the notification test (see notification-test.md)
 
 ---
@@ -8,11 +8,11 @@
 Exact approved text and spacing below. Implement verbatim, including blank lines.
 
 ```
-That's it, you're all set, ka! 🎉
+That's it, you're all set! 🎉
 
 Your first lesson arrives at your chosen time.
 
-See you soon, ka!
+See you soon!
 ```
 
 **On send:** onboarding is complete. The learner's first lesson delivery is scheduled per their chosen time (schedule-selection.md) and gender branch (gender-question.md).
