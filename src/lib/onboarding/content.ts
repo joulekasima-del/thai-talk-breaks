@@ -35,7 +35,7 @@ export const WELCOME_MESSAGE =
   "\n" +
   "No Thai script required. We'll focus first on Thai you can understand, say, and use in everyday life.\n" +
   "\n" +
-  "<i>If something ever seems confusing or doesn't work properly, just type <b>/oops</b> anytime ka. We'll take a look.</i>\n" +
+  "<i>If something ever seems confusing or doesn't work properly, just type <b>/oops</b> anytime. We'll take a look.</i>\n" +
   "\n" +
   "\n" +
   "And if you'd like to put your Thai into practice, join our <b>Thai Talk: Jot It Down</b> community. Every Saturday morning, <i>Chaa-yen</i> brings you a new little exercise to practise everyday Thai, improve your sentences, and learn together with the community.\n" +
@@ -47,7 +47,7 @@ export const WELCOME_MESSAGE =
 
 // onboarding/gender-question.md (LDTKB-033)
 export const GENDER_QUESTION_MESSAGE =
-  "Quick thing before we start, ka!\n" +
+  "Quick thing before we start!\n" +
   "\n" +
   "Thai has two polite word-endings depending on who's speaking — krap for a male voice, ka for a female voice.\n" +
   "\n" +
@@ -62,7 +62,7 @@ export const GENDER_QUESTION_KEYBOARD: InlineKeyboard = [
 
 // onboarding/schedule-selection.md step 1 (LDTKB-034)
 export const SCHEDULE_PERIOD_MESSAGE =
-  "What time works best for your daily lesson, ka? (Thailand time 🇹🇭)";
+  "What time works best for your daily lesson? (Thailand time 🇹🇭)";
 
 export const SCHEDULE_PERIOD_KEYBOARD: InlineKeyboard = [
   [
@@ -73,7 +73,7 @@ export const SCHEDULE_PERIOD_KEYBOARD: InlineKeyboard = [
 ];
 
 // onboarding/schedule-selection.md step 2 (LDTKB-034)
-export const SCHEDULE_TIME_MESSAGE = "Pick your time, ka:";
+export const SCHEDULE_TIME_MESSAGE = "Pick your time:";
 
 const SCHEDULE_TIME_OPTIONS: Record<"morning" | "afternoon" | "evening", string[]> = {
   morning: ["08:00", "09:00", "10:00", "11:00"],
@@ -96,7 +96,7 @@ export function isValidTimeForPeriod(period: "morning" | "afternoon" | "evening"
 
 // onboarding/notification-test.md (LDTKB-035)
 export const NOTIFICATION_TEST_MESSAGE =
-  "🔔 This is what your lesson notifications will look like, naka.\n" +
+  "🔔 This is what your lesson notifications will look like.\n" +
   "\n" +
   "If you saw or heard this, you're all set — your first lesson arrives at your chosen time.\n" +
   "\n" +
@@ -104,11 +104,11 @@ export const NOTIFICATION_TEST_MESSAGE =
 
 // onboarding/onboarding-complete.md (LDTKB-036)
 export const ONBOARDING_COMPLETE_MESSAGE =
-  "That's it, you're all set, ka! 🎉\n" +
+  "That's it, you're all set! 🎉\n" +
   "\n" +
   "Your first lesson arrives at your chosen time.\n" +
   "\n" +
-  "See you soon, ka!";
+  "See you soon!";
 
 // --- Not locked copy — implementation-level design choices, see Checkpoint 2 ---
 // report item 9 for why these exist and why they're flagged for Joule's review.
@@ -116,6 +116,6 @@ export const ONBOARDING_COMPLETE_MESSAGE =
 // but the exact wording is NOT covered by any LDTKB-### entry.
 
 export const ALREADY_ONBOARDED_MESSAGE =
-  "You're all set already, ka! 😊\n" +
+  "You're all set already! 😊\n" +
   "\n" +
   "No need to go through this again — your lessons are on their way at your chosen time.";

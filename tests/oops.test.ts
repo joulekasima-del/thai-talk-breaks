@@ -27,10 +27,10 @@ function makeDeps(adminTelegramUserId: number | null = null, now = new Date("202
 // --- Locked copy, reproduced verbatim from the /oops feature spec ---------
 
 test("locked /oops copy matches the spec verbatim", () => {
-  assert.equal(OOPS_PROMPT_MESSAGE, "What's going on, ka? Just type it out and send it — I'll take a look. 🐛");
+  assert.equal(OOPS_PROMPT_MESSAGE, "What's going on? Just type it out and send it — I'll take a look. 🐛");
   assert.equal(
     OOPS_CONFIRMATION_MESSAGE,
-    "Got it, ka! 🙏 I've noted this down — no need to wait for a reply, just carry on with your lessons. Thank you for helping make Thai Talk Breaks better! 💛",
+    "Got it! 🙏 I've noted this down — no need to wait for a reply, just carry on with your lessons. Thank you for helping make Thai Talk Breaks better! 💛",
   );
 });
 

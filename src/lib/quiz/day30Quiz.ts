@@ -101,10 +101,10 @@ export async function startDay30Quiz(learnerId: string, chatId: number, deps: Da
   await sendQuestion(chatId, 1, deps);
 }
 
-const POSITIVE_FEEDBACK = "Correct, ka! 🎉";
+const POSITIVE_FEEDBACK = "Correct! 🎉";
 
 function negativeFeedback(correctAnswerLabel: string): string {
-  return `Not quite, ka — that was "${correctAnswerLabel}."`;
+  return `Not quite — that was "${correctAnswerLabel}."`;
 }
 
 export async function handleDay30QuizCallback(
