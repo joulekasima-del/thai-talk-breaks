@@ -7,9 +7,9 @@ Day 29 was originally planned as a single rendered video file (Joule edits toget
 
 ## The interaction spec, exactly as given
 - **Format:** slidable/scrollable sequence of the 8 existing page images — not a video file.
-- **Audio timing:**
-  - 2 seconds between individual speeches (i.e. between consecutive speech-bubble audio clips within or across the sequence)
-  - 3 seconds between panels/pages
+- **Audio timing (revised 24 August 2026, LDTKB-056 — originally 2s/3s):**
+  - 1 second between individual speeches (i.e. between consecutive speech-bubble audio clips within or across the sequence)
+  - 2 seconds between panels/pages
 - **Sound toggle:** on/off control, default **on**.
 - **Toggle re-enable behavior:** when sound is turned back on, audio restarts from the **first speech of the page the learner is currently viewing** — not the first speech of the whole 8-page sequence. If they're on page 6 with sound off and then re-enable it, page 6's audio starts from its own beginning. Never plays audio from a different page than what's currently visible.
 

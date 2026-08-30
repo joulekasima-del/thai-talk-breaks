@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 4.9  
+**Register version:** 5.0  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -589,6 +589,14 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Confirmed out of scope:** none of the 28 lesson explanations (LDTKB-051), the actual Day 1–28 lesson delivery content, or Day 29's messages use this tic at all — verified via direct code search before locking this decision. This change touches onboarding, `/oops`, and Day 30 only.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-056 — Day 29 audio timing halved: 1s/2s, not 2s/3s
+
+**Status:** Locked  
+**Decision:** Confirmed 24 August 2026: the living comic's audio-pacing gaps are revised from the original 2 seconds (between speeches sharing a panel) / 3 seconds (between panels) to **1 second / 2 seconds** respectively — a faster pace, found during review to feel snappier. Purely a timing/pacing adjustment; the underlying playback-restart-on-toggle rule and all other Day 29 interaction behavior (LDTKB confirmed 20 August 2026) are unaffected.  
+**Exact spec:** see `curriculum/day29/day29-living-comic-spec.md`'s "Audio timing" section.  
+**Code:** `src/lib/day29/audioSequencer.ts`'s `SPEECH_GAP_MS`/`PANEL_GAP_MS` constants need updating to match (1000/2000), along with the tests that check these exact values.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -638,3 +646,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-053 | Fixed a real bug: the welcome message's asterisks never actually rendered as bold (no parse_mode was ever set); converted to real HTML bold, enabled only for this one message | Joule |
 | 24 Aug 2026 | LDTKB-054 | Welcome message content revised: heavier bold/italic formatting (corrected against Telegram's real HTML tag set), new community channel ("Thai Talk: Jot It Down," host "Chaa-yen," weekly Saturday format, replacing Thai Talk Newsletter), fixed a stale reference to the removed activity feature | Joule |
 | 24 Aug 2026 | LDTKB-055 | "ka" narrator tic removed from every message except the welcome message's very first "Sawasdee ka!" — covers onboarding (6 messages), /oops (2 messages), Day 30 quiz feedback (2 messages); the vocabulary-naming "ka" in the gender question is retained as an exception; confirmed the 28 lesson explanations and Day 29 never used this tic | Joule |
+| 24 Aug 2026 | LDTKB-056 | Day 29's audio-pacing gaps halved: 2s/3s (speech/panel) → 1s/2s, for a snappier feel; code and tests need a corresponding update to SPEECH_GAP_MS/PANEL_GAP_MS | Joule |
