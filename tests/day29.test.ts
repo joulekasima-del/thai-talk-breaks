@@ -59,18 +59,18 @@ test("day29AssetUrl builds a /day29/ public path", () => {
   assert.equal(day29AssetUrl("day29_page01.png"), "/day29/day29_page01.png");
 });
 
-// --- Audio sequencing: 2s within a panel, 3s across panels ----------------
+// --- Audio sequencing: 1s within a panel, 2s across panels ----------------
 
-test("buildPlaybackPlan: 2s gap between speeches sharing a panel, 3s gap across panels, 0 after the last", () => {
+test("buildPlaybackPlan: 1s gap between speeches sharing a panel, 2s gap across panels, 0 after the last", () => {
   const page5 = DAY29_STORY_PAGES.find((p) => p.pageNumber === 5)!;
   const plan = buildPlaybackPlan(page5.speeches);
 
   assert.equal(plan.length, 6);
-  assert.equal(plan[0].gapAfterMs, SPEECH_GAP_MS, "panel 1's two speeches: 2s gap");
-  assert.equal(plan[1].gapAfterMs, PANEL_GAP_MS, "panel 1 -> panel 2: 3s gap");
-  assert.equal(plan[2].gapAfterMs, SPEECH_GAP_MS, "panel 2's two speeches: 2s gap");
-  assert.equal(plan[3].gapAfterMs, PANEL_GAP_MS, "panel 2 -> panel 3: 3s gap");
-  assert.equal(plan[4].gapAfterMs, SPEECH_GAP_MS, "panel 3's two speeches: 2s gap");
+  assert.equal(plan[0].gapAfterMs, SPEECH_GAP_MS, "panel 1's two speeches: 1s gap");
+  assert.equal(plan[1].gapAfterMs, PANEL_GAP_MS, "panel 1 -> panel 2: 2s gap");
+  assert.equal(plan[2].gapAfterMs, SPEECH_GAP_MS, "panel 2's two speeches: 1s gap");
+  assert.equal(plan[3].gapAfterMs, PANEL_GAP_MS, "panel 2 -> panel 3: 2s gap");
+  assert.equal(plan[4].gapAfterMs, SPEECH_GAP_MS, "panel 3's two speeches: 1s gap");
   assert.equal(plan[5].gapAfterMs, 0, "no gap after the page's last speech");
 });
 
@@ -81,7 +81,7 @@ test("buildPlaybackPlan: a single-panel page (Page 8) has one step with no gap",
   assert.equal(plan[0].gapAfterMs, 0);
 });
 
-test("buildPlaybackPlan: two single-speech panels get the 3s panel gap, not the 2s speech gap", () => {
+test("buildPlaybackPlan: two single-speech panels get the 2s panel gap, not the 1s speech gap", () => {
   const page2 = DAY29_STORY_PAGES.find((p) => p.pageNumber === 2)!;
   const plan = buildPlaybackPlan(page2.speeches);
   assert.equal(plan.length, 2);
