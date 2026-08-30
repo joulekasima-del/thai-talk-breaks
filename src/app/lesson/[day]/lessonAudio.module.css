@@ -1,0 +1,54 @@
+.app {
+  min-height: 100vh;
+  background: #0e0d12;
+  color: #f5f3ee;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+}
+
+.card {
+  max-width: 28rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.wordRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(245, 243, 238, 0.12);
+}
+
+.wordRow:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.karaoke {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.meaning {
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.audioPlayer {
+  width: 100%;
+}
+
+.loading {
+  opacity: 0.7;
+  font-size: 0.95rem;
+  text-align: center;
+}

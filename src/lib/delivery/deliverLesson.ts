@@ -8,8 +8,19 @@
 
 import { getLesson, PILOT_LESSON_COUNT, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
 import { LESSON_EXPLANATIONS } from "@/lib/curriculum/lessonExplanations";
-import type { MediaFile, TelegramClient } from "@/lib/telegram";
+import type { InlineKeyboard, MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
+
+// PROTOTYPE SCOPING — Web App audio delivery pattern (see src/app/lesson/[day]/page.tsx).
+// Telegram's native sendAudio/sendDocument both auto-continue into whatever
+// message comes next in the chat regardless of when each was sent (confirmed
+// via real testing; no message-type trick avoids it) — a real HTML5 <audio>
+// element inside a Telegram Web App isn't affected. This is a scoped
+// prototype on exactly these two days to validate the pattern before wider
+// rollout — deliberately NOT written as a clean/generalized "any day" switch,
+// so it's obviously provisional. Every lesson number NOT in this list keeps
+// the existing sendAudio path completely untouched.
+export const WEB_APP_AUDIO_DAYS: readonly number[] = [3, 8];
 
 // Kept as a local type (not imported from the now-deleted distractors.ts) so
 // DeliverLessonDeps.rng and existing callers that still pass an `rng` stay
@@ -61,6 +72,14 @@ export interface DeliverLessonDeps {
   media: MediaLoader;
   now?: () => Date;
   rng?: Rng;
+  /**
+   * Public base URL of the deployed app — only read for lessons in
+   * WEB_APP_AUDIO_DAYS, to build the `/lesson/{day}` Web App button URL.
+   * Optional (falls back to reading process.env.APP_URL directly) so the
+   * cron route's existing call site doesn't need updating for this
+   * prototype — same appUrl shape as deliverDay29Entry.ts's own deps.
+   */
+  appUrl?: string;
 }
 
 export type DeliverLessonResult = { status: "delivered" } | { status: "already_delivered" };
@@ -139,6 +158,13 @@ async function deliverPhraseLesson(
     now.toISOString(),
   );
 
+  if (WEB_APP_AUDIO_DAYS.includes(input.lessonNumber)) {
+    // PROTOTYPE (see WEB_APP_AUDIO_DAYS above) — Lesson 3 only, for now.
+    await sendWebAppAudioButton(input, deps);
+    await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
+    return;
+  }
+
   const audio = await deps.media.loadPhraseLessonAudio(input.lessonNumber, input.gender);
   // Rule A (teaching audio) — reveal the pronunciation as the title.
   await deps.telegram.sendAudio(input.chatId, audio, {
@@ -146,6 +172,17 @@ async function deliverPhraseLesson(
     performer: lessonOrDayLabel(input.lessonNumber),
   });
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
+}
+
+/** PROTOTYPE helper shared by deliverPhraseLesson/deliverWordSetLesson — see WEB_APP_AUDIO_DAYS. */
+async function sendWebAppAudioButton(input: DeliverLessonInput, deps: DeliverLessonDeps): Promise<void> {
+  const appUrl = deps.appUrl ?? process.env.APP_URL;
+  if (!appUrl) throw new Error("APP_URL must be set to deliver the Web App audio button");
+
+  const keyboard: InlineKeyboard = [
+    [{ text: "🔊 Listen to the audio", web_app: { url: `${appUrl}/lesson/${input.lessonNumber}` } }],
+  ];
+  await deps.telegram.sendMessage(input.chatId, "Tap below to hear it:", keyboard);
 }
 
 async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLessonDeps, now: Date): Promise<void> {
@@ -192,6 +229,13 @@ async function deliverWordSetLesson(
 
   // Guard point, same rule as the other two delivery paths: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, input.lessonNumber, input.deliveryDate, now.toISOString());
+
+  if (WEB_APP_AUDIO_DAYS.includes(input.lessonNumber)) {
+    // PROTOTYPE (see WEB_APP_AUDIO_DAYS above) — Day 8 only, for now.
+    await sendWebAppAudioButton(input, deps);
+    await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
+    return;
+  }
 
   for (const w of lesson.words) {
     const audio = await deps.media.loadWordSetAudio(input.lessonNumber, w.index);

@@ -99,19 +99,24 @@ test("Day 25 uses example #1 (\"may I park here?\") as its canonical phrase", ()
 
 // --- Word-set day delivery: one image, per-word audio ----------------------
 
+// Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
+// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
+// longer sends native per-word audio; swapped to another word-set day to
+// keep this test's actual point (one image, one native audio per word)
+// intact.
 test("word-set day delivery sends exactly ONE image (not one per word) and exactly one audio per word", async () => {
   const media = new FakeMediaLoader();
   const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
 
   await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 8, deliveryDate: "2026-09-01", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7] },
+    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 10, deliveryDate: "2026-09-01", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
     deps,
   );
 
   assert.equal(deps.telegram.sentPhotos.length, 1, "exactly one photo for the whole day, not per word");
-  assert.equal(deps.telegram.sentPhotos[0].filename, "day8.png");
-  const contentAudio = media.requested.filter((f) => f.startsWith("day8_") && !f.startsWith("representative:"));
-  assert.equal(contentAudio.length, 4, "one audio clip per word, no more (no activity distractors anymore)");
+  assert.equal(deps.telegram.sentPhotos[0].filename, "day10.png");
+  const contentAudio = media.requested.filter((f) => f.startsWith("day10_") && !f.startsWith("representative:"));
+  assert.equal(contentAudio.length, 3, "one audio clip per word, no more (no activity distractors anymore)");
 });
 
 // --- Section 5E: "main, not extended" assumption for Days 9, 13, 24 -------

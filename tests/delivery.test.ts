@@ -66,15 +66,19 @@ test("findDueLearners returns the correct lesson number for an in-window, in-pil
 
 // --- deliverLesson: gender-branch file selection --------------------------
 
+// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
+// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
+// longer loads/sends its audio file the native way; swapped to keep this
+// test's actual point (gender-branch file selection) intact.
 test("deliverLesson selects the male audio/image files for a male learner (phrase lesson)", async () => {
   const media = new FakeMediaLoader();
   const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
   await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 3, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2] },
+    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
-  assert.ok(media.requested.includes("lesson3_male.mp3"));
-  assert.ok(media.requested.includes("lesson3_male.png"));
+  assert.ok(media.requested.includes("lesson4_male.mp3"));
+  assert.ok(media.requested.includes("lesson4_male.png"));
   assert.ok(!media.requested.some((f) => f.includes("female")));
 });
 
@@ -82,11 +86,11 @@ test("deliverLesson selects the female audio/image files for a female learner (p
   const media = new FakeMediaLoader();
   const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
   await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "female", lessonNumber: 3, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2] },
+    { learnerId: "l1", chatId: 1, gender: "female", lessonNumber: 4, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
-  assert.ok(media.requested.includes("lesson3_female.mp3"));
-  assert.ok(media.requested.includes("lesson3_female.png"));
+  assert.ok(media.requested.includes("lesson4_female.mp3"));
+  assert.ok(media.requested.includes("lesson4_female.png"));
   assert.ok(!media.requested.some((f) => f.includes("male") && !f.includes("female")));
 });
 
@@ -143,6 +147,10 @@ test("duplicate-send guard: same learner, same lesson, different date is allowed
 
 // --- Text-before-audio sequencing: two distinct recorded states -----------
 
+// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
+// delivery prototype days and no longer emits a native sendAudio event;
+// swapped to keep this test's actual point (text-before-audio ordering)
+// intact.
 test("text-before-audio: delivered_at is recorded before the lesson's native audio is sent, audio_delivered_at after", async () => {
   const log = new EventLog();
   const media = new FakeMediaLoader();
@@ -151,13 +159,13 @@ test("text-before-audio: delivered_at is recorded before the lesson's native aud
   const deps = { telegram, deliveryStore, media, rng: () => 0.9 };
 
   await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 3, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2] },
+    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
 
-  const deliveredIdx = log.events.indexOf("delivered_at:l1:3");
-  const mainAudioIdx = log.events.indexOf("sendAudio:lesson3_male.mp3");
-  const audioDeliveredIdx = log.events.indexOf("audio_delivered_at:l1:3");
+  const deliveredIdx = log.events.indexOf("delivered_at:l1:4");
+  const mainAudioIdx = log.events.indexOf("sendAudio:lesson4_male.mp3");
+  const audioDeliveredIdx = log.events.indexOf("audio_delivered_at:l1:4");
 
   assert.notEqual(deliveredIdx, -1);
   assert.notEqual(mainAudioIdx, -1);
@@ -166,7 +174,7 @@ test("text-before-audio: delivered_at is recorded before the lesson's native aud
   assert.ok(mainAudioIdx < audioDeliveredIdx, "audio_delivered_at must be recorded after the native audio send");
 
   // Two DISTINCT recorded states, not one combined timestamp.
-  const record = await deliveryStore.findExisting("l1", 3, "2026-08-21");
+  const record = await deliveryStore.findExisting("l1", 4, "2026-08-21");
   assert.ok(record?.delivered_at);
   assert.ok(record?.audio_delivered_at);
   assert.notEqual(record?.delivered_at, undefined);

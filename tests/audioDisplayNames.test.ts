@@ -29,19 +29,24 @@ function makeDeliverDeps(rngSequence: number[] = []) {
 
 // --- Rule A: teaching audio reveals the pronunciation ----------------------
 
-test("pilot phrase lesson (Lesson 3) main audio: title = karaoke pronunciation, performer = 'Lesson 3'", async () => {
+// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
+// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
+// longer sends native audio at all; swapped to keep this test's actual
+// point (title/performer on a normal pilot phrase lesson's native audio)
+// intact rather than colliding with that unrelated, later change.
+test("pilot phrase lesson (Lesson 4) main audio: title = karaoke pronunciation, performer = 'Lesson 4'", async () => {
   const deps = makeDeliverDeps();
-  const lesson = getLesson(3);
-  if (lesson.kind !== "phrase") throw new Error("expected lesson 3 to be a phrase lesson");
+  const lesson = getLesson(4);
+  if (lesson.kind !== "phrase") throw new Error("expected lesson 4 to be a phrase lesson");
 
   await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 3, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2] },
+    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
 
   const mainAudio = deps.telegram.sentAudio[0];
   assert.equal(mainAudio.title, lesson.karaoke.male);
-  assert.equal(mainAudio.performer, "Lesson 3");
+  assert.equal(mainAudio.performer, "Lesson 4");
 });
 
 test("Weeks 2-4 phrase day (Day 9) main audio: performer = 'Day 9', not 'Lesson 9'", async () => {
@@ -78,20 +83,23 @@ test("Lesson 2 (numbers) audio: each number's title = its own karaoke, performer
   }
 });
 
-test("word-set day (Day 8) audio: each word's title = its own karaoke, performer = 'Day 8'", async () => {
+// Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
+// prototype days and no longer sends native audio; swapped to another
+// word-set day (10, 16, 26 are the others) to keep this test's point intact.
+test("word-set day (Day 10) audio: each word's title = its own karaoke, performer = 'Day 10'", async () => {
   const deps = makeDeliverDeps();
-  const lesson = getLesson(8);
-  if (lesson.kind !== "wordset") throw new Error("expected day 8 to be a word-set day");
+  const lesson = getLesson(10);
+  if (lesson.kind !== "wordset") throw new Error("expected day 10 to be a word-set day");
 
   await deliverLesson(
-    { learnerId: "l4", chatId: 4, gender: "male", lessonNumber: 8, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7] },
+    { learnerId: "l4", chatId: 4, gender: "male", lessonNumber: 10, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
     deps,
   );
 
   const teachingAudio = deps.telegram.sentAudio.slice(0, lesson.words.length);
   for (let i = 0; i < lesson.words.length; i++) {
     assert.equal(teachingAudio[i].title, lesson.words[i].karaoke);
-    assert.equal(teachingAudio[i].performer, "Day 8");
+    assert.equal(teachingAudio[i].performer, "Day 10");
   }
 });
 

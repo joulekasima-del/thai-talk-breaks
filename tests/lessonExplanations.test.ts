@@ -68,17 +68,21 @@ function makeDeliverDeps() {
   };
 }
 
-test("phrase day (Lesson 3): explanation is sent as the final message, after the audio", async () => {
+// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
+// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
+// longer sends a native audio clip; swapped to keep this test's actual
+// point (explanation comes after the audio, plain text) intact.
+test("phrase day (Lesson 4): explanation is sent as the final message, after the audio", async () => {
   const deps = makeDeliverDeps();
 
   await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 3, deliveryDate: "2026-08-26", previouslyDeliveredLessonNumbers: [1, 2] },
+    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-26", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
 
   assert.equal(deps.telegram.sentAudio.length, 1, "explanation must come after the one audio clip, not interleaved");
   const lastMessage = deps.telegram.sent.at(-1);
-  assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[3]);
+  assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[4]);
   assert.equal(lastMessage?.keyboard, undefined, "plain text only, no keyboard");
 });
 
@@ -96,16 +100,20 @@ test("Lesson 2 (numbers): explanation is sent as the final message, after all 10
   assert.equal(lastMessage?.keyboard, undefined);
 });
 
-test("word-set day (Day 8): explanation is sent as the final message, after its own audio clips", async () => {
+// Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
+// prototype days and requires APP_URL to be set; swapped to another
+// word-set day to keep this test's actual point intact without depending
+// on that unrelated env var.
+test("word-set day (Day 10): explanation is sent as the final message, after its own audio clips", async () => {
   const deps = makeDeliverDeps();
 
   await deliverLesson(
-    { learnerId: "l3", chatId: 3, gender: "male", lessonNumber: 8, deliveryDate: "2026-08-26", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7] },
+    { learnerId: "l3", chatId: 3, gender: "male", lessonNumber: 10, deliveryDate: "2026-08-26", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
     deps,
   );
 
   const lastMessage = deps.telegram.sent.at(-1);
-  assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[8]);
+  assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[10]);
   assert.equal(lastMessage?.keyboard, undefined);
 });
 
