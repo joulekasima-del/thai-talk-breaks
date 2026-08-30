@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.0  
+**Register version:** 5.1  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -597,6 +597,16 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Code:** `src/lib/day29/audioSequencer.ts`'s `SPEECH_GAP_MS`/`PANEL_GAP_MS` constants need updating to match (1000/2000), along with the tests that check these exact values.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-057 — Lesson 2 (numbers) consolidated to one photo, one audio clip
+
+**Status:** Locked (decision confirmed; implementation pending)  
+**Decision:** Confirmed 24 August 2026: Lesson 2's format changes from 10 separate photos and 10 separate audio clips (one per number, with per-number captions/display-names) to **one combined photo showing all 10 numbers** and **one combined audio clip** speaking all 10 numbers together. The lesson's text summary (the "Lesson 2 — Numbers 1-10" message listing all ten karaoke values) is unchanged.  
+**Not yet implemented:** this decision covers the format itself, not its build. Two things still needed before this is live:
+1. **New assets from Joule** — the single combined photo and single combined audio file, replacing the current 10-per-number files.
+2. **A code change** to `deliverLesson.ts`'s `deliverNumbersLesson` function, which currently still loops through 10 separate `sendPhoto`/`sendAudio` calls — not yet updated to send one of each instead.  
+**Reference:** see the master chat script's Section 2.2 for the full before/after description.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -647,3 +657,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-054 | Welcome message content revised: heavier bold/italic formatting (corrected against Telegram's real HTML tag set), new community channel ("Thai Talk: Jot It Down," host "Chaa-yen," weekly Saturday format, replacing Thai Talk Newsletter), fixed a stale reference to the removed activity feature | Joule |
 | 24 Aug 2026 | LDTKB-055 | "ka" narrator tic removed from every message except the welcome message's very first "Sawasdee ka!" — covers onboarding (6 messages), /oops (2 messages), Day 30 quiz feedback (2 messages); the vocabulary-naming "ka" in the gender question is retained as an exception; confirmed the 28 lesson explanations and Day 29 never used this tic | Joule |
 | 24 Aug 2026 | LDTKB-056 | Day 29's audio-pacing gaps halved: 2s/3s (speech/panel) → 1s/2s, for a snappier feel; code and tests need a corresponding update to SPEECH_GAP_MS/PANEL_GAP_MS | Joule |
+| 24 Aug 2026 | LDTKB-057 | Lesson 2 (numbers) format decision locked: consolidating from 10 photos/10 audio clips to 1 combined photo + 1 combined audio clip; decision confirmed, implementation (new assets + deliverNumbersLesson code change) still pending | Joule |
