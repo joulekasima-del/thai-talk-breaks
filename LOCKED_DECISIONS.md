@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.1  
+**Register version:** 5.2  
 **Last updated:** 24 August 2026  
 **Authority:** Joule
 
@@ -607,6 +607,16 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Reference:** see the master chat script's Section 2.2 for the full before/after description.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
+## LDTKB-058 — Web App audio delivery, prototyped on Lessons 3 and 8
+
+**Status:** Locked (prototype phase — validate before wider rollout)  
+**Decision:** Confirmed 24 August 2026, after real-world testing found a genuine, unfixable Telegram platform limitation: native audio messages (`sendAudio`), voice messages (`sendVoice`), and even generic file attachments (`sendDocument`) all exhibit Telegram's built-in "continuous playback" behavior — playing one audio message auto-advances into whatever comes next in the chat, **regardless of how much real time separates them** (confirmed via Telegram's own bug tracker and direct empirical testing, not just documentation). No message-type or file-format trick avoids this — tested `sendDocument` with both `.mp3` (still auto-chains) and `.wav` (avoids chaining, but breaks inline playback entirely, forcing a download instead).  
+**Solution:** move audio playback into a Telegram Web App page — the same pattern Day 29's living comic already uses successfully — since a real HTML `<audio>` element is not part of Telegram's native media system and is therefore unaffected.  
+**Scope, this decision:** prototyped on exactly two days — **Lesson 3** (standard single-phrase day) and **Day 8** (word-set day, multiple audio clips) — chosen to represent the two different content shapes. Lesson 2 is deliberately excluded (its format is already a separate pending decision, LDTKB-057). Day 30's quiz audio is explicitly out of scope for this decision — it's structurally different (interactive, tap-driven, with correctness tracking) and will need its own, larger redesign if pursued later, not a simple extension of this pattern.  
+**Not yet validated in production:** this is confirmed as the right technical direction, but still needs real-device testing (opening the Web App page on a real phone, confirming the audio plays correctly and does not auto-chain) before deciding whether to roll out to the remaining 26 lesson days.  
+**Reference:** see the master chat script's Sections 2.1/2.3 for the updated Lesson 3 / Day 8 delivery description.  
+**Locked by:** Joule's confirmation, 24 August 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -658,3 +668,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-055 | "ka" narrator tic removed from every message except the welcome message's very first "Sawasdee ka!" — covers onboarding (6 messages), /oops (2 messages), Day 30 quiz feedback (2 messages); the vocabulary-naming "ka" in the gender question is retained as an exception; confirmed the 28 lesson explanations and Day 29 never used this tic | Joule |
 | 24 Aug 2026 | LDTKB-056 | Day 29's audio-pacing gaps halved: 2s/3s (speech/panel) → 1s/2s, for a snappier feel; code and tests need a corresponding update to SPEECH_GAP_MS/PANEL_GAP_MS | Joule |
 | 24 Aug 2026 | LDTKB-057 | Lesson 2 (numbers) format decision locked: consolidating from 10 photos/10 audio clips to 1 combined photo + 1 combined audio clip; decision confirmed, implementation (new assets + deliverNumbersLesson code change) still pending | Joule |
+| 24 Aug 2026 | LDTKB-058 | Web App audio delivery prototyped on Lessons 3 and 8, solving Telegram's unfixable native-audio auto-continue behavior (confirmed via real testing across sendAudio/sendVoice/sendDocument, no format trick avoids it); pattern reuses Day 29's Web App infrastructure; not yet validated on a real device, wider rollout to remaining lessons pending that validation | Joule |
