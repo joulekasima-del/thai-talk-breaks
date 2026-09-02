@@ -87,18 +87,22 @@ test("phrase day (Lesson 4): explanation is sent as the final message, after the
 });
 
 // LDTKB-057: Lesson 2 now sends one combined audio clip, not 10.
-test("Lesson 2 (numbers): explanation is sent as the final message, after the one combined audio clip", async () => {
-  const deps = makeDeliverDeps();
+// Lesson 2's audio is now delivered via the Web App (this revision of
+// LDTKB-057), not native sendAudio — there's no other "numbers" lesson to
+// swap this fixture to, so the test now covers the web_app-button flow
+// directly instead.
+test("Lesson 2 (numbers): explanation is sent as the final message, after the web_app audio button", async () => {
+  const deps = { ...makeDeliverDeps(), appUrl: "https://thaitalkbreaks.example" };
 
   await deliverLesson(
     { learnerId: "l2", chatId: 2, gender: "female", lessonNumber: 2, deliveryDate: "2026-08-26", previouslyDeliveredLessonNumbers: [1] },
     deps,
   );
 
-  assert.equal(deps.telegram.sentAudio.length, 1);
+  assert.equal(deps.telegram.sentAudio.length, 0, "no native audio for Lesson 2 any more");
   const lastMessage = deps.telegram.sent.at(-1);
   assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[2]);
-  assert.equal(lastMessage?.keyboard, undefined);
+  assert.equal(lastMessage?.keyboard, undefined, "the explanation itself is still plain text, no keyboard");
 });
 
 // Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery

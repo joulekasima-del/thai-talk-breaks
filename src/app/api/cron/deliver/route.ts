@@ -9,7 +9,6 @@ import { startDay30Quiz } from "@/lib/quiz/day30Quiz";
 import { deliverDay29Entry, DAY29_LESSON_NUMBER } from "@/lib/day29/deliverDay29Entry";
 import { WEEKS234_LAST_DAY } from "@/lib/curriculum/content";
 import {
-  loadCombinedNumbersAudio,
   loadCombinedNumbersImage,
   loadPhraseLessonAudio,
   loadPhraseLessonImage,
@@ -35,7 +34,6 @@ const DAY30_QUIZ_DAY_NUMBER = 30;
 const media: MediaLoader = {
   loadPhraseLessonAudio,
   loadPhraseLessonImage,
-  loadCombinedNumbersAudio,
   loadCombinedNumbersImage,
   loadRepresentativeClip,
   loadWordSetAudio,

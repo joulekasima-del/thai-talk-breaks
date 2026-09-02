@@ -16,11 +16,15 @@ import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
 // message comes next in the chat regardless of when each was sent (confirmed
 // via real testing; no message-type trick avoids it) — a real HTML5 <audio>
 // element inside a Telegram Web App isn't affected. This is a scoped
-// prototype on exactly these two days to validate the pattern before wider
+// prototype on exactly these days to validate the pattern before wider
 // rollout — deliberately NOT written as a clean/generalized "any day" switch,
 // so it's obviously provisional. Every lesson number NOT in this list keeps
 // the existing sendAudio path completely untouched.
-export const WEB_APP_AUDIO_DAYS: readonly number[] = [3, 8];
+// Lesson 2 added per this revision of LDTKB-057 — its combined-audio-clip
+// approach (one prior revision of LDTKB-057) is itself now superseded: audio
+// goes back to the original 10 per-number files, delivered via the Web App
+// like Lessons 3/8, not as one combined native sendAudio clip.
+export const WEB_APP_AUDIO_DAYS: readonly number[] = [2, 3, 8];
 
 // Kept as a local type (not imported from the now-deleted distractors.ts) so
 // DeliverLessonDeps.rng and existing callers that still pass an `rng` stay
@@ -42,8 +46,13 @@ function lessonOrDayLabel(lessonNumber: number): string {
 export interface MediaLoader {
   loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
   loadPhraseLessonImage(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
-  /** LDTKB-057: Lesson 2 now uses one combined photo + one combined audio clip, not one per number. */
-  loadCombinedNumbersAudio(): Promise<MediaFile>;
+  /**
+   * LDTKB-057 (this revision): Lesson 2's photo is still one combined image,
+   * sent natively — its audio is no longer loaded/sent through MediaLoader
+   * at all, now delivered via the Web App like Lessons 3/8 (see
+   * sendWebAppAudioButton / WEB_APP_AUDIO_DAYS). No loadCombinedNumbersAudio
+   * or per-number audio method belongs on this interface any more.
+   */
   loadCombinedNumbersImage(): Promise<MediaFile>;
   loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
   /** Checkpoint 5 — Weeks 2-4 word-set days (8, 10, 16, 26). */
@@ -186,9 +195,11 @@ async function sendWebAppAudioButton(input: DeliverLessonInput, deps: DeliverLes
   await deps.telegram.sendMessage(input.chatId, "Tap below to hear it:", keyboard);
 }
 
-// LDTKB-057: one combined photo + one combined audio clip, replacing the
-// previous 10 separate per-number files (curriculum/pilot/images|audio/
-// lesson02_1..10 -> lesson02_combined). The text summary is unchanged.
+// LDTKB-057 (this revision): the combined photo (curriculum/pilot/images/
+// lesson02_combined.png) and text summary are unchanged. Audio no longer
+// sends natively at all — it goes through the Web App instead, like Lessons
+// 3/8 (see WEB_APP_AUDIO_DAYS / sendWebAppAudioButton), delivering the
+// original 10 per-number files (lesson02_1.mp3 .. lesson02_10.mp3).
 async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLessonDeps, now: Date): Promise<void> {
   const lesson = getLesson(2);
   if (lesson.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
@@ -202,11 +213,8 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
   // Guard point, same rule as the phrase-lesson path: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, 2, input.deliveryDate, now.toISOString());
 
-  // Rule A (teaching audio) — the text summary above already reveals every
-  // number's pronunciation; "Numbers 1-10" identifies the clip's content
-  // without repeating all ten karaoke values as a title.
-  const audio = await deps.media.loadCombinedNumbersAudio();
-  await deps.telegram.sendAudio(input.chatId, audio, { title: "Numbers 1-10", performer: "Lesson 2" });
+  // PROTOTYPE (see WEB_APP_AUDIO_DAYS above) — Lesson 2 is now one of these too.
+  await sendWebAppAudioButton(input, deps);
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 

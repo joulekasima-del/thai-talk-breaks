@@ -10,7 +10,7 @@ function makeDeps() {
   return { learnerStore: new FakeLearnerStore(), deliveryStore: new FakeDeliveryStore() };
 }
 
-// --- Scope guard: only Lesson 3 / Day 8 are prototype days -----------------
+// --- Scope guard: only Lessons 2, 3 / Day 8 are prototype days -------------
 
 test("getLessonAudioContent: a day outside WEB_APP_AUDIO_DAYS (e.g. Lesson 5) is rejected, even for an existing learner", async () => {
   const deps = makeDeps();
@@ -19,12 +19,6 @@ test("getLessonAudioContent: a day outside WEB_APP_AUDIO_DAYS (e.g. Lesson 5) is
   await deps.deliveryStore.insertTextSent(learner.id, 5, "2026-08-30", new Date().toISOString());
 
   const result = await getLessonAudioContent(1, 5, deps);
-  assert.deepEqual(result, { ok: false, error: "not_a_prototype_day" });
-});
-
-test("getLessonAudioContent: Lesson 2 (numbers) is rejected — explicitly out of scope (LDTKB-057, pending)", async () => {
-  const deps = makeDeps();
-  const result = await getLessonAudioContent(1, 2, deps);
   assert.deepEqual(result, { ok: false, error: "not_a_prototype_day" });
 });
 
@@ -110,5 +104,28 @@ test("getLessonAudioContent: Day 8, delivered — one word entry (and one audio 
     assert.equal(result.content.words[i].karaoke, day8.words[i].karaoke);
     assert.equal(result.content.words[i].meaning, day8.words[i].meaning);
     assert.equal(result.content.words[i].audioUrl, `/lessons/week2_day08_${day8.words[i].index}.mp3`);
+  }
+});
+
+// --- Content shape: Lesson 2 (numbers) — reuses the "wordset" shape --------
+
+test("getLessonAudioContent: Lesson 2, delivered — all 10 numbers as 'wordset'-shaped entries, no gender branch", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(6);
+  await deps.learnerStore.update(learner.id, { gender_branch: "female" });
+  await deps.deliveryStore.insertTextSent(learner.id, 2, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(6, 2, deps);
+  assert.equal(result.ok, true);
+  if (!result.ok || result.content.kind !== "wordset") throw new Error("expected ok wordset-shaped content");
+
+  const lesson2 = getLesson(2);
+  if (lesson2.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
+
+  assert.equal(result.content.words.length, 10);
+  for (let i = 0; i < lesson2.numbers.length; i++) {
+    assert.equal(result.content.words[i].karaoke, lesson2.numbers[i].karaoke);
+    assert.equal(result.content.words[i].meaning, String(lesson2.numbers[i].value), "meaning is the number's own value, no English word to show otherwise");
+    assert.equal(result.content.words[i].audioUrl, `/lessons/lesson02_${lesson2.numbers[i].value}.mp3`);
   }
 });

@@ -5,7 +5,7 @@ import { deliverLesson, WEB_APP_AUDIO_DAYS } from "@/lib/delivery/deliverLesson"
 import { FakeTelegramClient } from "./fakes";
 import { FakeDeliveryStore, FakeMediaLoader } from "./deliveryFakes";
 
-// Web App audio delivery prototype — scoped to exactly Lesson 3 and Day 8.
+// Web App audio delivery prototype — scoped to exactly Lessons 2, 3 and Day 8.
 // See deliverLesson.ts's WEB_APP_AUDIO_DAYS.
 
 function makeDeps(appUrl: string | undefined = "https://thaitalkbreaks.example") {
@@ -18,8 +18,35 @@ function makeDeps(appUrl: string | undefined = "https://thaitalkbreaks.example")
   };
 }
 
-test("WEB_APP_AUDIO_DAYS is exactly [3, 8] — the prototype's scope", () => {
-  assert.deepEqual([...WEB_APP_AUDIO_DAYS], [3, 8]);
+test("WEB_APP_AUDIO_DAYS is exactly [2, 3, 8] — the prototype's scope", () => {
+  assert.deepEqual([...WEB_APP_AUDIO_DAYS], [2, 3, 8]);
+});
+
+// --- Lesson 2 (numbers day): combined photo still native, audio via Web App -
+
+test("Lesson 2: still sends the combined photo natively, but a web_app button (not audio) for the numbers", async () => {
+  const deps = makeDeps();
+
+  const result = await deliverLesson(
+    { learnerId: "l0", chatId: 0, gender: "male", lessonNumber: 2, deliveryDate: "2026-08-30", previouslyDeliveredLessonNumbers: [1] },
+    deps,
+  );
+
+  assert.equal(result.status, "delivered");
+  assert.equal(deps.telegram.sentPhotos.length, 1, "the combined photo is still sent natively");
+  assert.equal(deps.telegram.sentPhotos[0].filename, "lesson2_combined.png");
+  assert.equal(deps.telegram.sentAudio.length, 0, "no native sendAudio call for Lesson 2 any more");
+
+  const buttonMessage = deps.telegram.sent.find((m) => m.keyboard);
+  assert.ok(buttonMessage, "expected one message with a keyboard");
+  const button = buttonMessage!.keyboard![0][0];
+  assert.deepEqual(button, {
+    text: "🔊 Listen to the audio",
+    web_app: { url: "https://thaitalkbreaks.example/lesson/2" },
+  });
+
+  const delivery = await deps.deliveryStore.findExisting("l0", 2, "2026-08-30");
+  assert.ok(delivery?.audio_delivered_at, "audio_delivered_at must still be set for the web_app path");
 });
 
 // --- Lesson 3 (phrase day): web_app button instead of sendAudio ------------

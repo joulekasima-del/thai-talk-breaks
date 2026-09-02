@@ -95,16 +95,25 @@ test("deliverLesson selects the female audio/image files for a female learner (p
 });
 
 // LDTKB-057: Lesson 2 now uses one combined audio/image file, not one per number.
-test("deliverLesson uses the combined numbers file with no gender branch for lesson 2", async () => {
+// Lesson 2's audio is no longer loaded through MediaLoader at all (this
+// revision of LDTKB-057 moved it to the Web App) — only the combined photo
+// still goes through the normal gender-branch-free native path.
+test("deliverLesson uses the combined numbers photo (no gender branch) for lesson 2, and no native audio", async () => {
   const media = new FakeMediaLoader();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
+  const deps = {
+    telegram: new FakeTelegramClient(),
+    deliveryStore: new FakeDeliveryStore(),
+    media,
+    rng: () => 0.9,
+    appUrl: "https://thaitalkbreaks.example",
+  };
   await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 2, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [] },
     deps,
   );
-  assert.ok(media.requested.includes("lesson2_combined.mp3"));
   assert.ok(media.requested.includes("lesson2_combined.png"));
   assert.ok(!media.requested.some((f) => f.includes("male") || f.includes("female")));
+  assert.ok(!media.requested.includes("lesson2_combined.mp3"), "the combined audio file must not be loaded any more");
 });
 
 // --- Duplicate-send guard --------------------------------------------------
@@ -130,7 +139,13 @@ test("duplicate-send guard: a second delivery attempt for the same learner/lesso
 test("duplicate-send guard: same learner, same lesson, different date is allowed (a new day)", async () => {
   const media = new FakeMediaLoader();
   const deliveryStore = new FakeDeliveryStore();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore, media, rng: () => 0.9 };
+  const deps = {
+    telegram: new FakeTelegramClient(),
+    deliveryStore,
+    media,
+    rng: () => 0.9,
+    appUrl: "https://thaitalkbreaks.example", // lesson 2 (used as "day 2" below) now needs this
+  };
 
   const day1 = await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 1, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [] },

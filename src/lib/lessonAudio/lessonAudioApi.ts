@@ -4,9 +4,9 @@
 // validation handled by the route before calling in here with an
 // already-verified telegramUserId.
 //
-// Scoped to exactly WEB_APP_AUDIO_DAYS (Lesson 3 + Day 8, imported from
-// deliverLesson.ts as the single source of truth for which days this
-// prototype covers). Access is gated on the learner actually having had
+// Scoped to exactly WEB_APP_AUDIO_DAYS (Lesson 2 + Lesson 3 + Day 8,
+// imported from deliverLesson.ts as the single source of truth for which
+// days this prototype covers). Access is gated on the learner actually having had
 // this lesson delivered already (per lesson_deliveries) — same
 // "can't reach content early via a guessed URL" spirit as Day 29's
 // findExisting-based dedup guard, just checked as "has it ever been
@@ -73,6 +73,11 @@ function wordSetAudioUrl(dayNumber: number, wordIndex: number): string {
   return lessonAssetUrl(`week2_day${lessonCode(dayNumber)}_${wordIndex}.mp3`);
 }
 
+/** Lesson 2's per-number audio — curriculum/pilot/audio/lesson02_{value}.mp3, no gender branch, no zero-padding on the number itself. */
+function numberAudioUrl(value: number): string {
+  return lessonAssetUrl(`lesson02_${value}.mp3`);
+}
+
 export async function getLessonAudioContent(
   telegramUserId: number,
   day: number,
@@ -118,8 +123,21 @@ export async function getLessonAudioContent(
     };
   }
 
-  // Lesson 2 (numbers) is explicitly out of scope (LDTKB-057, pending) and
-  // can never reach here since WEB_APP_AUDIO_DAYS is [3, 8] — this is a
-  // defensive exhaustiveness fallback, not a real code path.
-  throw new Error(`Unsupported lesson kind for the Web App audio prototype: ${lesson.kind}`);
+  // Lesson 2 (numbers) — reuses the same "wordset" content shape rather than
+  // a new "numbers" kind, since the page already renders that shape as a
+  // list of audio players and ten numbers is structurally the same thing.
+  // `meaning` is the number's own value as a string (e.g. "1".."10") — there's
+  // no English word to show otherwise, unlike a real word-set day.
+  return {
+    ok: true,
+    content: {
+      kind: "wordset",
+      lessonNumber: day,
+      words: lesson.numbers.map((n) => ({
+        karaoke: n.karaoke,
+        meaning: String(n.value),
+        audioUrl: numberAudioUrl(n.value),
+      })),
+    },
+  };
 }

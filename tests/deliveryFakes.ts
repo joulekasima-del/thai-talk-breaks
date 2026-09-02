@@ -93,12 +93,6 @@ export class FakeMediaLoader implements MediaLoader {
     return fakeFile(name);
   }
 
-  async loadCombinedNumbersAudio(): Promise<MediaFile> {
-    const name = "lesson2_combined.mp3";
-    this.requested.push(name);
-    return fakeFile(name);
-  }
-
   async loadCombinedNumbersImage(): Promise<MediaFile> {
     const name = "lesson2_combined.png";
     this.requested.push(name);

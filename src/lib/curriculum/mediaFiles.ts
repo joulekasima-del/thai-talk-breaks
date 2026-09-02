@@ -1,8 +1,9 @@
 // Access to the actual pre-produced audio/image files committed under
 // curriculum/pilot/. Confirmed naming pattern (Checkpoint 3 report item 2,
-// Lesson 2 updated per LDTKB-057):
+// Lesson 2 updated per LDTKB-057, revised again — see loadCombinedNumbersAudio):
 //   lessonNN_male.{mp3,png} / lessonNN_female.{mp3,png}  — lessons 1,3-7
-//   lesson02_combined.{mp3,png}                          — lesson 2 (numbers), one combined file
+//   lesson02_combined.png                                — lesson 2's photo (still sent natively)
+//   lesson02_1.mp3 .. lesson02_10.mp3                    — lesson 2's audio (now via the Web App, not this module's MediaLoader path)
 //
 // Files are read directly off the deployment's filesystem (they ship inside
 // the repo checkout, which Vercel's Node.js functions can read) and uploaded
@@ -88,13 +89,25 @@ export async function loadWordSetImage(dayNumber: number): Promise<MediaFile> {
   return readWeeks234File("images", dayNumber, `${filePrefix}.png`, "image/png");
 }
 
-/** LDTKB-057: Lesson 2's combined numbers 1-10 audio/image (replaces the old one-file-per-number set). */
-export async function loadCombinedNumbersAudio(): Promise<MediaFile> {
-  return readMediaFile("audio", "lesson02_combined.mp3", "audio/mpeg");
-}
-
+/**
+ * Lesson 2's combined image — still sent natively (deliverLesson.ts), per
+ * this revision of LDTKB-057.
+ */
 export async function loadCombinedNumbersImage(): Promise<MediaFile> {
   return readMediaFile("images", "lesson02_combined.png", "image/png");
+}
+
+/**
+ * NOT part of MediaLoader / deliverLesson.ts's active Lesson 2 path any
+ * more — this revision of LDTKB-057 moved Lesson 2's audio to the Web App,
+ * delivering the original 10 per-number files instead (see
+ * lessonAudioApi.ts's numberAudioUrl). Kept only because loadRepresentativeClip
+ * below still calls it directly; curriculum/pilot/audio/lesson02_combined.mp3
+ * itself is also left in place (unused elsewhere, not deleted per instruction).
+ * Confirmed via search this is the only remaining caller before leaving it in.
+ */
+export async function loadCombinedNumbersAudio(): Promise<MediaFile> {
+  return readMediaFile("audio", "lesson02_combined.mp3", "audio/mpeg");
 }
 
 /**

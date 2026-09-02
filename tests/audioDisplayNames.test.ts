@@ -65,18 +65,11 @@ test("Weeks 2-4 phrase day (Day 9) main audio: performer = 'Day 9', not 'Lesson 
 });
 
 // LDTKB-057: Lesson 2 now sends one combined audio clip, not one per number.
-test("Lesson 2 (numbers) audio: title = 'Numbers 1-10', performer = 'Lesson 2'", async () => {
-  const deps = makeDeliverDeps();
-
-  await deliverLesson(
-    { learnerId: "l3", chatId: 3, gender: "male", lessonNumber: 2, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1] },
-    deps,
-  );
-
-  assert.equal(deps.telegram.sentAudio.length, 1, "one combined audio clip, not one per number");
-  assert.equal(deps.telegram.sentAudio[0].title, "Numbers 1-10");
-  assert.equal(deps.telegram.sentAudio[0].performer, "Lesson 2");
-});
+// Lesson 2's audio no longer sends natively at all (this revision of
+// LDTKB-057 moved it to the Web App, like Lessons 3/8) — there's no more
+// title/performer display-name behavior to test here. See
+// tests/deliverLessonWebAppPrototype.test.ts and tests/lessonAudio.test.ts
+// for Lesson 2's current (Web App button / content-API) coverage.
 
 // Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
 // prototype days and no longer sends native audio; swapped to another
