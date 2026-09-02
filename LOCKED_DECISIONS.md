@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.3  
-**Last updated:** 31 August 2026  
+**Register version:** 5.4  
+**Last updated:** 2 September 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -597,23 +597,24 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Code:** `src/lib/day29/audioSequencer.ts`'s `SPEECH_GAP_MS`/`PANEL_GAP_MS` constants need updating to match (1000/2000), along with the tests that check these exact values.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
-## LDTKB-057 — Lesson 2 (numbers) consolidated to one photo, one audio clip
+## LDTKB-057 — Lesson 2 (numbers): photo consolidated, audio revised twice
 
-**Status:** Locked, implemented, and deployed (31 August 2026)  
-**Decision:** Confirmed 24 August 2026: Lesson 2's format changes from 10 separate photos and 10 separate audio clips (one per number, with per-number captions/display-names) to **one combined photo showing all 10 numbers** and **one combined audio clip** speaking all 10 numbers together. The lesson's text summary (the "Lesson 2 — Numbers 1-10" message listing all ten karaoke values) is unchanged.  
-**Implementation complete (31 August 2026):** new assets provided (`curriculum/pilot/images/lesson02_combined.png`, `curriculum/pilot/audio/lesson02_combined.mp3`, replacing the 10 old per-number files, which were deleted), and `deliverLesson.ts`'s `deliverNumbersLesson` updated to send exactly one `sendPhoto`/`sendAudio` call instead of looping through 10. Combined audio's display name: title "Numbers 1-10", performer "Lesson 2". A real latent bug was also found and fixed during this work: `loadRepresentativeClip`'s Lesson 2 case still referenced the now-deleted `lesson02_5.mp3` file — not currently reachable by any live code path, but would have thrown at runtime had it ever been called; now correctly points to the combined audio.  
+**Status:** Locked, implemented, and deployed — audio delivery approach revised again 2 September 2026 (see below); superseded, not corrected — both revisions were real, deliberate decisions, not mistakes.  
+**Decision (24 August 2026, first revision):** Lesson 2's format changes from 10 separate photos and 10 separate audio clips (one per number, with per-number captions/display-names) to **one combined photo showing all 10 numbers**. The lesson's text summary (the "Lesson 2 — Numbers 1-10" message listing all ten karaoke values) is unchanged throughout every revision below.  
+**Implementation, first revision (31 August 2026):** new combined-photo asset provided (`curriculum/pilot/images/lesson02_combined.png`), and audio was also consolidated at this point into a single combined clip (`curriculum/pilot/audio/lesson02_combined.mp3`), sent as one native `sendAudio` call, title "Numbers 1-10", performer "Lesson 2". The original 10 per-number files were deleted from the repo at this point. A real latent bug was found and fixed during this work: `loadRepresentativeClip`'s Lesson 2 case referenced a now-deleted per-number file — not reachable by any live code path, but would have thrown at runtime had it ever been called.  
+**Revised again (2 September 2026), after LDTKB-058's Web App audio pattern was built and validated on a real device:*** the combined-photo approach stays (photo is still sent natively, unchanged), but **audio reverts to the original 10 per-number files** — restored from git history — now delivered through the Web App page (same pattern as Lessons 3/8, per LDTKB-058), not as native `sendAudio` at all. The now-superseded `lesson02_combined.mp3` file is intentionally left in the repo, unused, rather than deleted. `getLessonAudioContent` reuses the existing "wordset" content shape for Lesson 2 rather than introducing a new kind, since the Web App page already renders that shape as a list of audio players. A second safety check during this work confirmed `loadRepresentativeClip` still calls the combined-audio loader directly — that function was deliberately left in place (not deleted) to avoid reintroducing the same class of dangling-reference bug found in the first revision.  
 **Reference:** see the master chat script's Section 2.2 for the current delivery description.  
-**Locked by:** Joule's confirmation, 24 August 2026.
+**Locked by:** Joule's confirmation, 24 August 2026 (first revision) and 2 September 2026 (second revision).
 
-## LDTKB-058 — Web App audio delivery, prototyped on Lessons 3 and 8
+## LDTKB-058 — Web App audio delivery, prototyped on Lessons 2, 3 and 8
 
-**Status:** Locked (prototype phase — validate before wider rollout)  
+**Status:** Locked — prototype validated on a real device (2 September 2026) for all three days; wider rollout to the remaining 25 lesson days not yet decided.  
 **Decision:** Confirmed 24 August 2026, after real-world testing found a genuine, unfixable Telegram platform limitation: native audio messages (`sendAudio`), voice messages (`sendVoice`), and even generic file attachments (`sendDocument`) all exhibit Telegram's built-in "continuous playback" behavior — playing one audio message auto-advances into whatever comes next in the chat, **regardless of how much real time separates them** (confirmed via Telegram's own bug tracker and direct empirical testing, not just documentation). No message-type or file-format trick avoids this — tested `sendDocument` with both `.mp3` (still auto-chains) and `.wav` (avoids chaining, but breaks inline playback entirely, forcing a download instead).  
 **Solution:** move audio playback into a Telegram Web App page — the same pattern Day 29's living comic already uses successfully — since a real HTML `<audio>` element is not part of Telegram's native media system and is therefore unaffected.  
-**Scope, this decision:** prototyped on exactly two days — **Lesson 3** (standard single-phrase day) and **Day 8** (word-set day, multiple audio clips) — chosen to represent the two different content shapes. Lesson 2 is deliberately excluded (its format is already a separate pending decision, LDTKB-057). Day 30's quiz audio is explicitly out of scope for this decision — it's structurally different (interactive, tap-driven, with correctness tracking) and will need its own, larger redesign if pursued later, not a simple extension of this pattern.  
-**Not yet validated in production:** this is confirmed as the right technical direction, but still needs real-device testing (opening the Web App page on a real phone, confirming the audio plays correctly and does not auto-chain) before deciding whether to roll out to the remaining 26 lesson days.  
-**Reference:** see the master chat script's Sections 2.1/2.3 for the updated Lesson 3 / Day 8 delivery description.  
-**Locked by:** Joule's confirmation, 24 August 2026.
+**Scope, this decision (updated 2 September 2026):** prototyped on **Lesson 2** (numbers, 10 audio clips — added 2 September 2026, see LDTKB-057's second revision), **Lesson 3** (standard single-phrase day), and **Day 8** (word-set day, multiple audio clips) — together representing every content shape the pattern needs to support. Day 30's quiz audio remains explicitly out of scope — it's structurally different (interactive, tap-driven, with correctness tracking) and will need its own, larger redesign if pursued later, not a simple extension of this pattern.  
+**Validated in production (2 September 2026):** tested live on a real device for all three days — Lesson 3's single audio player and Day 8's four independent word players both confirmed to play cleanly with no auto-chaining whatsoever. Wider rollout to the remaining 25 lesson days is a separate, not-yet-made decision.  
+**Reference:** see the master chat script's Sections 2.1/2.2/2.3 for the updated Lesson 2/3 / Day 8 delivery description.  
+**Locked by:** Joule's confirmation, 24 August 2026 (decision) and 2 September 2026 (production validation).
 
 ## Future ideas — not decisions, not scheduled
 
@@ -667,4 +668,6 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-056 | Day 29's audio-pacing gaps halved: 2s/3s (speech/panel) → 1s/2s, for a snappier feel; code and tests need a corresponding update to SPEECH_GAP_MS/PANEL_GAP_MS | Joule |
 | 24 Aug 2026 | LDTKB-057 | Lesson 2 (numbers) format decision locked: consolidating from 10 photos/10 audio clips to 1 combined photo + 1 combined audio clip; decision confirmed, implementation (new assets + deliverNumbersLesson code change) still pending | Joule |
 | 31 Aug 2026 | LDTKB-057 | Implementation complete: new combined photo/audio assets provided, deliverNumbersLesson updated to send one photo/one audio instead of ten each; also fixed a real latent bug in loadRepresentativeClip's Lesson 2 case (referenced a now-deleted per-number file) | Joule |
+| 2 Sep 2026 | LDTKB-057 | Revised again: Lesson 2's audio reverts from the combined clip to the original 10 per-number files (restored from git history), now delivered via the Web App (LDTKB-058's pattern) instead of native sendAudio; combined photo unchanged; combined audio file left in repo, unused | Joule |
+| 2 Sep 2026 | LDTKB-058 | Validated on a real device for all three prototype days (Lessons 2, 3, and Day 8) — clean playback confirmed, no auto-chaining in any case; wider rollout to remaining 25 lessons not yet decided | Joule |
 | 24 Aug 2026 | LDTKB-058 | Web App audio delivery prototyped on Lessons 3 and 8, solving Telegram's unfixable native-audio auto-continue behavior (confirmed via real testing across sendAudio/sendVoice/sendDocument, no format trick avoids it); pattern reuses Day 29's Web App infrastructure; not yet validated on a real device, wider rollout to remaining lessons pending that validation | Joule |
