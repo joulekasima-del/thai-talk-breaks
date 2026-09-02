@@ -1,20 +1,42 @@
-// Build-time sync for the Web App audio delivery prototype (Lessons 2, 3 +
-// Day 8 — see deliverLesson.ts's WEB_APP_AUDIO_DAYS). Copies exactly the
-// files this prototype needs into public/lessons/ as a flat directory,
-// same "curriculum stays the single source of truth" reasoning as
-// syncDay29Assets.mjs. Unlike that script (one whole source folder copied
-// recursively), this one pulls from several different curriculum
-// subdirectories into one flat destination, since these days' assets live
-// in different places (pilot vs. week2) — explicit per-source
-// file-pattern list, not a generalized "any day" copier, since this is a
-// scoped prototype, not a permanent pattern yet.
+// Build-time sync for the Web App audio delivery pattern — LDTKB-058 full
+// rollout. Copies every lesson day's (1-28) audio files into public/lessons/
+// as a flat directory, same "curriculum stays the single source of truth"
+// reasoning as syncDay29Assets.mjs.
 //
-// Lesson 2's combined image/audio (lesson02_combined.{png,mp3}) are
-// deliberately NOT synced here: the combined image still sends natively
-// (curriculum/pilot/images/, not this public folder), and the combined
-// audio is unused now that Lesson 2's audio is these 10 per-number files
-// instead — see mediaFiles.ts's loadCombinedNumbersAudio for why that file
-// and function are still kept around, just not through this path.
+// Audio only — no images. The Web App page (src/app/lesson/[day]/page.tsx)
+// and its content API (lessonAudioApi.ts) never reference an image URL;
+// every lesson kind still sends its photo natively via sendPhoto. The
+// original 2-day prototype synced Lesson 3's and Day 8's images too, but
+// nothing ever used them — dropped here rather than scaled up to ~50+
+// pointless files across 28 days. (Confirmed by reading page.tsx: no
+// "image"/".png" reference anywhere in it.)
+//
+// Patterns are generalized from the actual directory/filename conventions
+// (see mediaFiles.ts's loadPhraseLessonAudio/loadWordSetAudio, which this
+// mirrors) rather than one entry per day:
+//   - Lesson 2 (numbers): lesson02_<digits>.mp3 (excludes lesson02_combined.mp3,
+//     which has no digit-only suffix — that file is unused now, see
+//     mediaFiles.ts's loadCombinedNumbersAudio comment, and stays unsynced).
+//   - Pilot phrase days (1, 3-7): lessonNN_(male|female).mp3, exact match —
+//     excludes lesson02_1.mp3 etc. (not "male"/"female") automatically.
+//   - Weeks 2-4 phrase days: weekN_dayNN_(male|female).mp3, exact match —
+//     one source entry per week folder (2, 3, 4), since each dir only ever
+//     contains its own week's prefix.
+//   - Weeks 2-4 word-set days (8, 10, 16, 26): weekN_dayNN_<digits>.mp3,
+//     exact match, same per-week-folder source entries.
+//
+// "Exact match" matters: several phrase days have EXTRA files beyond the
+// plain gender file that loadPhraseLessonAudio/phraseAudioUrl actually
+// request — e.g. week2_day09_female_ext.mp3, week2_day13_sweet1.mp3,
+// week4_day22_bonus1_male.mp3, week4_day25_male_2.mp3..._5.mp3. These are
+// reference/bonus material, not what gets delivered, and the patterns above
+// deliberately do not match them (anchored ^...$, no wildcard swallowing the
+// suffix). See this task's report for a real, pre-existing, OUT-OF-SCOPE
+// finding: Days 15, 17, 21, 22, and 25 have NO plain "_male.mp3"/"_female.mp3"
+// file at all (only _older/_younger/_1.._5 suffixed variants) — their audio
+// was already broken under the old native sendAudio path (same underlying
+// loader function) and remains unfixed by this rollout; not something this
+// script can or should silently paper over.
 
 import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
@@ -22,12 +44,15 @@ import path from "node:path";
 const ROOT = process.cwd();
 const DEST_DIR = path.join(ROOT, "public", "lessons");
 
+const WEEK_AUDIO_DIRS = ["week2-audio", "week3-audio", "week4-audio"];
+
 const SOURCES = [
-  { dir: path.join(ROOT, "curriculum", "pilot", "audio"), pattern: /^lesson02_\d+\.mp3$/ },
-  { dir: path.join(ROOT, "curriculum", "pilot", "audio"), pattern: /^lesson03_.*\.mp3$/ },
-  { dir: path.join(ROOT, "curriculum", "pilot", "images"), pattern: /^lesson03_.*\.png$/ },
-  { dir: path.join(ROOT, "curriculum", "week2-audio"), pattern: /^week2_day08_.*\.mp3$/ },
-  { dir: path.join(ROOT, "curriculum", "week2-images"), pattern: /^week2_day08\.png$/ },
+  { dir: path.join(ROOT, "curriculum", "pilot", "audio"), pattern: /^lesson02_\d+\.mp3$/ }, // Lesson 2 (numbers)
+  { dir: path.join(ROOT, "curriculum", "pilot", "audio"), pattern: /^lesson\d{2}_(male|female)\.mp3$/ }, // Lessons 1, 3-7 (phrase)
+  ...WEEK_AUDIO_DIRS.flatMap((weekDir) => [
+    { dir: path.join(ROOT, "curriculum", weekDir), pattern: /^week\d_day\d{2}_(male|female)\.mp3$/ }, // phrase days
+    { dir: path.join(ROOT, "curriculum", weekDir), pattern: /^week\d_day\d{2}_\d+\.mp3$/ }, // word-set days
+  ]),
 ];
 
 async function main() {
@@ -42,7 +67,7 @@ async function main() {
       copied += 1;
     }
   }
-  console.log(`Synced ${copied} lesson-prototype asset(s) (Lessons 2, 3 + Day 8) -> ${DEST_DIR}`);
+  console.log(`Synced ${copied} lesson audio file(s) (Days 1-28) -> ${DEST_DIR}`);
 }
 
 main().catch((error) => {

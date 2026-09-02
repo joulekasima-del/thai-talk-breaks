@@ -66,32 +66,34 @@ test("findDueLearners returns the correct lesson number for an in-window, in-pil
 
 // --- deliverLesson: gender-branch file selection --------------------------
 
-// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
-// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
-// longer loads/sends its audio file the native way; swapped to keep this
-// test's actual point (gender-branch file selection) intact.
-test("deliverLesson selects the male audio/image files for a male learner (phrase lesson)", async () => {
+// LDTKB-058: audio is no longer loaded through MediaLoader for any lesson
+// day (it's delivered via the Web App instead) — only the image stays
+// gender-branched and natively loaded/sent, so that's all these two tests
+// verify now.
+test("deliverLesson selects the male image file for a male learner, and no native audio (phrase lesson)", async () => {
   const media = new FakeMediaLoader();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
+  const telegram = new FakeTelegramClient();
+  const deps = { telegram, deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9, appUrl: "https://thaitalkbreaks.example" };
   await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
-  assert.ok(media.requested.includes("lesson4_male.mp3"));
   assert.ok(media.requested.includes("lesson4_male.png"));
   assert.ok(!media.requested.some((f) => f.includes("female")));
+  assert.equal(telegram.sentAudio.length, 0, "no native audio for any lesson day any more");
 });
 
-test("deliverLesson selects the female audio/image files for a female learner (phrase lesson)", async () => {
+test("deliverLesson selects the female image file for a female learner, and no native audio (phrase lesson)", async () => {
   const media = new FakeMediaLoader();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
+  const telegram = new FakeTelegramClient();
+  const deps = { telegram, deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9, appUrl: "https://thaitalkbreaks.example" };
   await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "female", lessonNumber: 4, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2, 3] },
     deps,
   );
-  assert.ok(media.requested.includes("lesson4_female.mp3"));
   assert.ok(media.requested.includes("lesson4_female.png"));
   assert.ok(!media.requested.some((f) => f.includes("male") && !f.includes("female")));
+  assert.equal(telegram.sentAudio.length, 0, "no native audio for any lesson day any more");
 });
 
 // LDTKB-057: Lesson 2 now uses one combined audio/image file, not one per number.
@@ -122,7 +124,7 @@ test("duplicate-send guard: a second delivery attempt for the same learner/lesso
   const media = new FakeMediaLoader();
   const telegram = new FakeTelegramClient();
   const deliveryStore = new FakeDeliveryStore();
-  const deps = { telegram, deliveryStore, media, rng: () => 0.9 };
+  const deps = { telegram, deliveryStore, media, rng: () => 0.9, appUrl: "https://thaitalkbreaks.example" };
   const input = { learnerId: "l1", chatId: 1, gender: "male" as const, lessonNumber: 1, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [] };
 
   const first = await deliverLesson(input, deps);
@@ -161,16 +163,17 @@ test("duplicate-send guard: same learner, same lesson, different date is allowed
 
 // --- Text-before-audio sequencing: two distinct recorded states -----------
 
-// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
-// delivery prototype days and no longer emits a native sendAudio event;
-// swapped to keep this test's actual point (text-before-audio ordering)
-// intact.
-test("text-before-audio: delivered_at is recorded before the lesson's native audio is sent, audio_delivered_at after", async () => {
+// LDTKB-058: audio no longer sends natively at all (no more "sendAudio:..."
+// event to sequence against) — this test now verifies the same underlying
+// guarantee (delivered_at recorded before audio_delivered_at) directly via
+// the two DeliveryStore events, plus that the web_app button message (the
+// audio-equivalent step) was actually sent in between.
+test("text-before-audio: delivered_at is recorded before audio_delivered_at, with the web_app button sent in between", async () => {
   const log = new EventLog();
   const media = new FakeMediaLoader();
   const telegram = new FakeTelegramClient(log);
   const deliveryStore = new FakeDeliveryStore(log);
-  const deps = { telegram, deliveryStore, media, rng: () => 0.9 };
+  const deps = { telegram, deliveryStore, media, rng: () => 0.9, appUrl: "https://thaitalkbreaks.example" };
 
   await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [1, 2, 3] },
@@ -178,14 +181,15 @@ test("text-before-audio: delivered_at is recorded before the lesson's native aud
   );
 
   const deliveredIdx = log.events.indexOf("delivered_at:l1:4");
-  const mainAudioIdx = log.events.indexOf("sendAudio:lesson4_male.mp3");
   const audioDeliveredIdx = log.events.indexOf("audio_delivered_at:l1:4");
 
   assert.notEqual(deliveredIdx, -1);
-  assert.notEqual(mainAudioIdx, -1);
   assert.notEqual(audioDeliveredIdx, -1);
-  assert.ok(deliveredIdx < mainAudioIdx, "delivered_at must be recorded before the native audio send");
-  assert.ok(mainAudioIdx < audioDeliveredIdx, "audio_delivered_at must be recorded after the native audio send");
+  assert.ok(deliveredIdx < audioDeliveredIdx, "delivered_at must be recorded before audio_delivered_at");
+  assert.equal(telegram.sentAudio.length, 0, "no native sendAudio call any more");
+
+  const buttonMessage = telegram.sent.find((m) => m.keyboard?.some((row) => row.some((b) => "web_app" in b)));
+  assert.ok(buttonMessage, "the web_app audio button must have been sent");
 
   // Two DISTINCT recorded states, not one combined timestamp.
   const record = await deliveryStore.findExisting("l1", 4, "2026-08-21");

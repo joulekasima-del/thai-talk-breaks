@@ -1,18 +1,18 @@
-// Testable core of the Web App audio delivery prototype's API
+// Testable core of the Web App audio delivery API
 // (src/app/api/lesson/[day]/route.ts). Same separation-of-concerns pattern
 // as day29/questApi.ts — all I/O behind injected interfaces, initData
 // validation handled by the route before calling in here with an
 // already-verified telegramUserId.
 //
-// Scoped to exactly WEB_APP_AUDIO_DAYS (Lesson 2 + Lesson 3 + Day 8,
-// imported from deliverLesson.ts as the single source of truth for which
-// days this prototype covers). Access is gated on the learner actually having had
-// this lesson delivered already (per lesson_deliveries) — same
-// "can't reach content early via a guessed URL" spirit as Day 29's
-// findExisting-based dedup guard, just checked as "has it ever been
-// delivered" rather than "was it delivered today."
+// Scoped to exactly WEB_APP_AUDIO_DAYS (every lesson day, 1-28, imported
+// from deliverLesson.ts as the single source of truth — LDTKB-058's full
+// rollout). Access is gated on the learner actually having had this lesson
+// delivered already (per lesson_deliveries) — same "can't reach content
+// early via a guessed URL" spirit as Day 29's findExisting-based dedup
+// guard, just checked as "has it ever been delivered" rather than "was it
+// delivered today."
 
-import { getLesson, type GenderBranch } from "@/lib/curriculum/content";
+import { getLesson, PILOT_LESSON_COUNT, type GenderBranch } from "@/lib/curriculum/content";
 import type { LearnerStore } from "@/lib/onboarding/learnerStore";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
 import { WEB_APP_AUDIO_DAYS } from "@/lib/delivery/deliverLesson";
@@ -59,18 +59,29 @@ function lessonCode(n: number): string {
 }
 
 /**
- * Builds this content's public asset URL(s) — hardcoded per lesson number
- * rather than a generalized "any day" filename builder, matching
- * WEB_APP_AUDIO_DAYS's own deliberately-provisional scoping (exactly
- * Lesson 3's curriculum/pilot/ naming and Day 8's week2/ naming, the only
- * two shapes this prototype needs).
+ * Which week folder/file-prefix a Weeks 2-4 day (8-28) belongs to — mirrors
+ * mediaFiles.ts's weeks234Location exactly (that one isn't exported, and
+ * this module only needs the filename prefix, not a filesystem path).
+ * Bug note: earlier versions of phraseAudioUrl/wordSetAudioUrl hardcoded a
+ * bare "lessonNN" / a fixed "week2_" prefix — invisible while only Lesson 3
+ * (pilot) and Day 8 (already week2) were ever exercised by the prototype,
+ * but wrong for e.g. Day 9 (needs "week2_day09", not "lesson09") or Day 16
+ * (needs "week3_day16", not "week2_day16"). Fixed as part of the LDTKB-058
+ * full rollout, which is what actually exercises every day for the first time.
  */
+function weeks234FilePrefix(dayNumber: number): string {
+  const weekNumber = dayNumber <= 14 ? 2 : dayNumber <= 21 ? 3 : 4;
+  return `week${weekNumber}_day${lessonCode(dayNumber)}`;
+}
+
+/** A phrase day's public audio URL — pilot (1-7) uses bare "lessonNN", Weeks 2-4 (8-28) uses "weekN_dayNN". */
 function phraseAudioUrl(lessonNumber: number, gender: GenderBranch): string {
-  return lessonAssetUrl(`lesson${lessonCode(lessonNumber)}_${gender}.mp3`);
+  const prefix = lessonNumber <= PILOT_LESSON_COUNT ? `lesson${lessonCode(lessonNumber)}` : weeks234FilePrefix(lessonNumber);
+  return lessonAssetUrl(`${prefix}_${gender}.mp3`);
 }
 
 function wordSetAudioUrl(dayNumber: number, wordIndex: number): string {
-  return lessonAssetUrl(`week2_day${lessonCode(dayNumber)}_${wordIndex}.mp3`);
+  return lessonAssetUrl(`${weeks234FilePrefix(dayNumber)}_${wordIndex}.mp3`);
 }
 
 /** Lesson 2's per-number audio — curriculum/pilot/audio/lesson02_{value}.mp3, no gender branch, no zero-padding on the number itself. */

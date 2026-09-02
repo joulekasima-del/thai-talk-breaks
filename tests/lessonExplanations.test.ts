@@ -59,20 +59,22 @@ test("every LESSON_EXPLANATIONS entry matches curriculum/lesson-explanations.md 
 
 // --- Delivery-flow: the explanation is actually sent, as the final message -
 
+// LDTKB-058 full rollout: every lesson day now needs appUrl (the web_app
+// audio button), so it's included by default here rather than added
+// per-test as before.
 function makeDeliverDeps() {
   return {
     telegram: new FakeTelegramClient(),
     deliveryStore: new FakeDeliveryStore(),
     media: new FakeMediaLoader(),
     now: () => new Date("2026-08-26T01:00:00.000Z"),
+    appUrl: "https://thaitalkbreaks.example",
   };
 }
 
-// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
-// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
-// longer sends a native audio clip; swapped to keep this test's actual
-// point (explanation comes after the audio, plain text) intact.
-test("phrase day (Lesson 4): explanation is sent as the final message, after the audio", async () => {
+// LDTKB-058: no lesson day sends native audio any more — "after the audio"
+// now means "after the web_app audio button."
+test("phrase day (Lesson 4): explanation is sent as the final message, after the web_app audio button", async () => {
   const deps = makeDeliverDeps();
 
   await deliverLesson(
@@ -80,19 +82,14 @@ test("phrase day (Lesson 4): explanation is sent as the final message, after the
     deps,
   );
 
-  assert.equal(deps.telegram.sentAudio.length, 1, "explanation must come after the one audio clip, not interleaved");
+  assert.equal(deps.telegram.sentAudio.length, 0, "no native audio for any lesson day any more");
   const lastMessage = deps.telegram.sent.at(-1);
   assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[4]);
   assert.equal(lastMessage?.keyboard, undefined, "plain text only, no keyboard");
 });
 
-// LDTKB-057: Lesson 2 now sends one combined audio clip, not 10.
-// Lesson 2's audio is now delivered via the Web App (this revision of
-// LDTKB-057), not native sendAudio — there's no other "numbers" lesson to
-// swap this fixture to, so the test now covers the web_app-button flow
-// directly instead.
 test("Lesson 2 (numbers): explanation is sent as the final message, after the web_app audio button", async () => {
-  const deps = { ...makeDeliverDeps(), appUrl: "https://thaitalkbreaks.example" };
+  const deps = makeDeliverDeps();
 
   await deliverLesson(
     { learnerId: "l2", chatId: 2, gender: "female", lessonNumber: 2, deliveryDate: "2026-08-26", previouslyDeliveredLessonNumbers: [1] },
@@ -105,11 +102,7 @@ test("Lesson 2 (numbers): explanation is sent as the final message, after the we
   assert.equal(lastMessage?.keyboard, undefined, "the explanation itself is still plain text, no keyboard");
 });
 
-// Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
-// prototype days and requires APP_URL to be set; swapped to another
-// word-set day to keep this test's actual point intact without depending
-// on that unrelated env var.
-test("word-set day (Day 10): explanation is sent as the final message, after its own audio clips", async () => {
+test("word-set day (Day 10): explanation is sent as the final message, after the web_app audio button", async () => {
   const deps = makeDeliverDeps();
 
   await deliverLesson(
@@ -117,6 +110,7 @@ test("word-set day (Day 10): explanation is sent as the final message, after its
     deps,
   );
 
+  assert.equal(deps.telegram.sentAudio.length, 0, "no native audio for any word-set day any more");
   const lastMessage = deps.telegram.sent.at(-1);
   assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[10]);
   assert.equal(lastMessage?.keyboard, undefined);

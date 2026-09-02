@@ -1,100 +1,24 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { deliverLesson } from "@/lib/delivery/deliverLesson";
-import { getLesson } from "@/lib/curriculum/content";
 import { startDay30Quiz, handleDay30QuizCallback } from "@/lib/quiz/day30Quiz";
 import { DAY30_QUESTION_COUNT } from "@/lib/curriculum/day30Content";
 import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
-import { FakeDeliveryStore, FakeMediaLoader } from "./deliveryFakes";
 import { FakeDay30QuizStore } from "./quizFakes";
 import type { MediaFile } from "@/lib/telegram";
 
-// Every audio message should display a real title/performer, never the raw
-// internal disk filename — the bug this fix addresses. Teaching audio (rule
-// A) should REVEAL the pronunciation as its title; activity/quiz audio
-// (rule B) must stay anonymized. See deliverLesson.ts / day30Quiz.ts.
-
-function makeDeliverDeps(rngSequence: number[] = []) {
-  let i = 0;
-  const rng = () => (i < rngSequence.length ? rngSequence[i++] : 0.99);
-  return {
-    telegram: new FakeTelegramClient(),
-    deliveryStore: new FakeDeliveryStore(),
-    media: new FakeMediaLoader(),
-    now: () => new Date("2026-08-23T01:00:00.000Z"),
-    rng,
-  };
-}
-
-// --- Rule A: teaching audio reveals the pronunciation ----------------------
-
-// Lesson 4, not Lesson 3 — Lesson 3 is now one of the two Web App audio
-// delivery prototype days (WEB_APP_AUDIO_DAYS, deliverLesson.ts) and no
-// longer sends native audio at all; swapped to keep this test's actual
-// point (title/performer on a normal pilot phrase lesson's native audio)
-// intact rather than colliding with that unrelated, later change.
-test("pilot phrase lesson (Lesson 4) main audio: title = karaoke pronunciation, performer = 'Lesson 4'", async () => {
-  const deps = makeDeliverDeps();
-  const lesson = getLesson(4);
-  if (lesson.kind !== "phrase") throw new Error("expected lesson 4 to be a phrase lesson");
-
-  await deliverLesson(
-    { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 4, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3] },
-    deps,
-  );
-
-  const mainAudio = deps.telegram.sentAudio[0];
-  assert.equal(mainAudio.title, lesson.karaoke.male);
-  assert.equal(mainAudio.performer, "Lesson 4");
-});
-
-test("Weeks 2-4 phrase day (Day 9) main audio: performer = 'Day 9', not 'Lesson 9'", async () => {
-  const deps = makeDeliverDeps();
-  const lesson = getLesson(9);
-  if (lesson.kind !== "phrase") throw new Error("expected day 9 to be a phrase lesson");
-
-  await deliverLesson(
-    { learnerId: "l2", chatId: 2, gender: "female", lessonNumber: 9, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8] },
-    deps,
-  );
-
-  const mainAudio = deps.telegram.sentAudio[0];
-  assert.equal(mainAudio.title, lesson.karaoke.female);
-  assert.equal(mainAudio.performer, "Day 9");
-});
-
-// LDTKB-057: Lesson 2 now sends one combined audio clip, not one per number.
-// Lesson 2's audio no longer sends natively at all (this revision of
-// LDTKB-057 moved it to the Web App, like Lessons 3/8) — there's no more
-// title/performer display-name behavior to test here. See
-// tests/deliverLessonWebAppPrototype.test.ts and tests/lessonAudio.test.ts
-// for Lesson 2's current (Web App button / content-API) coverage.
-
-// Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
-// prototype days and no longer sends native audio; swapped to another
-// word-set day (10, 16, 26 are the others) to keep this test's point intact.
-test("word-set day (Day 10) audio: each word's title = its own karaoke, performer = 'Day 10'", async () => {
-  const deps = makeDeliverDeps();
-  const lesson = getLesson(10);
-  if (lesson.kind !== "wordset") throw new Error("expected day 10 to be a word-set day");
-
-  await deliverLesson(
-    { learnerId: "l4", chatId: 4, gender: "male", lessonNumber: 10, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
-    deps,
-  );
-
-  const teachingAudio = deps.telegram.sentAudio.slice(0, lesson.words.length);
-  for (let i = 0; i < lesson.words.length; i++) {
-    assert.equal(teachingAudio[i].title, lesson.words[i].karaoke);
-    assert.equal(teachingAudio[i].performer, "Day 10");
-  }
-});
-
-// Rule B's activity-distractor coverage (Lesson 2 / word-set / phrase
-// activity audio) was removed along with the recognition-tap activity
-// feature itself — see deliverLesson.ts. Day 30 quiz audio (below) is the
-// only remaining rule-B (anonymized) audio in the app.
+// Originally: every audio message should display a real title/performer,
+// never the raw internal disk filename. "Rule A" (teaching audio reveals
+// the pronunciation as its title) applied only to native sendAudio calls
+// for lesson/day content — as of the LDTKB-058 full Web App audio rollout,
+// no lesson day sends native audio at all any more (see deliverLesson.ts),
+// so there is no more Rule-A code path left to test here. Lesson/Day audio
+// delivery is now covered by tests/deliverLessonWebAppPrototype.test.ts
+// (the web_app button send) and tests/lessonAudio.test.ts (the content
+// API's audioUrl values). "Rule B" (anonymized activity/quiz audio) never
+// applied to lesson/day content in the first place — Day 30's quiz audio
+// below is the only rule-B audio left in the app, and is unaffected by
+// this rollout (Day 30 is explicitly out of scope).
 
 // --- Day 30 quiz: anonymized throughout --------------------------------
 

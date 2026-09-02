@@ -81,12 +81,6 @@ function fakeFile(filename: string): MediaFile {
 export class FakeMediaLoader implements MediaLoader {
   requested: string[] = [];
 
-  async loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
-    const name = `lesson${lessonNumber}_${gender}.mp3`;
-    this.requested.push(name);
-    return fakeFile(name);
-  }
-
   async loadPhraseLessonImage(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
     const name = `lesson${lessonNumber}_${gender}.png`;
     this.requested.push(name);
@@ -103,12 +97,6 @@ export class FakeMediaLoader implements MediaLoader {
     const isWordSet = [8, 10, 16, 26].includes(lessonNumber);
     const name = lessonNumber === 2 ? "lesson2_combined.mp3" : isWordSet ? `day${lessonNumber}_1.mp3` : `lesson${lessonNumber}_${gender}.mp3`;
     this.requested.push(`representative:${name}`);
-    return fakeFile(name);
-  }
-
-  async loadWordSetAudio(dayNumber: number, wordIndex: number): Promise<MediaFile> {
-    const name = `day${dayNumber}_${wordIndex}.mp3`;
-    this.requested.push(name);
     return fakeFile(name);
   }
 

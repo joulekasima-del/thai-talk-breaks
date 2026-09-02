@@ -1,9 +1,19 @@
 // Access to the actual pre-produced audio/image files committed under
-// curriculum/pilot/. Confirmed naming pattern (Checkpoint 3 report item 2,
-// Lesson 2 updated per LDTKB-057, revised again — see loadCombinedNumbersAudio):
+// curriculum/pilot/ and curriculum/week{2,3,4}-{audio,images}/. Confirmed
+// naming pattern (Checkpoint 3 report item 2, Lesson 2 updated per
+// LDTKB-057, revised again):
 //   lessonNN_male.{mp3,png} / lessonNN_female.{mp3,png}  — lessons 1,3-7
 //   lesson02_combined.png                                — lesson 2's photo (still sent natively)
-//   lesson02_1.mp3 .. lesson02_10.mp3                    — lesson 2's audio (now via the Web App, not this module's MediaLoader path)
+//   lesson02_1.mp3 .. lesson02_10.mp3                    — lesson 2's audio (via the Web App)
+//
+// As of the LDTKB-058 full rollout, this module's *audio* loaders
+// (loadPhraseLessonAudio, loadWordSetAudio, loadCombinedNumbersAudio) are no
+// longer used by deliverLesson.ts's active delivery path at all — every
+// lesson day's audio now goes through the Web App (src/app/lesson/[day]/,
+// scripts/syncLessonAssets.mjs) instead of native sendAudio. They're kept
+// here only because loadRepresentativeClip still calls them directly for
+// its (currently unwired) cross-lesson-distractor logic. Image loaders are
+// unaffected — every lesson kind still sends its photo natively.
 //
 // Files are read directly off the deployment's filesystem (they ship inside
 // the repo checkout, which Vercel's Node.js functions can read) and uploaded
@@ -49,13 +59,16 @@ async function readWeeks234File(subdir: "audio" | "images", dayNumber: number, f
 }
 
 /**
- * Audio/image for a gender-branched phrase lesson, in the learner's own
- * branch. Transparently routes between the pilot (Days 1-7,
- * curriculum/pilot/, lessonNN_<gender> naming) and Weeks 2-4 (Days 8-28,
- * curriculum/week{2,3,4}-audio|images/, week{N}_day{DD}_<gender> naming) —
- * deliverLesson.ts's phrase-delivery code calls this the same way
- * regardless of which range lessonNumber falls in, so no changes were
- * needed there for standard phrase days.
+ * NOT part of MediaLoader any more — the LDTKB-058 full Web App audio
+ * rollout moved every lesson day's audio off native sendAudio, so
+ * deliverLesson.ts no longer calls this via `deps.media`. Kept only because
+ * loadRepresentativeClip below still calls it directly (confirmed via
+ * search) — same dependency this project has hit before with
+ * loadCombinedNumbersAudio (LDTKB-057's two revisions).
+ *
+ * Transparently routes between the pilot (Days 1-7, curriculum/pilot/,
+ * lessonNN_<gender> naming) and Weeks 2-4 (Days 8-28,
+ * curriculum/week{2,3,4}-audio|images/, week{N}_day{DD}_<gender> naming).
  */
 export async function loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
   if (lessonNumber <= WEEKS234_PILOT_BOUNDARY) {
@@ -73,7 +86,13 @@ export async function loadPhraseLessonImage(lessonNumber: number, gender: Gender
   return readWeeks234File("images", lessonNumber, `${filePrefix}_${gender}.png`, "image/png");
 }
 
-/** Audio for one word of a Weeks 2-4 word-set day (8, 10, 16, 26 — no gender branch). */
+/**
+ * NOT part of MediaLoader any more — same LDTKB-058 rollout reasoning as
+ * loadPhraseLessonAudio above. Kept because loadRepresentativeClip still
+ * calls it directly.
+ *
+ * Audio for one word of a Weeks 2-4 word-set day (8, 10, 16, 26 — no gender branch).
+ */
 export async function loadWordSetAudio(dayNumber: number, wordIndex: number): Promise<MediaFile> {
   const { filePrefix } = weeks234Location(dayNumber);
   return readWeeks234File("audio", dayNumber, `${filePrefix}_${wordIndex}.mp3`, "audio/mpeg");

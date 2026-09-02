@@ -10,10 +10,8 @@ import { deliverDay29Entry, DAY29_LESSON_NUMBER } from "@/lib/day29/deliverDay29
 import { WEEKS234_LAST_DAY } from "@/lib/curriculum/content";
 import {
   loadCombinedNumbersImage,
-  loadPhraseLessonAudio,
   loadPhraseLessonImage,
   loadRepresentativeClip,
-  loadWordSetAudio,
   loadWordSetImage,
 } from "@/lib/curriculum/mediaFiles";
 
@@ -32,11 +30,9 @@ const LOOKBACK_MINUTES = 30; // see SCHEDULER.md "Cron interval and window"
 const DAY30_QUIZ_DAY_NUMBER = 30;
 
 const media: MediaLoader = {
-  loadPhraseLessonAudio,
   loadPhraseLessonImage,
   loadCombinedNumbersImage,
   loadRepresentativeClip,
-  loadWordSetAudio,
   loadWordSetImage,
 };
 

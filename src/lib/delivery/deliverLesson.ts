@@ -1,30 +1,29 @@
-// Orchestrates one lesson delivery: guard check, picture -> text -> native
-// audio (LDTKB-006 order), then a plain-text explanation (LDTKB-051). The
-// recognition-tap activity that used to occupy this final slot (LDTKB-026)
+// Orchestrates one lesson delivery: guard check, picture -> text -> a Web
+// App audio button (LDTKB-006 order; audio itself moved off native
+// sendAudio entirely per the LDTKB-058 full rollout — see
+// WEB_APP_AUDIO_DAYS), then a plain-text explanation (LDTKB-051). The
+// recognition-tap activity that used to occupy that final slot (LDTKB-026)
 // was removed as a deliberate product decision; LDTKB-051's explanation
 // message is its replacement, now built (see LESSON_EXPLANATIONS import).
 // All I/O (Telegram, DB, file reads) is behind injected interfaces, so this
 // is unit-testable the same way handleUpdate.ts was in Checkpoint 2.
 
-import { getLesson, PILOT_LESSON_COUNT, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
+import { getLesson, WEEKS234_LAST_DAY, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
 import { LESSON_EXPLANATIONS } from "@/lib/curriculum/lessonExplanations";
 import type { InlineKeyboard, MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
 
-// PROTOTYPE SCOPING — Web App audio delivery pattern (see src/app/lesson/[day]/page.tsx).
-// Telegram's native sendAudio/sendDocument both auto-continue into whatever
-// message comes next in the chat regardless of when each was sent (confirmed
-// via real testing; no message-type trick avoids it) — a real HTML5 <audio>
-// element inside a Telegram Web App isn't affected. This is a scoped
-// prototype on exactly these days to validate the pattern before wider
-// rollout — deliberately NOT written as a clean/generalized "any day" switch,
-// so it's obviously provisional. Every lesson number NOT in this list keeps
-// the existing sendAudio path completely untouched.
-// Lesson 2 added per this revision of LDTKB-057 — its combined-audio-clip
-// approach (one prior revision of LDTKB-057) is itself now superseded: audio
-// goes back to the original 10 per-number files, delivered via the Web App
-// like Lessons 3/8, not as one combined native sendAudio clip.
-export const WEB_APP_AUDIO_DAYS: readonly number[] = [2, 3, 8];
+// Web App audio delivery — FULL ROLLOUT (revises LDTKB-058). Validated first
+// as a scoped prototype on Lessons 2/3/Day 8, now the permanent mechanism
+// for every lesson day's audio, 1 through WEEKS234_LAST_DAY (28). Telegram's
+// native sendAudio/sendDocument both auto-continue into whatever message
+// comes next in the chat regardless of when each was sent (confirmed via
+// real testing; no message-type trick avoids it) — a real HTML5 <audio>
+// element inside a Telegram Web App isn't affected. Day 29 has its own,
+// separate, already-working Web App mechanism (deliverDay29Entry.ts) and is
+// deliberately not part of this array. Day 30's quiz audio is explicitly
+// out of scope — structurally different, would need its own redesign.
+export const WEB_APP_AUDIO_DAYS: readonly number[] = Array.from({ length: WEEKS234_LAST_DAY }, (_, i) => i + 1);
 
 // Kept as a local type (not imported from the now-deleted distractors.ts) so
 // DeliverLessonDeps.rng and existing callers that still pass an `rng` stay
@@ -32,31 +31,19 @@ export const WEB_APP_AUDIO_DAYS: readonly number[] = [2, 3, 8];
 type Rng = () => number;
 
 /**
- * "Lesson {N}" for the pilot (1-7) / "Day {N}" for Weeks 2-4 (8-28) — the
- * audio performer-label convention this project already uses elsewhere
- * (deliverWordSetLesson's "Day {N}" summary, mediaFiles.ts's identical
- * WEEKS234_PILOT_BOUNDARY split), applied here to sendAudio's `performer`
- * field. Deliberately independent of composePhraseText's own "Lesson {N}"
- * message body text, which this fix does not touch.
+ * Full Web App audio rollout: every lesson day's audio now goes through
+ * sendWebAppAudioButton, not MediaLoader — loadPhraseLessonAudio and
+ * loadWordSetAudio are gone from this interface (nothing calls them via
+ * `deps.media` any more). Their real implementations stay in mediaFiles.ts,
+ * unremoved — loadRepresentativeClip still calls both directly (confirmed
+ * via search), the same dependency this project has hit twice before with
+ * loadCombinedNumbersAudio (LDTKB-057's two revisions).
  */
-function lessonOrDayLabel(lessonNumber: number): string {
-  return lessonNumber <= PILOT_LESSON_COUNT ? `Lesson ${lessonNumber}` : `Day ${lessonNumber}`;
-}
-
 export interface MediaLoader {
-  loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
   loadPhraseLessonImage(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
-  /**
-   * LDTKB-057 (this revision): Lesson 2's photo is still one combined image,
-   * sent natively — its audio is no longer loaded/sent through MediaLoader
-   * at all, now delivered via the Web App like Lessons 3/8 (see
-   * sendWebAppAudioButton / WEB_APP_AUDIO_DAYS). No loadCombinedNumbersAudio
-   * or per-number audio method belongs on this interface any more.
-   */
+  /** Lesson 2's photo is still one combined image, sent natively (LDTKB-057). */
   loadCombinedNumbersImage(): Promise<MediaFile>;
   loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
-  /** Checkpoint 5 — Weeks 2-4 word-set days (8, 10, 16, 26). */
-  loadWordSetAudio(dayNumber: number, wordIndex: number): Promise<MediaFile>;
   loadWordSetImage(dayNumber: number): Promise<MediaFile>;
 }
 
@@ -83,11 +70,10 @@ export interface DeliverLessonDeps {
   now?: () => Date;
   rng?: Rng;
   /**
-   * Public base URL of the deployed app — only read for lessons in
-   * WEB_APP_AUDIO_DAYS, to build the `/lesson/{day}` Web App button URL.
-   * Optional (falls back to reading process.env.APP_URL directly) so the
-   * cron route's existing call site doesn't need updating for this
-   * prototype — same appUrl shape as deliverDay29Entry.ts's own deps.
+   * Public base URL of the deployed app, used to build every lesson's
+   * `/lesson/{day}` Web App button URL. Optional (falls back to reading
+   * process.env.APP_URL directly) so the cron route's existing call site
+   * doesn't need updating — same appUrl shape as deliverDay29Entry.ts's own deps.
    */
   appUrl?: string;
 }
@@ -168,23 +154,11 @@ async function deliverPhraseLesson(
     now.toISOString(),
   );
 
-  if (WEB_APP_AUDIO_DAYS.includes(input.lessonNumber)) {
-    // PROTOTYPE (see WEB_APP_AUDIO_DAYS above) — Lesson 3 only, for now.
-    await sendWebAppAudioButton(input, deps);
-    await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
-    return;
-  }
-
-  const audio = await deps.media.loadPhraseLessonAudio(input.lessonNumber, input.gender);
-  // Rule A (teaching audio) — reveal the pronunciation as the title.
-  await deps.telegram.sendAudio(input.chatId, audio, {
-    title: lesson.karaoke[input.gender],
-    performer: lessonOrDayLabel(input.lessonNumber),
-  });
+  await sendWebAppAudioButton(input, deps);
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 
-/** PROTOTYPE helper shared by deliverPhraseLesson/deliverWordSetLesson — see WEB_APP_AUDIO_DAYS. */
+/** Shared by deliverPhraseLesson/deliverNumbersLesson/deliverWordSetLesson — see WEB_APP_AUDIO_DAYS. */
 async function sendWebAppAudioButton(input: DeliverLessonInput, deps: DeliverLessonDeps): Promise<void> {
   const appUrl = deps.appUrl ?? process.env.APP_URL;
   if (!appUrl) throw new Error("APP_URL must be set to deliver the Web App audio button");
@@ -196,10 +170,9 @@ async function sendWebAppAudioButton(input: DeliverLessonInput, deps: DeliverLes
 }
 
 // LDTKB-057 (this revision): the combined photo (curriculum/pilot/images/
-// lesson02_combined.png) and text summary are unchanged. Audio no longer
-// sends natively at all — it goes through the Web App instead, like Lessons
-// 3/8 (see WEB_APP_AUDIO_DAYS / sendWebAppAudioButton), delivering the
-// original 10 per-number files (lesson02_1.mp3 .. lesson02_10.mp3).
+// lesson02_combined.png) and text summary are unchanged. Audio delivers via
+// the Web App (see WEB_APP_AUDIO_DAYS / sendWebAppAudioButton), delivering
+// the original 10 per-number files (lesson02_1.mp3 .. lesson02_10.mp3).
 async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLessonDeps, now: Date): Promise<void> {
   const lesson = getLesson(2);
   if (lesson.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
@@ -213,7 +186,6 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
   // Guard point, same rule as the phrase-lesson path: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, 2, input.deliveryDate, now.toISOString());
 
-  // PROTOTYPE (see WEB_APP_AUDIO_DAYS above) — Lesson 2 is now one of these too.
   await sendWebAppAudioButton(input, deps);
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
@@ -240,18 +212,7 @@ async function deliverWordSetLesson(
   // Guard point, same rule as the other two delivery paths: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, input.lessonNumber, input.deliveryDate, now.toISOString());
 
-  if (WEB_APP_AUDIO_DAYS.includes(input.lessonNumber)) {
-    // PROTOTYPE (see WEB_APP_AUDIO_DAYS above) — Day 8 only, for now.
-    await sendWebAppAudioButton(input, deps);
-    await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
-    return;
-  }
-
-  for (const w of lesson.words) {
-    const audio = await deps.media.loadWordSetAudio(input.lessonNumber, w.index);
-    // Rule A (teaching audio) — reveal the pronunciation as the title.
-    await deps.telegram.sendAudio(input.chatId, audio, { title: w.karaoke, performer: `Day ${input.lessonNumber}` });
-  }
+  await sendWebAppAudioButton(input, deps);
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 

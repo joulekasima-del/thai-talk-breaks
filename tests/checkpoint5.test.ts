@@ -104,9 +104,18 @@ test("Day 25 uses example #1 (\"may I park here?\") as its canonical phrase", ()
 // longer sends native per-word audio; swapped to another word-set day to
 // keep this test's actual point (one image, one native audio per word)
 // intact.
-test("word-set day delivery sends exactly ONE image (not one per word) and exactly one audio per word", async () => {
+// LDTKB-058: word-set audio now delivers via the Web App (no native audio
+// load/send at all any more) — this test now only covers the still-native
+// image, plus confirming no audio file is loaded through MediaLoader.
+test("word-set day delivery sends exactly ONE image (not one per word), and no native audio at all", async () => {
   const media = new FakeMediaLoader();
-  const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
+  const deps = {
+    telegram: new FakeTelegramClient(),
+    deliveryStore: new FakeDeliveryStore(),
+    media,
+    rng: () => 0.9,
+    appUrl: "https://thaitalkbreaks.example",
+  };
 
   await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 10, deliveryDate: "2026-09-01", previouslyDeliveredLessonNumbers: [1, 2, 3, 4, 5, 6, 7, 8, 9] },
@@ -115,8 +124,9 @@ test("word-set day delivery sends exactly ONE image (not one per word) and exact
 
   assert.equal(deps.telegram.sentPhotos.length, 1, "exactly one photo for the whole day, not per word");
   assert.equal(deps.telegram.sentPhotos[0].filename, "day10.png");
+  assert.equal(deps.telegram.sentAudio.length, 0, "no native audio for word-set days any more");
   const contentAudio = media.requested.filter((f) => f.startsWith("day10_") && !f.startsWith("representative:"));
-  assert.equal(contentAudio.length, 3, "one audio clip per word, no more (no activity distractors anymore)");
+  assert.equal(contentAudio.length, 0, "no per-word audio file is loaded through MediaLoader any more");
 });
 
 // --- Section 5E: "main, not extended" assumption for Days 9, 13, 24 -------

@@ -10,15 +10,27 @@ function makeDeps() {
   return { learnerStore: new FakeLearnerStore(), deliveryStore: new FakeDeliveryStore() };
 }
 
-// --- Scope guard: only Lessons 2, 3 / Day 8 are prototype days -------------
+// --- Scope guard: only Days 1-28 are in WEB_APP_AUDIO_DAYS -----------------
+// (LDTKB-058 full rollout — every lesson day is in scope now; Day 29 has its
+// own separate mechanism, Day 30's quiz audio is explicitly out of scope.)
 
-test("getLessonAudioContent: a day outside WEB_APP_AUDIO_DAYS (e.g. Lesson 5) is rejected, even for an existing learner", async () => {
+test("getLessonAudioContent: Day 29 (outside WEB_APP_AUDIO_DAYS) is rejected, even for an existing learner", async () => {
   const deps = makeDeps();
   const learner = await deps.learnerStore.create(1);
   await deps.learnerStore.update(learner.id, { gender_branch: "male" });
-  await deps.deliveryStore.insertTextSent(learner.id, 5, "2026-08-30", new Date().toISOString());
+  await deps.deliveryStore.insertTextSent(learner.id, 29, "2026-08-30", new Date().toISOString());
 
-  const result = await getLessonAudioContent(1, 5, deps);
+  const result = await getLessonAudioContent(1, 29, deps);
+  assert.deepEqual(result, { ok: false, error: "not_a_prototype_day" });
+});
+
+test("getLessonAudioContent: Day 30 (outside WEB_APP_AUDIO_DAYS) is rejected, even for an existing learner", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(1000);
+  await deps.learnerStore.update(learner.id, { gender_branch: "male" });
+  await deps.deliveryStore.insertTextSent(learner.id, 30, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(1000, 30, deps);
   assert.deepEqual(result, { ok: false, error: "not_a_prototype_day" });
 });
 
@@ -104,6 +116,44 @@ test("getLessonAudioContent: Day 8, delivered — one word entry (and one audio 
     assert.equal(result.content.words[i].karaoke, day8.words[i].karaoke);
     assert.equal(result.content.words[i].meaning, day8.words[i].meaning);
     assert.equal(result.content.words[i].audioUrl, `/lessons/week2_day08_${day8.words[i].index}.mp3`);
+  }
+});
+
+// --- Content shape: Weeks 2-4 phrase/word-set days — full rollout coverage -
+// (Regression coverage for a real bug found while building the LDTKB-058
+// rollout: phraseAudioUrl/wordSetAudioUrl previously hardcoded a bare
+// "lessonNN" prefix / a fixed "week2_" prefix respectively — invisible while
+// only Lesson 3 [pilot] and Day 8 [already week2] were ever exercised by the
+// 2-day prototype, but wrong for any other Weeks 2-4 day. Fixed in
+// lessonAudioApi.ts; these tests cover days outside week2 specifically.)
+
+test("getLessonAudioContent: Day 20 (Weeks 2-4 phrase day, week3) — audioUrl uses the 'weekN_dayNN' prefix, not a bare 'lessonNN'", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(7);
+  await deps.learnerStore.update(learner.id, { gender_branch: "male" });
+  await deps.deliveryStore.insertTextSent(learner.id, 20, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(7, 20, deps);
+  assert.equal(result.ok, true);
+  if (!result.ok || result.content.kind !== "phrase") throw new Error("expected ok phrase content");
+  assert.equal(result.content.audioUrl, "/lessons/week3_day20_male.mp3");
+});
+
+test("getLessonAudioContent: Day 26 (word-set day, week4) — audioUrl uses 'week4_day26', not a hardcoded 'week2_'", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(8);
+  await deps.learnerStore.update(learner.id, { gender_branch: "female" });
+  await deps.deliveryStore.insertTextSent(learner.id, 26, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(8, 26, deps);
+  assert.equal(result.ok, true);
+  if (!result.ok || result.content.kind !== "wordset") throw new Error("expected ok wordset content");
+
+  const day26 = getLesson(26);
+  if (day26.kind !== "wordset") throw new Error("expected day 26 to be a word-set day");
+
+  for (let i = 0; i < day26.words.length; i++) {
+    assert.equal(result.content.words[i].audioUrl, `/lessons/week4_day26_${day26.words[i].index}.mp3`);
   }
 });
 
