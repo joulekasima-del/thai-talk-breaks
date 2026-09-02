@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.2  
-**Last updated:** 24 August 2026  
+**Register version:** 5.3  
+**Last updated:** 31 August 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -599,12 +599,10 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 
 ## LDTKB-057 — Lesson 2 (numbers) consolidated to one photo, one audio clip
 
-**Status:** Locked (decision confirmed; implementation pending)  
+**Status:** Locked, implemented, and deployed (31 August 2026)  
 **Decision:** Confirmed 24 August 2026: Lesson 2's format changes from 10 separate photos and 10 separate audio clips (one per number, with per-number captions/display-names) to **one combined photo showing all 10 numbers** and **one combined audio clip** speaking all 10 numbers together. The lesson's text summary (the "Lesson 2 — Numbers 1-10" message listing all ten karaoke values) is unchanged.  
-**Not yet implemented:** this decision covers the format itself, not its build. Two things still needed before this is live:
-1. **New assets from Joule** — the single combined photo and single combined audio file, replacing the current 10-per-number files.
-2. **A code change** to `deliverLesson.ts`'s `deliverNumbersLesson` function, which currently still loops through 10 separate `sendPhoto`/`sendAudio` calls — not yet updated to send one of each instead.  
-**Reference:** see the master chat script's Section 2.2 for the full before/after description.  
+**Implementation complete (31 August 2026):** new assets provided (`curriculum/pilot/images/lesson02_combined.png`, `curriculum/pilot/audio/lesson02_combined.mp3`, replacing the 10 old per-number files, which were deleted), and `deliverLesson.ts`'s `deliverNumbersLesson` updated to send exactly one `sendPhoto`/`sendAudio` call instead of looping through 10. Combined audio's display name: title "Numbers 1-10", performer "Lesson 2". A real latent bug was also found and fixed during this work: `loadRepresentativeClip`'s Lesson 2 case still referenced the now-deleted `lesson02_5.mp3` file — not currently reachable by any live code path, but would have thrown at runtime had it ever been called; now correctly points to the combined audio.  
+**Reference:** see the master chat script's Section 2.2 for the current delivery description.  
 **Locked by:** Joule's confirmation, 24 August 2026.
 
 ## LDTKB-058 — Web App audio delivery, prototyped on Lessons 3 and 8
@@ -668,4 +666,5 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-055 | "ka" narrator tic removed from every message except the welcome message's very first "Sawasdee ka!" — covers onboarding (6 messages), /oops (2 messages), Day 30 quiz feedback (2 messages); the vocabulary-naming "ka" in the gender question is retained as an exception; confirmed the 28 lesson explanations and Day 29 never used this tic | Joule |
 | 24 Aug 2026 | LDTKB-056 | Day 29's audio-pacing gaps halved: 2s/3s (speech/panel) → 1s/2s, for a snappier feel; code and tests need a corresponding update to SPEECH_GAP_MS/PANEL_GAP_MS | Joule |
 | 24 Aug 2026 | LDTKB-057 | Lesson 2 (numbers) format decision locked: consolidating from 10 photos/10 audio clips to 1 combined photo + 1 combined audio clip; decision confirmed, implementation (new assets + deliverNumbersLesson code change) still pending | Joule |
+| 31 Aug 2026 | LDTKB-057 | Implementation complete: new combined photo/audio assets provided, deliverNumbersLesson updated to send one photo/one audio instead of ten each; also fixed a real latent bug in loadRepresentativeClip's Lesson 2 case (referenced a now-deleted per-number file) | Joule |
 | 24 Aug 2026 | LDTKB-058 | Web App audio delivery prototyped on Lessons 3 and 8, solving Telegram's unfixable native-audio auto-continue behavior (confirmed via real testing across sendAudio/sendVoice/sendDocument, no format trick avoids it); pattern reuses Day 29's Web App infrastructure; not yet validated on a real device, wider rollout to remaining lessons pending that validation | Joule |
