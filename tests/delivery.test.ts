@@ -94,18 +94,17 @@ test("deliverLesson selects the female audio/image files for a female learner (p
   assert.ok(!media.requested.some((f) => f.includes("male") && !f.includes("female")));
 });
 
-test("deliverLesson uses number files with no gender branch for lesson 2", async () => {
+// LDTKB-057: Lesson 2 now uses one combined audio/image file, not one per number.
+test("deliverLesson uses the combined numbers file with no gender branch for lesson 2", async () => {
   const media = new FakeMediaLoader();
   const deps = { telegram: new FakeTelegramClient(), deliveryStore: new FakeDeliveryStore(), media, rng: () => 0.9 };
   await deliverLesson(
     { learnerId: "l1", chatId: 1, gender: "male", lessonNumber: 2, deliveryDate: "2026-08-21", previouslyDeliveredLessonNumbers: [] },
     deps,
   );
-  // All 10 numbers' audio+image requested, none of them gender-suffixed.
-  for (let n = 1; n <= 10; n++) {
-    assert.ok(media.requested.includes(`lesson2_${n}.mp3`));
-    assert.ok(media.requested.includes(`lesson2_${n}.png`));
-  }
+  assert.ok(media.requested.includes("lesson2_combined.mp3"));
+  assert.ok(media.requested.includes("lesson2_combined.png"));
+  assert.ok(!media.requested.some((f) => f.includes("male") || f.includes("female")));
 });
 
 // --- Duplicate-send guard --------------------------------------------------

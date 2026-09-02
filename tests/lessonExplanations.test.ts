@@ -86,7 +86,8 @@ test("phrase day (Lesson 4): explanation is sent as the final message, after the
   assert.equal(lastMessage?.keyboard, undefined, "plain text only, no keyboard");
 });
 
-test("Lesson 2 (numbers): explanation is sent as the final message, after all 10 audio clips", async () => {
+// LDTKB-057: Lesson 2 now sends one combined audio clip, not 10.
+test("Lesson 2 (numbers): explanation is sent as the final message, after the one combined audio clip", async () => {
   const deps = makeDeliverDeps();
 
   await deliverLesson(
@@ -94,7 +95,7 @@ test("Lesson 2 (numbers): explanation is sent as the final message, after all 10
     deps,
   );
 
-  assert.equal(deps.telegram.sentAudio.length, 10);
+  assert.equal(deps.telegram.sentAudio.length, 1);
   const lastMessage = deps.telegram.sent.at(-1);
   assert.equal(lastMessage?.text, LESSON_EXPLANATIONS[2]);
   assert.equal(lastMessage?.keyboard, undefined);

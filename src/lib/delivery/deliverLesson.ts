@@ -42,8 +42,9 @@ function lessonOrDayLabel(lessonNumber: number): string {
 export interface MediaLoader {
   loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
   loadPhraseLessonImage(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
-  loadNumberAudio(numberValue: number): Promise<MediaFile>;
-  loadNumberImage(numberValue: number): Promise<MediaFile>;
+  /** LDTKB-057: Lesson 2 now uses one combined photo + one combined audio clip, not one per number. */
+  loadCombinedNumbersAudio(): Promise<MediaFile>;
+  loadCombinedNumbersImage(): Promise<MediaFile>;
   loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile>;
   /** Checkpoint 5 — Weeks 2-4 word-set days (8, 10, 16, 26). */
   loadWordSetAudio(dayNumber: number, wordIndex: number): Promise<MediaFile>;
@@ -185,6 +186,9 @@ async function sendWebAppAudioButton(input: DeliverLessonInput, deps: DeliverLes
   await deps.telegram.sendMessage(input.chatId, "Tap below to hear it:", keyboard);
 }
 
+// LDTKB-057: one combined photo + one combined audio clip, replacing the
+// previous 10 separate per-number files (curriculum/pilot/images|audio/
+// lesson02_1..10 -> lesson02_combined). The text summary is unchanged.
 async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLessonDeps, now: Date): Promise<void> {
   const lesson = getLesson(2);
   if (lesson.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
@@ -192,19 +196,17 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
   const summary = lesson.numbers.map((n) => `${n.value}: ${n.karaoke}`).join("\n");
   await deps.telegram.sendMessage(input.chatId, `Lesson 2 — Numbers 1-10\n\n${summary}`);
 
-  for (const n of lesson.numbers) {
-    const image = await deps.media.loadNumberImage(n.value);
-    await deps.telegram.sendPhoto(input.chatId, image, `${n.value}: ${n.karaoke}`);
-  }
+  const image = await deps.media.loadCombinedNumbersImage();
+  await deps.telegram.sendPhoto(input.chatId, image);
 
   // Guard point, same rule as the phrase-lesson path: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, 2, input.deliveryDate, now.toISOString());
 
-  for (const n of lesson.numbers) {
-    const audio = await deps.media.loadNumberAudio(n.value);
-    // Rule A (teaching audio) — reveal the pronunciation as the title.
-    await deps.telegram.sendAudio(input.chatId, audio, { title: n.karaoke, performer: "Lesson 2" });
-  }
+  // Rule A (teaching audio) — the text summary above already reveals every
+  // number's pronunciation; "Numbers 1-10" identifies the clip's content
+  // without repeating all ten karaoke values as a title.
+  const audio = await deps.media.loadCombinedNumbersAudio();
+  await deps.telegram.sendAudio(input.chatId, audio, { title: "Numbers 1-10", performer: "Lesson 2" });
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 

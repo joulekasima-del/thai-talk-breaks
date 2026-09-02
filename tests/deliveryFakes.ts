@@ -93,21 +93,21 @@ export class FakeMediaLoader implements MediaLoader {
     return fakeFile(name);
   }
 
-  async loadNumberAudio(numberValue: number): Promise<MediaFile> {
-    const name = `lesson2_${numberValue}.mp3`;
+  async loadCombinedNumbersAudio(): Promise<MediaFile> {
+    const name = "lesson2_combined.mp3";
     this.requested.push(name);
     return fakeFile(name);
   }
 
-  async loadNumberImage(numberValue: number): Promise<MediaFile> {
-    const name = `lesson2_${numberValue}.png`;
+  async loadCombinedNumbersImage(): Promise<MediaFile> {
+    const name = "lesson2_combined.png";
     this.requested.push(name);
     return fakeFile(name);
   }
 
   async loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
     const isWordSet = [8, 10, 16, 26].includes(lessonNumber);
-    const name = lessonNumber === 2 ? "lesson2_5.mp3" : isWordSet ? `day${lessonNumber}_1.mp3` : `lesson${lessonNumber}_${gender}.mp3`;
+    const name = lessonNumber === 2 ? "lesson2_combined.mp3" : isWordSet ? `day${lessonNumber}_1.mp3` : `lesson${lessonNumber}_${gender}.mp3`;
     this.requested.push(`representative:${name}`);
     return fakeFile(name);
   }

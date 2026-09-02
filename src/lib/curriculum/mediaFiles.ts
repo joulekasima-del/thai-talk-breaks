@@ -1,7 +1,8 @@
 // Access to the actual pre-produced audio/image files committed under
-// curriculum/pilot/. Confirmed naming pattern (Checkpoint 3 report item 2):
+// curriculum/pilot/. Confirmed naming pattern (Checkpoint 3 report item 2,
+// Lesson 2 updated per LDTKB-057):
 //   lessonNN_male.{mp3,png} / lessonNN_female.{mp3,png}  — lessons 1,3-7
-//   lessonNN_<1-10>.{mp3,png}                            — lesson 2 (numbers)
+//   lesson02_combined.{mp3,png}                          — lesson 2 (numbers), one combined file
 //
 // Files are read directly off the deployment's filesystem (they ship inside
 // the repo checkout, which Vercel's Node.js functions can read) and uploaded
@@ -87,13 +88,13 @@ export async function loadWordSetImage(dayNumber: number): Promise<MediaFile> {
   return readWeeks234File("images", dayNumber, `${filePrefix}.png`, "image/png");
 }
 
-/** Audio/image for one of lesson 2's ten numbers (1-10, no gender branch). */
-export async function loadNumberAudio(numberValue: number): Promise<MediaFile> {
-  return readMediaFile("audio", `lesson02_${numberValue}.mp3`, "audio/mpeg");
+/** LDTKB-057: Lesson 2's combined numbers 1-10 audio/image (replaces the old one-file-per-number set). */
+export async function loadCombinedNumbersAudio(): Promise<MediaFile> {
+  return readMediaFile("audio", "lesson02_combined.mp3", "audio/mpeg");
 }
 
-export async function loadNumberImage(numberValue: number): Promise<MediaFile> {
-  return readMediaFile("images", `lesson02_${numberValue}.png`, "image/png");
+export async function loadCombinedNumbersImage(): Promise<MediaFile> {
+  return readMediaFile("images", "lesson02_combined.png", "image/png");
 }
 
 /**
@@ -109,7 +110,7 @@ export async function loadNumberImage(numberValue: number): Promise<MediaFile> {
  * days use word index 1 for the same reason (Checkpoint 5).
  */
 export async function loadRepresentativeClip(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
-  if (lessonNumber === 2) return loadNumberAudio(5);
+  if (lessonNumber === 2) return loadCombinedNumbersAudio();
   if (isWordSetDay(lessonNumber)) return loadWordSetAudio(lessonNumber, 1);
   return loadPhraseLessonAudio(lessonNumber, gender);
 }

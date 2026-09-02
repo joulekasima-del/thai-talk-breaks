@@ -64,23 +64,18 @@ test("Weeks 2-4 phrase day (Day 9) main audio: performer = 'Day 9', not 'Lesson 
   assert.equal(mainAudio.performer, "Day 9");
 });
 
-test("Lesson 2 (numbers) audio: each number's title = its own karaoke, performer = 'Lesson 2'", async () => {
+// LDTKB-057: Lesson 2 now sends one combined audio clip, not one per number.
+test("Lesson 2 (numbers) audio: title = 'Numbers 1-10', performer = 'Lesson 2'", async () => {
   const deps = makeDeliverDeps();
-  const lesson = getLesson(2);
-  if (lesson.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
 
   await deliverLesson(
     { learnerId: "l3", chatId: 3, gender: "male", lessonNumber: 2, deliveryDate: "2026-08-23", previouslyDeliveredLessonNumbers: [1] },
     deps,
   );
 
-  // First 10 sentAudio entries are the teaching audio (before the activity's own sendAudio calls).
-  const teachingAudio = deps.telegram.sentAudio.slice(0, 10);
-  assert.equal(teachingAudio.length, 10);
-  for (let i = 0; i < 10; i++) {
-    assert.equal(teachingAudio[i].title, lesson.numbers[i].karaoke);
-    assert.equal(teachingAudio[i].performer, "Lesson 2");
-  }
+  assert.equal(deps.telegram.sentAudio.length, 1, "one combined audio clip, not one per number");
+  assert.equal(deps.telegram.sentAudio[0].title, "Numbers 1-10");
+  assert.equal(deps.telegram.sentAudio[0].performer, "Lesson 2");
 });
 
 // Day 10, not Day 8 — Day 8 is now one of the two Web App audio delivery
