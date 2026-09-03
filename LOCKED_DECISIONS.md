@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.8  
+**Register version:** 5.9  
 **Last updated:** 3 September 2026  
 **Authority:** Joule
 
@@ -208,7 +208,6 @@ The following remain open and must not be treated as decisions:
 - Individual lesson content (phrases, Karaoke, audio, images) for Days 8-30 (topic arc itself is locked — see LDTKB-039)
 - Exact AI tool choice, specific prompts, and per-lesson icon/gesture selection (image-production method and scope are locked — see LDTKB-027)
 - Exact payment amount if 500 Stars produces an unsuitable buyer-visible price
-- Refund window and eligibility rules
 - Data-retention period
 - Onboarding gender-question wording and whether/how a learner may skip or decline it
 
@@ -655,6 +654,14 @@ No other Day 29 content uses first-person narrator voice — confirmed via a ful
 **Reference:** see `curriculum/day29/day29-audio-map.md` and `day29-story-draft.md`'s Page 8 sections for the exact wording; `src/app/day29/day29.module.css`/`page.tsx` for the scroll-direction fix; `src/lib/day29/comicContent.ts` for Page 8's updated speech list.  
 **Locked by:** Joule's confirmation, 3 September 2026.
 
+## LDTKB-063 — Refund policy: Telegram's own baseline (failure to deliver only)
+
+**Status:** Locked, revised 3 September 2026 (see below) — superseded, not corrected; the first version was a real, deliberate decision, not a mistake.  
+**Decision (3 September 2026, first version):** A learner may request a refund of their 500-Star purchase for any reason, at any time after purchase — no fixed window, no eligibility screening, every `/paysupport` request granted.  
+**Revised (3 September 2026, same day):** After reviewing what Telegram itself requires and how other bots/digital-course creators actually handle refunds, Joule chose to follow Telegram's own baseline standard instead of the more generous first version. A refund is granted only when Thai Talk Breaks fails to deliver the purchased course as advertised and within its agreed-upon timeframe (e.g. a scheduled lesson doesn't arrive, delivery breaks, promised content is missing) — not for reasons unrelated to delivery failure, such as a change of mind or general dissatisfaction. There is no separate refund-request time cutoff on top of this — eligibility is scoped by *what happened* (a genuine delivery failure), not by *how long ago* the purchase was made, since a failure could in principle surface at any point in the 30-day course.  
+**Boundary:** This matches, not exceeds, Telegram's own Stars ToS requirement — bots must be able to refund a failed delivery at no penalty via `refundStarPayment`, and must respond to `/paysupport` in a timely fashion, but nothing beyond that is mandated. `/paysupport`'s reply should state this standard plainly (e.g. that refunds are issued for delivery failures, not general returns) so learners know what to expect before asking. This does not remove Joule's discretion to grant an occasional goodwill refund outside this standard — it just means that's a judgment call each time, not a blanket policy.  
+**Locked by:** Joule's confirmation, 3 September 2026 (first version and same-day revision).
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -715,3 +722,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 2 Sep 2026 | LDTKB-060 | Day 30's quiz redesigned as a single Web App page — all 10 questions in one continuous experience, native per-question messages/audio/buttons removed entirely; resumability and anti-replay logic preserved exactly, verified via direct code review before shipping | Joule |
 | 3 Sep 2026 | LDTKB-061 | Day 29's narrator pronoun revised to "we" (entry + completion messages, 3 instances) extending the welcome message's one-time exception to LDTKB-030's fixed "I" voice; also fixed a real layout bug where fixed-position nav arrows overlapped/blurred text on the Surprise Quest's completion page | Joule |
 | 3 Sep 2026 | LDTKB-062 | Day 29's scroll direction changed from vertical to horizontal to match the existing ◀/▶ nav arrows (arrows kept as-is); Page 8 gets a new first speech "ขอโทษค่ะ!" before the existing closing line, new recording provided by Joule | Joule |
+| 3 Sep 2026 | LDTKB-063 | Stage 5 kickoff: refund policy locked; revised same day from "any reason, no window" to Telegram's own baseline standard (refund only for genuine delivery failure, no separate time cutoff) after reviewing Telegram's requirements and market practice | Joule |
