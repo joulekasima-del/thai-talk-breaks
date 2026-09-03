@@ -105,8 +105,31 @@
   backdrop-filter: blur(6px);
 }
 
+/*
+ * LDTKB-061: .navArrows is `position: fixed; top: 50%`, always centered on
+ * the viewport regardless of which page is scrolled into view — its two
+ * buttons occupy roughly the outer 1rem-to-4rem zone on each side of the
+ * screen (1rem container padding + 3rem button width). On the 8 illustrated
+ * story pages this never overlaps anything (the image is capped well short
+ * of those zones), but .questCard/.completionMessage are centered TEXT
+ * blocks that, without a width constraint tied to the viewport, can render
+ * right up against the screen edges on a narrow phone — under the
+ * (blurred, backdrop-filter) nav buttons.
+ *
+ * Fix: cap max-width at `calc(100vw - 9rem)` (the design's original
+ * max-width, or the viewport width minus the nav arrows' 4rem-per-side
+ * footprint plus 0.5rem of actual breathing room on each side, whichever is
+ * smaller) — a responsive clearance rule scoped to just these two text
+ * containers, not a blanket change to .page's padding (which would
+ * needlessly shrink the image area on the 8 normal pages). The extra 0.5rem
+ * per side matters: the exact 8rem figure places the text edge flush
+ * against the button edge with zero gap (verified in a live 390px-wide
+ * preview) — fragile, not a real fix. align-items: center on .page then
+ * centers the now-narrower box, so the freed-up width becomes equal,
+ * guaranteed-clear margin on both sides.
+ */
 .questCard {
-  max-width: 28rem;
+  max-width: min(28rem, calc(100vw - 9rem));
   width: 100%;
   text-align: center;
   display: flex;
@@ -151,7 +174,8 @@
   white-space: pre-line;
   font-size: 1.1rem;
   line-height: 1.6;
-  max-width: 26rem;
+  /* See .questCard's comment above (LDTKB-061) — same nav-arrow clearance rule. */
+  max-width: min(26rem, calc(100vw - 9rem));
 }
 
 .loading {

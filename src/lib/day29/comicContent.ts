@@ -113,10 +113,13 @@ export const DAY29_QUEST_OPTIONS: Day29QuestOption[] = [
 
 export const DAY29_QUEST_CORRECT_ANSWER_ID = "doi_pui";
 
+// Pronoun revised "I" -> "we" (both instances) 3 September 2026 (LDTKB-061),
+// same one-time "we" exception (LDTKB-030) as the entry message
+// (deliverDay29Entry.ts's MESSAGE_3) and the welcome message.
 export const DAY29_QUEST_COMPLETION_MESSAGE =
   "✨ It's been 29 days since you started the course!\n\n" +
-  "I really hope you've gotten to try out some of these phrases with real people along the way — even one small conversation makes it worth it.\n\n" +
-  "There's just one more day to go... and I am so looking forward to it. 👀🎉";
+  "We really hope you've gotten to try out some of these phrases with real people along the way — even one small conversation makes it worth it.\n\n" +
+  "There's just one more day to go... and we are so looking forward to it. 👀🎉";
 
 /** Public URL for a Day 29 asset — served from public/day29/ (scripts/syncDay29Assets.mjs). */
 export function day29AssetUrl(filename: string): string {

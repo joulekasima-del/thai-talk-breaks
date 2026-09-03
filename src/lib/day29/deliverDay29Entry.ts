@@ -19,10 +19,14 @@ export const DAY29_LESSON_NUMBER = 29;
 // 22 August 2026) — intentionally drops the usual "ka" narrator tic (LDTKB-030)
 // for this quest-framing moment, per that section's note. Not gender-branched:
 // the spec gives one single version, no male/female variant.
+//
+// MESSAGE_3's pronoun revised "I" -> "we" 3 September 2026 (LDTKB-061),
+// extending the welcome message's existing one-time "we" exception
+// (LDTKB-030) to this same quest-framing moment.
 const MESSAGE_1 = "🗺️ *knock knock*";
 const MESSAGE_2 = "Heyy! Remember everything you've learned this month?";
 const MESSAGE_3 =
-  "I put together something special — a little story, a little journey, a few surprises along the way...";
+  "We put together something special — a comic-style recap, a few little stories, and a surprise quest at the end...";
 const BUTTON_TEXT = "🎁 Start the story";
 
 export interface DeliverDay29EntryInput {

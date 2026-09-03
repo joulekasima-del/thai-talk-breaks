@@ -5,7 +5,13 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { createHmac } from "node:crypto";
 
-import { DAY29_STORY_PAGES, DAY29_TOTAL_PAGES, DAY29_QUEST_CORRECT_ANSWER_ID, day29AssetUrl } from "@/lib/day29/comicContent";
+import {
+  DAY29_STORY_PAGES,
+  DAY29_TOTAL_PAGES,
+  DAY29_QUEST_CORRECT_ANSWER_ID,
+  DAY29_QUEST_COMPLETION_MESSAGE,
+  day29AssetUrl,
+} from "@/lib/day29/comicContent";
 import { buildPlaybackPlan, SPEECH_GAP_MS, PANEL_GAP_MS } from "@/lib/day29/audioSequencer";
 import { validateTelegramInitData } from "@/lib/day29/telegramInitData";
 import { getQuestStatus, submitQuestAnswer } from "@/lib/day29/questApi";
@@ -230,6 +236,40 @@ test("deliverDay29Entry's buildup text matches day29-living-comic-spec.md's lock
   const spec = readFileSync(path.join(REPO_ROOT, "curriculum", "day29", "day29-living-comic-spec.md"), "utf8");
   assert.match(spec, /🗺️ \*knock knock\*/);
   assert.match(spec, /Heyy! Remember everything you've learned this month\?/);
-  assert.match(spec, /I put together something special — a little story, a little journey, a few surprises along the way\.\.\./);
+  // LDTKB-061 (3 September 2026): pronoun revised "I" -> "we".
+  assert.match(spec, /We put together something special — a comic-style recap, a few little stories, and a surprise quest at the end\.\.\./);
   assert.match(spec, /🎁 Start the story/);
+});
+
+// LDTKB-061: the exact pronoun revision, verified directly against the sent
+// message (not just the spec doc above) — the button-bearing message (the
+// 3rd/last of the 3 buildup messages) carries MESSAGE_3.
+test("deliverDay29Entry's MESSAGE_3 uses 'We', matching LDTKB-061's pronoun revision", async () => {
+  const telegram = new FakeTelegramClient();
+  const deliveryStore = new FakeDeliveryStore();
+
+  await deliverDay29Entry(
+    { learnerId: "learner-we", chatId: 222, deliveryDate: "2026-09-19" },
+    { telegram, deliveryStore, appUrl: "https://thaitalkbreaks.example", now: () => new Date("2026-09-19T08:00:00Z") },
+  );
+
+  const lastMessage = telegram.sent[2];
+  assert.equal(
+    lastMessage.text,
+    "We put together something special — a comic-style recap, a few little stories, and a surprise quest at the end...",
+  );
+  assert.ok(!lastMessage.text.startsWith("I "), "must not still start with the old first-person 'I'");
+});
+
+test("DAY29_QUEST_COMPLETION_MESSAGE uses 'We' in both places, matching LDTKB-061's pronoun revision and the locked spec", () => {
+  assert.equal(
+    DAY29_QUEST_COMPLETION_MESSAGE,
+    "✨ It's been 29 days since you started the course!\n\n" +
+      "We really hope you've gotten to try out some of these phrases with real people along the way — even one small conversation makes it worth it.\n\n" +
+      "There's just one more day to go... and we are so looking forward to it. 👀🎉",
+  );
+
+  const spec = readFileSync(path.join(REPO_ROOT, "curriculum", "day29", "day29-living-comic-spec.md"), "utf8");
+  assert.match(spec, /We really hope you've gotten to try out some of these phrases with real people along the way/);
+  assert.match(spec, /and we are so looking forward to it\. 👀🎉/);
 });
