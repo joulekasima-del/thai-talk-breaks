@@ -80,11 +80,26 @@ test("buildPlaybackPlan: 1s gap between speeches sharing a panel, 2s gap across 
   assert.equal(plan[5].gapAfterMs, 0, "no gap after the page's last speech");
 });
 
-test("buildPlaybackPlan: a single-panel page (Page 8) has one step with no gap", () => {
-  const page8 = DAY29_STORY_PAGES.find((p) => p.pageNumber === 8)!;
-  const plan = buildPlaybackPlan(page8.speeches);
+// A synthetic single-speech fixture, not a real page's speeches array — as
+// of LDTKB-062 (Page 8 gaining a second speech), no real Day 29 page has
+// exactly one speech any more, so this edge case is no longer reachable
+// via DAY29_STORY_PAGES and is asserted directly instead.
+test("buildPlaybackPlan: a single-speech page has one step with no gap", () => {
+  const plan = buildPlaybackPlan([{ audioFile: "solo.mp3", panel: 1 }]);
   assert.equal(plan.length, 1);
   assert.equal(plan[0].gapAfterMs, 0);
+});
+
+// LDTKB-062: Page 8 now has 2 speeches, one per panel — same shape as Page
+// 2's "two single-speech panels" case, gets the 2s panel gap.
+test("buildPlaybackPlan: Page 8's new 2-speech shape (ขอโทษค่ะ! added as panel 1) gets the 2s panel gap", () => {
+  const page8 = DAY29_STORY_PAGES.find((p) => p.pageNumber === 8)!;
+  const plan = buildPlaybackPlan(page8.speeches);
+  assert.equal(plan.length, 2);
+  assert.equal(plan[0].audioFile, "day29_page08_panel1.mp3");
+  assert.equal(plan[0].gapAfterMs, PANEL_GAP_MS);
+  assert.equal(plan[1].audioFile, "day29_page08_panel2.mp3");
+  assert.equal(plan[1].gapAfterMs, 0);
 });
 
 test("buildPlaybackPlan: two single-speech panels get the 2s panel gap, not the 1s speech gap", () => {

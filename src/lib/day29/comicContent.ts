@@ -85,7 +85,14 @@ export const DAY29_STORY_PAGES: Day29Page[] = [
   {
     pageNumber: 8,
     image: "day29_page08.png",
-    speeches: [{ audioFile: "day29_page08_panel1.mp3", panel: 1 }],
+    // LDTKB-062 (3 September 2026): new first speech, "ขอโทษค่ะ!" — the
+    // existing closing line ("อยากพูดไทยเก่งขึ้นค่ะ") shifts from panel 1 to
+    // panel 2 (audio content unchanged, file renamed) — see
+    // curriculum/day29/day29-audio-map.md's Page 8 notes.
+    speeches: [
+      { audioFile: "day29_page08_panel1.mp3", panel: 1 },
+      { audioFile: "day29_page08_panel2.mp3", panel: 2 },
+    ],
   },
 ];
 

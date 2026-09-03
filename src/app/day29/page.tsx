@@ -149,7 +149,12 @@ export default function Day29Page() {
   }, []);
 
   const goToPage = (pageNumber: number) => {
-    pageRefs.current.get(pageNumber)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    // LDTKB-062: scroll axis is now horizontal (day29.module.css's
+    // .scroller) — `inline: "start"` is the horizontal-axis equivalent of
+    // the old `block: "start"`. `block: "center"` is left at its default
+    // ("nearest") deliberately, so this scroll doesn't also try to move the
+    // page vertically (each page already fills the full viewport height).
+    pageRefs.current.get(pageNumber)?.scrollIntoView({ behavior: "smooth", inline: "start" });
   };
 
   const submitAnswer = async (answerId: string) => {
