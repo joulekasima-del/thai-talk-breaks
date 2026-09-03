@@ -157,6 +157,64 @@ test("getLessonAudioContent: Day 26 (word-set day, week4) — audioUrl uses 'wee
   }
 });
 
+// --- Content shape: Days 15, 17, 21, 22, 25 — canonical-variant audio URLs -
+// (Regression coverage for a real gap found while building the LDTKB-058
+// rollout: these 5 phrase days have no plain "_<gender>.mp3" file on disk,
+// only variant-suffixed files. phraseAudioUrl now appends each day's locked
+// canonical variant — LDTKB-047's "_younger" for 15/17/21/22, LDTKB-048's
+// "_1" for 25 — see lessonAudioApi.ts's CANONICAL_VARIANT.)
+
+test("getLessonAudioContent: Days 15, 17, 21 (week3) use the '_younger' canonical variant, per LDTKB-047", async () => {
+  const deps = makeDeps();
+  let userId = 100;
+  for (const day of [15, 17, 21]) {
+    const learner = await deps.learnerStore.create(userId++);
+    await deps.learnerStore.update(learner.id, { gender_branch: "male" });
+    await deps.deliveryStore.insertTextSent(learner.id, day, "2026-08-30", new Date().toISOString());
+
+    const result = await getLessonAudioContent(learner.telegram_user_id, day, deps);
+    assert.equal(result.ok, true);
+    if (!result.ok || result.content.kind !== "phrase") throw new Error(`expected ok phrase content for Day ${day}`);
+    assert.equal(result.content.audioUrl, `/lessons/week3_day${day}_male_younger.mp3`);
+  }
+});
+
+test("getLessonAudioContent: Day 22 (week4) uses the '_younger' canonical variant, per LDTKB-047", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(110);
+  await deps.learnerStore.update(learner.id, { gender_branch: "female" });
+  await deps.deliveryStore.insertTextSent(learner.id, 22, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(110, 22, deps);
+  assert.equal(result.ok, true);
+  if (!result.ok || result.content.kind !== "phrase") throw new Error("expected ok phrase content");
+  assert.equal(result.content.audioUrl, "/lessons/week4_day22_female_younger.mp3");
+});
+
+test("getLessonAudioContent: Day 25 (week4) uses the '_1' canonical variant (example #1), per LDTKB-048", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(111);
+  await deps.learnerStore.update(learner.id, { gender_branch: "male" });
+  await deps.deliveryStore.insertTextSent(learner.id, 25, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(111, 25, deps);
+  assert.equal(result.ok, true);
+  if (!result.ok || result.content.kind !== "phrase") throw new Error("expected ok phrase content");
+  assert.equal(result.content.audioUrl, "/lessons/week4_day25_male_1.mp3");
+});
+
+test("getLessonAudioContent: an unaffected day (Lesson 4) still produces its normal plain filename, no variant suffix", async () => {
+  const deps = makeDeps();
+  const learner = await deps.learnerStore.create(112);
+  await deps.learnerStore.update(learner.id, { gender_branch: "male" });
+  await deps.deliveryStore.insertTextSent(learner.id, 4, "2026-08-30", new Date().toISOString());
+
+  const result = await getLessonAudioContent(112, 4, deps);
+  assert.equal(result.ok, true);
+  if (!result.ok || result.content.kind !== "phrase") throw new Error("expected ok phrase content");
+  assert.equal(result.content.audioUrl, "/lessons/lesson04_male.mp3");
+});
+
 // --- Content shape: Lesson 2 (numbers) — reuses the "wordset" shape --------
 
 test("getLessonAudioContent: Lesson 2, delivered — all 10 numbers as 'wordset'-shaped entries, no gender branch", async () => {

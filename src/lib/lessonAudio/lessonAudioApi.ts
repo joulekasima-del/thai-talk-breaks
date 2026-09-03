@@ -74,10 +74,22 @@ function weeks234FilePrefix(dayNumber: number): string {
   return `week${weekNumber}_day${lessonCode(dayNumber)}`;
 }
 
-/** A phrase day's public audio URL — pilot (1-7) uses bare "lessonNN", Weeks 2-4 (8-28) uses "weekN_dayNN". */
+/**
+ * Days 15, 17, 21, 22, and Day 25 have no plain `_<gender>.mp3` file — only
+ * variant-suffixed files. Mirrors mediaFiles.ts's CANONICAL_VARIANT exactly
+ * (that one isn't exported): LDTKB-047 locks the younger-form audio as
+ * canonical for 15/17/21/22 (LDTKB-040's four-way age-relative-pronoun
+ * branching); LDTKB-048 locks example #1 ("may I park here?") as Day 25's
+ * canonical tested phrase, stored as its `_1` variant file.
+ */
+const CANONICAL_VARIANT: Record<number, string> = { 15: "younger", 17: "younger", 21: "younger", 22: "younger", 25: "1" };
+
+/** A phrase day's public audio URL — pilot (1-7) uses bare "lessonNN", Weeks 2-4 (8-28) uses "weekN_dayNN"; Days 15/17/21/22/25 append their canonical variant suffix (see CANONICAL_VARIANT). */
 function phraseAudioUrl(lessonNumber: number, gender: GenderBranch): string {
   const prefix = lessonNumber <= PILOT_LESSON_COUNT ? `lesson${lessonCode(lessonNumber)}` : weeks234FilePrefix(lessonNumber);
-  return lessonAssetUrl(`${prefix}_${gender}.mp3`);
+  const variant = CANONICAL_VARIANT[lessonNumber];
+  const suffix = variant ? `_${variant}` : "";
+  return lessonAssetUrl(`${prefix}_${gender}${suffix}.mp3`);
 }
 
 function wordSetAudioUrl(dayNumber: number, wordIndex: number): string {

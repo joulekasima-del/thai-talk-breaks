@@ -163,6 +163,27 @@ test("real media files: loadPhraseLessonAudio routes correctly across the pilot/
   assert.ok(week4File.buffer.length > 0);
 });
 
+// Days 15, 17, 21, 22, 25 have no plain "_<gender>.mp3" file on disk — only
+// variant-suffixed files. LDTKB-047 locks the younger form as canonical for
+// 15/17/21/22; LDTKB-048 locks example #1 as canonical for 25. Regression
+// coverage for the real gap this fixes (see mediaFiles.ts's CANONICAL_VARIANT).
+test("real media files: loadPhraseLessonAudio uses each day's locked canonical variant for Days 15, 17, 21, 22, 25", async () => {
+  for (const day of [15, 17, 21, 22] as const) {
+    for (const gender of ["male", "female"] as const) {
+      const file = await loadPhraseLessonAudio(day, gender);
+      const weekNumber = day <= 21 ? 3 : 4;
+      assert.equal(file.filename, `week${weekNumber}_day${day}_${gender}_younger.mp3`, `Day ${day} (${gender}) must use the _younger variant, per LDTKB-047`);
+      assert.ok(file.buffer.length > 0);
+    }
+  }
+
+  for (const gender of ["male", "female"] as const) {
+    const file = await loadPhraseLessonAudio(25, gender);
+    assert.equal(file.filename, `week4_day25_${gender}_1.mp3`, "Day 25 must use example #1's _1 variant, per LDTKB-048");
+    assert.ok(file.buffer.length > 0);
+  }
+});
+
 test("real media files: word-set audio and single shared image are readable for all 4 word-set days", async () => {
   for (const [day, wordCount] of [[8, 4], [10, 3], [16, 3], [26, 3]] as const) {
     const image = await loadWordSetImage(day);

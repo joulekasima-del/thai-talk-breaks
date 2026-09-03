@@ -31,12 +31,17 @@
 // week4_day22_bonus1_male.mp3, week4_day25_male_2.mp3..._5.mp3. These are
 // reference/bonus material, not what gets delivered, and the patterns above
 // deliberately do not match them (anchored ^...$, no wildcard swallowing the
-// suffix). See this task's report for a real, pre-existing, OUT-OF-SCOPE
-// finding: Days 15, 17, 21, 22, and 25 have NO plain "_male.mp3"/"_female.mp3"
-// file at all (only _older/_younger/_1.._5 suffixed variants) — their audio
-// was already broken under the old native sendAudio path (same underlying
-// loader function) and remains unfixed by this rollout; not something this
-// script can or should silently paper over.
+// suffix).
+//
+// Days 15, 17, 21, 22, and 25 fix: these 5 days have NO plain
+// "_male.mp3"/"_female.mp3" file at all — only _older/_younger (15/17/21/22)
+// or _1.._5 (25) suffixed variants — so the two generic phrase-day patterns
+// above never match them. loadPhraseLessonAudio/phraseAudioUrl now request
+// the specific canonical-variant file for each (LDTKB-047: _younger for
+// 15/17/21/22; LDTKB-048: _1 for 25 — see mediaFiles.ts's CANONICAL_VARIANT),
+// so this script needs its own exact-match entries for exactly those files,
+// added below rather than widening the generic pattern (which would also
+// pull in the _older files and Day 25's _2.._5 reference-only files).
 
 import { cp, mkdir, readdir, rm } from "node:fs/promises";
 import path from "node:path";
@@ -46,6 +51,12 @@ const DEST_DIR = path.join(ROOT, "public", "lessons");
 
 const WEEK_AUDIO_DIRS = ["week2-audio", "week3-audio", "week4-audio"];
 
+const CANONICAL_VARIANT_FILES = [
+  { dir: path.join(ROOT, "curriculum", "week3-audio"), pattern: /^week3_day(15|17|21)_(male|female)_younger\.mp3$/ },
+  { dir: path.join(ROOT, "curriculum", "week4-audio"), pattern: /^week4_day22_(male|female)_younger\.mp3$/ },
+  { dir: path.join(ROOT, "curriculum", "week4-audio"), pattern: /^week4_day25_(male|female)_1\.mp3$/ },
+];
+
 const SOURCES = [
   { dir: path.join(ROOT, "curriculum", "pilot", "audio"), pattern: /^lesson02_\d+\.mp3$/ }, // Lesson 2 (numbers)
   { dir: path.join(ROOT, "curriculum", "pilot", "audio"), pattern: /^lesson\d{2}_(male|female)\.mp3$/ }, // Lessons 1, 3-7 (phrase)
@@ -53,6 +64,7 @@ const SOURCES = [
     { dir: path.join(ROOT, "curriculum", weekDir), pattern: /^week\d_day\d{2}_(male|female)\.mp3$/ }, // phrase days
     { dir: path.join(ROOT, "curriculum", weekDir), pattern: /^week\d_day\d{2}_\d+\.mp3$/ }, // word-set days
   ]),
+  ...CANONICAL_VARIANT_FILES, // Days 15, 17, 21, 22, 25 — see comment above
 ];
 
 async function main() {

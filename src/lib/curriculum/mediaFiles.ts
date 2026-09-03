@@ -59,6 +59,20 @@ async function readWeeks234File(subdir: "audio" | "images", dayNumber: number, f
 }
 
 /**
+ * Days 15, 17, 21, 22, and Day 25 have no plain `_<gender>.mp3` file on
+ * disk — only variant-suffixed files (confirmed by directory listing):
+ *   - 15, 17, 21, 22: `_<gender>_older.mp3` / `_<gender>_younger.mp3`
+ *     (LDTKB-040's four-way age-relative-pronoun branching)
+ *   - 25: `_<gender>_1.mp3` .. `_<gender>_5.mp3` (5 valid example sentences)
+ * LDTKB-047 locks "every learner is taught/tested on the younger form" for
+ * the first group; LDTKB-048 locks example #1 ("may I park here?") as Day
+ * 25's canonical tested phrase. This maps each of those 5 days to the
+ * variant suffix its canonical/locked audio file actually uses — every
+ * other day has no suffix (`""`) and keeps its plain filename.
+ */
+const CANONICAL_VARIANT: Record<number, string> = { 15: "younger", 17: "younger", 21: "younger", 22: "younger", 25: "1" };
+
+/**
  * NOT part of MediaLoader any more — the LDTKB-058 full Web App audio
  * rollout moved every lesson day's audio off native sendAudio, so
  * deliverLesson.ts no longer calls this via `deps.media`. Kept only because
@@ -69,13 +83,18 @@ async function readWeeks234File(subdir: "audio" | "images", dayNumber: number, f
  * Transparently routes between the pilot (Days 1-7, curriculum/pilot/,
  * lessonNN_<gender> naming) and Weeks 2-4 (Days 8-28,
  * curriculum/week{2,3,4}-audio|images/, week{N}_day{DD}_<gender> naming).
+ * Days 15, 17, 21, 22, 25 append CANONICAL_VARIANT's suffix after the
+ * gender, since those days have no plain gender-only file (see
+ * CANONICAL_VARIANT's comment).
  */
 export async function loadPhraseLessonAudio(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
+  const variant = CANONICAL_VARIANT[lessonNumber];
+  const suffix = variant ? `_${variant}` : "";
   if (lessonNumber <= WEEKS234_PILOT_BOUNDARY) {
-    return readMediaFile("audio", `lesson${lessonCode(lessonNumber)}_${gender}.mp3`, "audio/mpeg");
+    return readMediaFile("audio", `lesson${lessonCode(lessonNumber)}_${gender}${suffix}.mp3`, "audio/mpeg");
   }
   const { filePrefix } = weeks234Location(lessonNumber);
-  return readWeeks234File("audio", lessonNumber, `${filePrefix}_${gender}.mp3`, "audio/mpeg");
+  return readWeeks234File("audio", lessonNumber, `${filePrefix}_${gender}${suffix}.mp3`, "audio/mpeg");
 }
 
 export async function loadPhraseLessonImage(lessonNumber: number, gender: GenderBranch): Promise<MediaFile> {
