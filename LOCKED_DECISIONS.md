@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.5  
+**Register version:** 5.6  
 **Last updated:** 2 September 2026  
 **Authority:** Joule
 
@@ -624,6 +624,17 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Reference:** see `src/lib/curriculum/mediaFiles.ts` and `src/lib/lessonAudio/lessonAudioApi.ts`'s `CANONICAL_VARIANT` mapping for the exact implementation.  
 **Locked by:** found and fixed during LDTKB-058's rollout, confirmed by Joule, 2 September 2026.
 
+## LDTKB-060 — Day 30's quiz redesigned as a single Web App page
+
+**Status:** Locked and deployed (2 September 2026)  
+**Decision:** Confirmed 2 September 2026: Day 30's quiz moves from a back-and-forth of individual native Telegram messages (native audio per question, native inline-keyboard buttons) to **one continuous Web App page** walking through all 10 questions, extending LDTKB-058's Web App audio pattern to the whole quiz interaction, not just its audio. The bot now sends exactly one message with a single "Start the Day 30 Quiz" Web App button when a learner reaches Day 30 — no more native per-question messages, buttons, or audio at all.  
+**Inside the page:** one question at a time, 3 in-page selectable options; tapping an option plays that option's own real audio in-page (no "lying label" scheme, LDTKB-046 still applies exactly as before — only the transport changed, not the quiz's actual content or rules) and reveals correctness feedback immediately, with no new Telegram messages sent. After question 10: an in-page results screen with the locked score/badge text.  
+**Resumability, explicitly required and preserved:** each answer is saved to the database immediately as tapped (not batched), via the same `Day30QuizStore` methods and unchanged `day30_quiz_progress` schema the old native flow used. The new GET endpoint has no client-side state at all — it always reads current progress fresh from the database, so closing and reopening the Web App resumes exactly where the learner left off, by construction rather than by synchronization logic.  
+**Anti-replay, explicitly verified:** the new answer-submission logic rejects (without writing anything) unless the submitted question index matches the learner's actual current question and the quiz isn't already completed — the identical guard the old native callback used, confirmed via direct code review before this was approved to ship.  
+**Old native flow removed entirely** (not left dormant): the per-question native audio/message sending and the webhook's quiz callback routing are both gone, per Joule's standing preference for clean removal over dead code once a pattern is fully superseded.  
+**Reference:** see `src/lib/quiz/day30QuizApi.ts` for the core logic, `src/app/day30-quiz/page.tsx` for the page.  
+**Locked by:** Joule's confirmation, 2 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -681,3 +692,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 24 Aug 2026 | LDTKB-058 | Web App audio delivery prototyped on Lessons 3 and 8, solving Telegram's unfixable native-audio auto-continue behavior (confirmed via real testing across sendAudio/sendVoice/sendDocument, no format trick avoids it); pattern reuses Day 29's Web App infrastructure; not yet validated on a real device, wider rollout to remaining lessons pending that validation | Joule |
 | 2 Sep 2026 | LDTKB-058 | Full rollout to all 28 lesson days — native sendAudio removed entirely for phrase/word-set lessons, not just bypassed; photo/text delivery unchanged, only audio moved; Day 29/30 untouched | Joule |
 | 2 Sep 2026 | LDTKB-059 | Two real bugs found and fixed during the full rollout: URL-builder functions had hardcoded prefixes only correct for the prototype's 2 days; Days 15/17/21/22/25 had no plain gender audio file, resolved using already-locked LDTKB-047/LDTKB-048 canonical-variant decisions | Joule |
+| 2 Sep 2026 | LDTKB-060 | Day 30's quiz redesigned as a single Web App page — all 10 questions in one continuous experience, native per-question messages/audio/buttons removed entirely; resumability and anti-replay logic preserved exactly, verified via direct code review before shipping | Joule |
