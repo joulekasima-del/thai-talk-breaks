@@ -115,9 +115,14 @@ The boy answers, pointing vaguely toward the mountains.
 ---
 
 ## Page 8 — Closing / Teaser
-*(New — closing beat, not tied to a specific day)*
+*(New — closing beat, not tied to a specific day. Panel 1 added 3 September 2026, LDTKB-062.)*
 
-**Panel 1:** She looks back at the sunset, smiling, reflective.
+**Panel 1:** *(new, 3 September 2026)*
+> 🟡 ขอโทษค่ะ! *(khǎaw-thôht-kâ)*
+
+*🟡 "ขอโทษค่ะ!" = "Sorry!" — a short, everyday interjection opening the closing beat.*
+
+**Panel 2** *(originally Panel 1):* She looks back at the sunset, smiling, reflective.
 > 🟡 อยากพูดไทยเก่งขึ้นค่ะ *(yàak-phûut-thai-gèng-khûen-kâ)*
 
 *🟡 "อยากพูดไทยเก่งขึ้นค่ะ" = "I want to get better at speaking Thai." A forward-looking closing line — sets up whatever comes after Day 30 without committing to specifics yet.*

@@ -1,6 +1,6 @@
 # Day 29 — Audio Source Map (per panel)
 
-**Complete as of 22 August 2026.** All 20 dialogue lines across the 8 pages now have their own dedicated recording, per LDTKB-045 (no reuse — every line gets its own file, even where the text is identical to something recorded elsewhere in the project). **All assets (8 images + 20 audio files) now live together in `curriculum/day29/assets/`**, consolidated from the previous separate `images/`/`audio/` folders for easier maintenance ahead of the living comic Web App build.
+**Complete as of 22 August 2026, Page 8 revised 3 September 2026 (LDTKB-062, adding a new first speech).** All dialogue lines across the 8 pages have their own dedicated recording, per LDTKB-045 (no reuse — every line gets its own file, even where the text is identical to something recorded elsewhere in the project). **All assets (8 images + audio files) now live together in `curriculum/day29/assets/`**, consolidated from the previous separate `images/`/`audio/` folders for easier maintenance ahead of the living comic Web App build.
 
 | Page | Panel | Thai / Karaoke | Audio file | Voice |
 |---|---|---|---|---|
@@ -23,7 +23,14 @@
 | 6 | 2 | พูดช้าๆได้ไหมคะ (phûut-cháa-cháa-dâai-mǎi-ká) | `day29_page06_panel2.mp3` | Female |
 | 7 | 1 | ขอบคุณมากค่ะ (khàwp-khun-mâak-kâ) | `day29_page07_panel1.mp3` | Female |
 | 7 | 2 | เจอกันใหม่ค่ะ (jer-gan-mài-kâ) | `day29_page07_panel2.mp3` | Female |
-| 8 | 1 | อยากพูดไทยเก่งขึ้นค่ะ (yàak-phûut-thai-gèng-khûen-kâ) | `day29_page08_panel1.mp3` | Female |
+| 8 | 1 | ขอโทษค่ะ! (khǎaw-thôht-kâ) | `day29_page08_panel1.mp3` | Female |
+| 8 | 2 | อยากพูดไทยเก่งขึ้นค่ะ (yàak-phûut-thai-gèng-khûen-kâ) | `day29_page08_panel2.mp3` | Female |
+
+## What changed on 3 September 2026 (LDTKB-062)
+
+- **Page 8 gets a new first line, "ขอโทษค่ะ!" (Sorry!)**, added before the existing closing line. New recording provided by Joule, saved as `day29_page08_panel1.mp3`.
+- **The existing line ("อยากพูดไทยเก่งขึ้นค่ะ") shifts to panel 2** — its audio file, previously `day29_page08_panel1.mp3`, is renamed to `day29_page08_panel2.mp3` (the audio content itself is unchanged, only the filename/panel number).
+- Page 8 now has 2 panels/speeches instead of 1 — `comicContent.ts`'s `DAY29_STORY_PAGES` entry for page 8 updated to match.
 
 ## What changed on 22 August 2026
 

@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.7  
+**Register version:** 5.8  
 **Last updated:** 3 September 2026  
 **Authority:** Joule
 
@@ -647,6 +647,14 @@ No other Day 29 content uses first-person narrator voice — confirmed via a ful
 **Reference:** see `curriculum/day29/day29-living-comic-spec.md`'s "Entry message sequence" and "Surprise Quest — Page 9" sections for the exact wording; `src/app/day29/day29.module.css` for the layout fix.  
 **Locked by:** Joule's confirmation, 3 September 2026.
 
+## LDTKB-062 — Day 29: nav-arrow scroll direction fixed to match arrows; Page 8 gets a new first speech
+
+**Status:** Locked  
+**Decision (scroll direction):** Confirmed 3 September 2026: the living comic's page-to-page navigation was found to move vertically (`scroll-snap-type: y`) while the nav arrows visually point left/right (`◀`/`▶`) — a real UX mismatch between the arrows' implied direction and the actual motion. Fix direction confirmed: **keep the existing `◀`/`▶` arrow characters as-is**, and change the actual scroll motion to horizontal to match them, rather than changing the arrows to `▲`/`▼` to match the existing vertical motion.  
+**Decision (Page 8 content):** Confirmed 3 September 2026: Page 8 gets a new first speech, "ขอโทษค่ะ!" ("Sorry!"), added before the existing closing line ("อยากพูดไทยเก่งขึ้นค่ะ," "I want to get better at speaking Thai"). This is new content, not a restoration — confirmed via a full check of both the original story draft and the audio map that no such line ever previously existed for Page 8. New recording provided by Joule. The existing line shifts from panel 1 to panel 2 (audio content unchanged, only the filename/panel number changes — `day29_page08_panel1.mp3` renamed to `day29_page08_panel2.mp3`, new `day29_page08_panel1.mp3` added).  
+**Reference:** see `curriculum/day29/day29-audio-map.md` and `day29-story-draft.md`'s Page 8 sections for the exact wording; `src/app/day29/day29.module.css`/`page.tsx` for the scroll-direction fix; `src/lib/day29/comicContent.ts` for Page 8's updated speech list.  
+**Locked by:** Joule's confirmation, 3 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -706,3 +714,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 2 Sep 2026 | LDTKB-059 | Two real bugs found and fixed during the full rollout: URL-builder functions had hardcoded prefixes only correct for the prototype's 2 days; Days 15/17/21/22/25 had no plain gender audio file, resolved using already-locked LDTKB-047/LDTKB-048 canonical-variant decisions | Joule |
 | 2 Sep 2026 | LDTKB-060 | Day 30's quiz redesigned as a single Web App page — all 10 questions in one continuous experience, native per-question messages/audio/buttons removed entirely; resumability and anti-replay logic preserved exactly, verified via direct code review before shipping | Joule |
 | 3 Sep 2026 | LDTKB-061 | Day 29's narrator pronoun revised to "we" (entry + completion messages, 3 instances) extending the welcome message's one-time exception to LDTKB-030's fixed "I" voice; also fixed a real layout bug where fixed-position nav arrows overlapped/blurred text on the Surprise Quest's completion page | Joule |
+| 3 Sep 2026 | LDTKB-062 | Day 29's scroll direction changed from vertical to horizontal to match the existing ◀/▶ nav arrows (arrows kept as-is); Page 8 gets a new first speech "ขอโทษค่ะ!" before the existing closing line, new recording provided by Joule | Joule |
