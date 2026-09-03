@@ -45,18 +45,18 @@ Learner taps Start → bot sends scripted messages → bot sends a button
 ## Bot trigger sequence (confirmed 20 August 2026; reconfirmed 22 August 2026)
 Day 29 is triggered by the same scheduler as every other lesson (pg_cron + delivery route from Checkpoint 3) — no special scheduling logic needed, and **no manual "tap Start" or any other learner-initiated action required.** The difference is only in *what gets sent*: instead of the normal picture → text → audio → activity message sequence, Day 29 sends a short Kiki-style buildup (see below), ending in a button that opens the living comic as a Telegram Web App. The only thing the learner actively does is tap that one button when it arrives — everything before it (the buildup messages) is sent automatically, exactly like Days 1–28's content arrives automatically.
 
-## Entry message sequence (confirmed 22 August 2026)
+## Entry message sequence (confirmed 22 August 2026, pronoun revised to "we" 3 September 2026)
 Matching the anticipation-building pattern from the Kiki reference — a few short messages before the button, framing this as a quest:
 
 > 🗺️ *knock knock*
 >
 > Heyy! Remember everything you've learned this month?
 >
-> I put together something special — a little story, a little journey, a few surprises along the way...
+> We put together something special — a comic-style recap, a few little stories, and a surprise quest at the end...
 >
 > [🎁 Start the story] *(button — opens the living comic Web App)*
 
-*(Confirmed by Joule, 22 August 2026 — locked. Note: intentionally drops the usual "ka" narrator tic (LDTKB-030) for this quest-framing moment — a deliberate stylistic exception, not an inconsistency to fix.)*
+*(Confirmed by Joule, 22 August 2026 — locked. Note: intentionally drops the usual "ka" narrator tic (LDTKB-030) for this quest-framing moment — a deliberate stylistic exception, not an inconsistency to fix. Pronoun revised from "I" to "we" 3 September 2026 — see LDTKB-061 — extending the same one-time "we" exception the welcome message already has (LDTKB-030), for this same quest-framing moment specifically.)*
 
 ## Surprise Quest — Page 9 (new, 20 August 2026)
 A hidden 9th "page" appears after the 8 story pages — not part of the narrative, a bonus mini-quiz tying Day 29 directly into Day 30's quiz format as a preview/teaser.
@@ -71,15 +71,15 @@ A hidden 9th "page" appears after the 8 story pages — not part of the narrativ
 - **Unlimited wrong attempts** — the learner can keep answering incorrectly with no penalty or lockout.
 - **Once answered correctly, the question locks permanently** — it cannot be answered again after the first correct answer.
 
-**Completion reward — replaced 22 August 2026, monkey mascot concept removed entirely.** Upon the correct answer, the question locks and shows a warm, personal **text-only completion message** — no illustration, no audio, no new character:
+**Completion reward — replaced 22 August 2026, monkey mascot concept removed entirely; pronoun revised to "we" 3 September 2026.** Upon the correct answer, the question locks and shows a warm, personal **text-only completion message** — no illustration, no audio, no new character:
 
 > ✨ It's been 29 days since you started the course!
 >
-> I really hope you've gotten to try out some of these phrases with real people along the way — even one small conversation makes it worth it.
+> We really hope you've gotten to try out some of these phrases with real people along the way — even one small conversation makes it worth it.
 >
-> There's just one more day to go... and I am so looking forward to it. 👀🎉
+> There's just one more day to go... and we are so looking forward to it. 👀🎉
 
-*(Confirmed by Joule, 22 August 2026 — locked, same as the entry message and quest question wording above.)*
+*(Confirmed by Joule, 22 August 2026 — locked, same as the entry message and quest question wording above. Pronoun revised from "I" to "we" 3 September 2026 — see LDTKB-061.)*
 
 This means the page count and indicator become **9 pages total**, not 8 — Page 9 is the Surprise Quest interaction itself (question → unlimited attempts → lock on correct answer → this text message), not a separate illustrated reward. Worth reflecting in the navigation UI's page counter from the start rather than bolting it on later.
 

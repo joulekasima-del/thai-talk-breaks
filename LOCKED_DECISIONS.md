@@ -1,7 +1,7 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.6  
-**Last updated:** 2 September 2026  
+**Register version:** 5.7  
+**Last updated:** 3 September 2026  
 **Authority:** Joule
 
 This file contains confirmed decisions only. It must not convert suggestions or research findings into approved product requirements.
@@ -635,6 +635,18 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Reference:** see `src/lib/quiz/day30QuizApi.ts` for the core logic, `src/app/day30-quiz/page.tsx` for the page.  
 **Locked by:** Joule's confirmation, 2 September 2026.
 
+## LDTKB-061 — Day 29's narrator pronoun revised to "we"; nav-arrow text-overlap bug fixed
+
+**Status:** Locked  
+**Decision (pronoun):** Confirmed 3 September 2026: Day 29's entry message and completion message both revise their "I" statements to "we" — extending the same one-time exception the welcome message already has to LDTKB-030's fixed first-person narrator voice, applied here for the same quest-framing spirit as Day 29's existing "ka" tic exception. Three instances changed:
+1. Entry message: "I put together something special — a little story, a little journey, a few surprises along the way..." → "We put together something special — a comic-style recap, a few little stories, and a surprise quest at the end..." (also revised beyond just the pronoun, at Joule's request, to accurately describe the actual content — several stories in comic form, plus the Surprise Quest, not "a few surprises").
+2. Completion message: "I really hope you've gotten to try out..." → "We really hope you've gotten to try out..."
+3. Completion message: "...and I am so looking forward to it." → "...and we are so looking forward to it."  
+No other Day 29 content uses first-person narrator voice — confirmed via a full search of every file under `src/lib/day29/` and `src/app/day29/` before locking this.  
+**Decision (layout bug):** the living comic's fixed-position navigation arrows (`position: fixed; top: 50%`, always vertically centered on the viewport regardless of page content) were found to visually overlap and blur text on content-heavy pages — specifically the Surprise Quest's completion message, whose text block was nearly as wide as a typical phone screen while the page's own horizontal padding left far less clearance than the arrows' actual footprint. Fixed by ensuring text content keeps adequate clearance from the arrows' fixed position, regardless of how much text a given page has — exact implementation approach recorded once confirmed.  
+**Reference:** see `curriculum/day29/day29-living-comic-spec.md`'s "Entry message sequence" and "Surprise Quest — Page 9" sections for the exact wording; `src/app/day29/day29.module.css` for the layout fix.  
+**Locked by:** Joule's confirmation, 3 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -693,3 +705,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 2 Sep 2026 | LDTKB-058 | Full rollout to all 28 lesson days — native sendAudio removed entirely for phrase/word-set lessons, not just bypassed; photo/text delivery unchanged, only audio moved; Day 29/30 untouched | Joule |
 | 2 Sep 2026 | LDTKB-059 | Two real bugs found and fixed during the full rollout: URL-builder functions had hardcoded prefixes only correct for the prototype's 2 days; Days 15/17/21/22/25 had no plain gender audio file, resolved using already-locked LDTKB-047/LDTKB-048 canonical-variant decisions | Joule |
 | 2 Sep 2026 | LDTKB-060 | Day 30's quiz redesigned as a single Web App page — all 10 questions in one continuous experience, native per-question messages/audio/buttons removed entirely; resumability and anti-replay logic preserved exactly, verified via direct code review before shipping | Joule |
+| 3 Sep 2026 | LDTKB-061 | Day 29's narrator pronoun revised to "we" (entry + completion messages, 3 instances) extending the welcome message's one-time exception to LDTKB-030's fixed "I" voice; also fixed a real layout bug where fixed-position nav arrows overlapped/blurred text on the Surprise Quest's completion page | Joule |
