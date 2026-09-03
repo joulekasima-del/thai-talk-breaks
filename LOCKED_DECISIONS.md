@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.4  
+**Register version:** 5.5  
 **Last updated:** 2 September 2026  
 **Authority:** Joule
 
@@ -606,15 +606,23 @@ This applies wherever a self-referential "I" statement occurs across the full 30
 **Reference:** see the master chat script's Section 2.2 for the current delivery description.  
 **Locked by:** Joule's confirmation, 24 August 2026 (first revision) and 2 September 2026 (second revision).
 
-## LDTKB-058 — Web App audio delivery, prototyped on Lessons 2, 3 and 8
+## LDTKB-058 — Web App audio delivery: full rollout to all 28 lesson days
 
-**Status:** Locked — prototype validated on a real device (2 September 2026) for all three days; wider rollout to the remaining 25 lesson days not yet decided.  
+**Status:** Locked and fully deployed (2 September 2026) — every lesson day (1–28) now delivers audio exclusively through the Web App. Native `sendAudio` code for phrase and word-set lessons was removed entirely, not just bypassed, per Joule's explicit direction once every day moved to this pattern.  
 **Decision:** Confirmed 24 August 2026, after real-world testing found a genuine, unfixable Telegram platform limitation: native audio messages (`sendAudio`), voice messages (`sendVoice`), and even generic file attachments (`sendDocument`) all exhibit Telegram's built-in "continuous playback" behavior — playing one audio message auto-advances into whatever comes next in the chat, **regardless of how much real time separates them** (confirmed via Telegram's own bug tracker and direct empirical testing, not just documentation). No message-type or file-format trick avoids this — tested `sendDocument` with both `.mp3` (still auto-chains) and `.wav` (avoids chaining, but breaks inline playback entirely, forcing a download instead).  
 **Solution:** move audio playback into a Telegram Web App page — the same pattern Day 29's living comic already uses successfully — since a real HTML `<audio>` element is not part of Telegram's native media system and is therefore unaffected.  
-**Scope, this decision (updated 2 September 2026):** prototyped on **Lesson 2** (numbers, 10 audio clips — added 2 September 2026, see LDTKB-057's second revision), **Lesson 3** (standard single-phrase day), and **Day 8** (word-set day, multiple audio clips) — together representing every content shape the pattern needs to support. Day 30's quiz audio remains explicitly out of scope — it's structurally different (interactive, tap-driven, with correctness tracking) and will need its own, larger redesign if pursued later, not a simple extension of this pattern.  
-**Validated in production (2 September 2026):** tested live on a real device for all three days — Lesson 3's single audio player and Day 8's four independent word players both confirmed to play cleanly with no auto-chaining whatsoever. Wider rollout to the remaining 25 lesson days is a separate, not-yet-made decision.  
-**Reference:** see the master chat script's Sections 2.1/2.2/2.3 for the updated Lesson 2/3 / Day 8 delivery description.  
-**Locked by:** Joule's confirmation, 24 August 2026 (decision) and 2 September 2026 (production validation).
+**Rollout history:** prototyped 24 August–2 September 2026 on Lessons 2, 3, and Day 8 (representing every content shape: numbers, single-phrase, word-set), validated on a real device with zero auto-chaining across all three. Rolled out to the remaining 25 lesson days on 2 September 2026, once the prototype was confirmed working. Photo and text delivery are unchanged throughout — native `sendPhoto`/`sendMessage` — only audio moved. Day 29 keeps its own separate, pre-existing Web App mechanism (untouched by this rollout). Day 30's quiz audio remains explicitly out of scope — it's structurally different (interactive, tap-driven, with correctness tracking) and would need its own, larger redesign if pursued later.  
+**Reference:** see the master chat script's Section 2 for the current, universal audio-delivery description.  
+**Locked by:** Joule's confirmation, 24 August 2026 (decision), 2 September 2026 (prototype validation and full rollout).
+
+## LDTKB-059 — Two real audio-serving bugs found and fixed during the full rollout
+
+**Status:** Locked  
+**Decision:** During LDTKB-058's full rollout, two real, previously-undetected bugs were found and fixed, plus one real gap resolved using already-locked decisions:
+1. **URL-builder bugs:** the Web App's `phraseAudioUrl` and `wordSetAudioUrl` (in `lessonAudioApi.ts`) had hardcoded filename prefixes that only ever happened to be correct for the single prototype day of each kind (Lesson 3 for phrase, Day 8 for word-set) — every other day of each kind would have received a wrong or broken URL. Fixed to branch on pilot vs. Weeks 2-4 exactly as `mediaFiles.ts`'s equivalent native loaders already did. Caught before any real learner was affected, since this was found during the rollout itself, not after.
+2. **Days 15, 17, 21, 22, and 25 had no plain gender-suffixed audio file on disk at all** — only variant-suffixed files. This bug already existed in the old native `sendAudio` path (same underlying loader function) but was never exercised or caught, since nothing had tested these specific days' audio loading before. Resolved using two already-locked decisions rather than requiring a new one: LDTKB-047 (younger-speaker form is canonical for Days 15/17/21/22) and LDTKB-048 (example #1 is canonical for Day 25) — both loaders now request the correct variant file for these 5 days specifically.  
+**Reference:** see `src/lib/curriculum/mediaFiles.ts` and `src/lib/lessonAudio/lessonAudioApi.ts`'s `CANONICAL_VARIANT` mapping for the exact implementation.  
+**Locked by:** found and fixed during LDTKB-058's rollout, confirmed by Joule, 2 September 2026.
 
 ## Future ideas — not decisions, not scheduled
 
@@ -671,3 +679,5 @@ These are not locked decisions, not open questions blocking current work, and no
 | 2 Sep 2026 | LDTKB-057 | Revised again: Lesson 2's audio reverts from the combined clip to the original 10 per-number files (restored from git history), now delivered via the Web App (LDTKB-058's pattern) instead of native sendAudio; combined photo unchanged; combined audio file left in repo, unused | Joule |
 | 2 Sep 2026 | LDTKB-058 | Validated on a real device for all three prototype days (Lessons 2, 3, and Day 8) — clean playback confirmed, no auto-chaining in any case; wider rollout to remaining 25 lessons not yet decided | Joule |
 | 24 Aug 2026 | LDTKB-058 | Web App audio delivery prototyped on Lessons 3 and 8, solving Telegram's unfixable native-audio auto-continue behavior (confirmed via real testing across sendAudio/sendVoice/sendDocument, no format trick avoids it); pattern reuses Day 29's Web App infrastructure; not yet validated on a real device, wider rollout to remaining lessons pending that validation | Joule |
+| 2 Sep 2026 | LDTKB-058 | Full rollout to all 28 lesson days — native sendAudio removed entirely for phrase/word-set lessons, not just bypassed; photo/text delivery unchanged, only audio moved; Day 29/30 untouched | Joule |
+| 2 Sep 2026 | LDTKB-059 | Two real bugs found and fixed during the full rollout: URL-builder functions had hardcoded prefixes only correct for the prototype's 2 days; Days 15/17/21/22/25 had no plain gender audio file, resolved using already-locked LDTKB-047/LDTKB-048 canonical-variant decisions | Joule |
