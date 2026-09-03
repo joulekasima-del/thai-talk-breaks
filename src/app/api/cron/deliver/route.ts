@@ -106,7 +106,9 @@ export async function POST(request: Request): Promise<Response> {
         );
         results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: result.status });
       } else if (dayNumber === DAY30_QUIZ_DAY_NUMBER) {
-        await startDay30Quiz(learner.id, learner.telegram_user_id, { telegram, learnerStore, quizStore, now: () => now });
+        const appUrl = process.env.APP_URL;
+        if (!appUrl) throw new Error("APP_URL must be set to deliver the Day 30 quiz button");
+        await startDay30Quiz(learner.id, learner.telegram_user_id, { telegram, quizStore, appUrl });
         results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "day30_quiz_started_or_already_in_progress" });
       } else {
         // Defensive fallback only — every value findDueLearners can return

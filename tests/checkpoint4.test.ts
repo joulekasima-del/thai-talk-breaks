@@ -4,12 +4,11 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-import { startDay30Quiz, handleDay30QuizCallback } from "@/lib/quiz/day30Quiz";
+import { startDay30Quiz } from "@/lib/quiz/day30Quiz";
 import { DAY30_QUESTIONS, day30ScoreMessage, DAY30_BADGE_MESSAGE } from "@/lib/curriculum/day30Content";
 import { dayNumberForLearner, findDueLearners, type OnboardedLearner } from "@/lib/delivery/dueLearners";
-import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
+import { FakeTelegramClient } from "./fakes";
 import { FakeDay30QuizStore } from "./quizFakes";
-import type { MediaFile } from "@/lib/telegram";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -34,182 +33,7 @@ test("day30ScoreMessage and badge match day30-quiz-content.md's locked format", 
   assert.equal(DAY30_BADGE_MESSAGE, "🏅 **Thai Talk Breaks Graduate**");
 });
 
-// --- Part B: Day 30 quiz-ladder --------------------------------------------
-
-function fakeAudio(filename: string): MediaFile {
-  return { buffer: Buffer.from(filename), filename, contentType: "audio/mpeg" };
-}
-
-function makeQuizDeps(rngSequence: number[] = []) {
-  let i = 0;
-  const rng = () => (i < rngSequence.length ? rngSequence[i++] : 0.99);
-  return {
-    telegram: new FakeTelegramClient(),
-    learnerStore: new FakeLearnerStore(),
-    quizStore: new FakeDay30QuizStore(),
-    now: () => new Date("2026-08-23T01:00:00.000Z"),
-    rng,
-    loadAudio: async (filename: string) => fakeAudio(filename),
-  };
-}
-
-test("starting the quiz sends question 1's audio and 3 buttons, one per option", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(200);
-
-  await startDay30Quiz(learner.id, 200, deps);
-
-  assert.equal(deps.telegram.sentAudio.length, 1);
-  assert.equal(deps.telegram.sentAudio[0].filename, "Q1_correct_answer.mp3");
-  assert.equal(deps.telegram.sent.length, 1);
-  assert.equal(deps.telegram.sent[0].keyboard?.[0].length, 3);
-
-  const progress = await deps.quizStore.findByLearner(learner.id);
-  assert.equal(progress?.current_question_index, 1);
-});
-
-test("starting the quiz twice is a no-op the second time (guard against re-start on a later cron tick)", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(201);
-
-  await startDay30Quiz(learner.id, 201, deps);
-  const audioCountAfterFirst = deps.telegram.sentAudio.length;
-  await startDay30Quiz(learner.id, 201, deps);
-
-  assert.equal(deps.telegram.sentAudio.length, audioCountAfterFirst, "no second question-1 send");
-});
-
-test("full 10-question quiz: correct/incorrect tracked, advances each time, ends with score+badge", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(202);
-  await startDay30Quiz(learner.id, 202, deps);
-
-  // Answer: correct, correct, incorrect (d1), correct x7 -> 9/10.
-  const answers = ["c", "c", "d1", "c", "c", "c", "c", "c", "c", "c"];
-  for (let q = 1; q <= 10; q++) {
-    await handleDay30QuizCallback(
-      { id: `cb-${q}`, from: { id: 202 }, message: { chat: { id: 202 } } },
-      `quiz:${q}:${answers[q - 1]}`,
-      deps,
-    );
-  }
-
-  const progress = await deps.quizStore.findByLearner(learner.id);
-  assert.equal(progress?.correct_count, 9);
-  assert.ok(progress?.completed_at);
-
-  const lastTwo = deps.telegram.sent.slice(-2).map((m) => m.text);
-  assert.equal(lastTwo[0], "You got **9/10**! 🎉");
-  assert.equal(lastTwo[1], "🏅 **Thai Talk Breaks Graduate**");
-
-  // 10 upfront prompts + 10 tap-audio plays (one per answered question) = 20.
-  assert.equal(deps.telegram.sentAudio.length, 20);
-});
-
-test("an out-of-order quiz answer (wrong question index) is ignored", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(203);
-  await startDay30Quiz(learner.id, 203, deps); // now on question 1
-
-  const countBefore = deps.telegram.sent.length;
-  await handleDay30QuizCallback(
-    { id: "cb-x", from: { id: 203 }, message: { chat: { id: 203 } } },
-    "quiz:5:c", // learner is actually on question 1, not 5
-    deps,
-  );
-
-  assert.equal(deps.telegram.sent.length, countBefore, "stale/out-of-order answer produces no feedback");
-  const progress = await deps.quizStore.findByLearner(learner.id);
-  assert.equal(progress?.current_question_index, 1, "progress unchanged");
-});
-
-// --- Checkpoint 4 follow-up: tapped button plays its own real audio -------
-// (LDTKB-046, amended 22 August 2026)
-
-test("upfront prompt audio is unchanged: still just the correct-answer clip, once, before any tap", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(210);
-
-  await startDay30Quiz(learner.id, 210, deps);
-
-  assert.equal(deps.telegram.sentAudio.length, 1);
-  assert.equal(deps.telegram.sentAudio[0].filename, "Q1_correct_answer.mp3");
-});
-
-// Note: tapping question 1 auto-advances and sends question 2's own upfront
-// prompt audio too (unless it's the last question) — so the tapped clip is
-// checked at a specific index (the one immediately after the Q1 prompt),
-// not via "last audio sent" or an exact total count.
-
-test("tapping the correct button plays the correct-answer audio again, in addition to the prompt", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(211);
-  await startDay30Quiz(learner.id, 211, deps); // sentAudio[0] = Q1 prompt
-
-  await handleDay30QuizCallback(
-    { id: "cb-211", from: { id: 211 }, message: { chat: { id: 211 } } },
-    "quiz:1:c",
-    deps,
-  );
-
-  assert.equal(deps.telegram.sentAudio[0].filename, "Q1_correct_answer.mp3", "unchanged upfront prompt");
-  assert.equal(deps.telegram.sentAudio[1].filename, "Q1_correct_answer.mp3", "tapped-button audio, played again");
-});
-
-test("tapping distractor button 1 plays that specific distractor's own audio file", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(212);
-  await startDay30Quiz(learner.id, 212, deps);
-
-  await handleDay30QuizCallback(
-    { id: "cb-212", from: { id: 212 }, message: { chat: { id: 212 } } },
-    "quiz:1:d1",
-    deps,
-  );
-
-  assert.equal(deps.telegram.sentAudio[1].filename, "Q1_distractor-1.mp3");
-});
-
-test("tapping distractor button 2 plays that specific distractor's own audio file", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(213);
-  await startDay30Quiz(learner.id, 213, deps);
-
-  await handleDay30QuizCallback(
-    { id: "cb-213", from: { id: 213 }, message: { chat: { id: 213 } } },
-    "quiz:1:d2",
-    deps,
-  );
-
-  assert.equal(deps.telegram.sentAudio[1].filename, "Q1_distractor-2.mp3");
-});
-
-test("on the final question, tapping plays its own audio and does NOT trigger a next-question prompt", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(215);
-  await startDay30Quiz(learner.id, 215, deps);
-  // Fast-forward through questions 1-9 with correct answers.
-  for (let q = 1; q <= 9; q++) {
-    await handleDay30QuizCallback(
-      { id: `cb-215-${q}`, from: { id: 215 }, message: { chat: { id: 215 } } },
-      `quiz:${q}:c`,
-      deps,
-    );
-  }
-  const audioCountBeforeQ10Tap = deps.telegram.sentAudio.length;
-
-  await handleDay30QuizCallback(
-    { id: "cb-215-10", from: { id: 215 }, message: { chat: { id: 215 } } },
-    "quiz:10:d2",
-    deps,
-  );
-
-  // Exactly one new audio (the tapped distractor) — no question 11 exists to prompt.
-  assert.equal(deps.telegram.sentAudio.length, audioCountBeforeQ10Tap + 1);
-  assert.equal(deps.telegram.sentAudio.at(-1)?.filename, "Q10_distractor-2.mp3");
-});
-
-test("across all 10 questions, every button's callback_data kind maps to that button's own true audio file", () => {
+test("across all 10 questions, every button's kind maps to that button's own true audio file", () => {
   for (const q of DAY30_QUESTIONS) {
     // Mirrors audioFileForKind's mapping without importing an internal —
     // asserts the content data itself is self-consistent.
@@ -218,34 +42,91 @@ test("across all 10 questions, every button's callback_data kind maps to that bu
   }
 });
 
-test("tapping a button still records correctness and sends feedback exactly as before this fix", async () => {
-  const deps = makeQuizDeps();
-  const learner = await deps.learnerStore.create(214);
-  await startDay30Quiz(learner.id, 214, deps); // sent[0] = "What did you hear?" (question 1)
-
-  await handleDay30QuizCallback(
-    { id: "cb-214a", from: { id: 214 }, message: { chat: { id: 214 } } },
-    "quiz:1:d2",
-    deps,
-  );
-
-  // sent[1] is the feedback; sent[2] (if present) is question 2's prompt message.
-  assert.match(deps.telegram.sent[1]?.text ?? "", /Not quite/);
-  const progress = await deps.quizStore.findByLearner(learner.id);
-  assert.equal(progress?.correct_count, 0);
-  assert.equal(progress?.current_question_index, 2, "still advances to the next question");
-});
-
-test("Day 30 quiz never calls Checkpoint 3's dynamic distractor-selection logic (LDTKB-045)", async () => {
+test("Day 30 quiz never calls Checkpoint 3's dynamic distractor-selection logic (LDTKB-045)", () => {
   // distractors.ts's pickCrossLessonDistractors/pickNumberDistractors both
   // require a non-trivial input (a lesson pool, a correct number 1-10) that
   // day30Content.ts's fixed data doesn't shape-match — the real evidence
-  // this constraint holds is structural: day30Quiz.ts has no import of
-  // "@/lib/delivery/distractors" at all. Confirmed by reading the file
-  // directly (see CHECKPOINT4.md item 5) rather than only by this test.
-  const source = readFileSync(path.join(REPO_ROOT, "src/lib/quiz/day30Quiz.ts"), "utf8");
-  const hasImportStatement = /^\s*import\b[^\n]*delivery\/distractors/m.test(source);
-  assert.equal(hasImportStatement, false, "day30Quiz.ts must not import Checkpoint 3's distractor-selection module");
+  // this constraint holds is structural: neither day30Quiz.ts nor
+  // day30QuizApi.ts imports "@/lib/delivery/distractors" at all.
+  for (const file of ["src/lib/quiz/day30Quiz.ts", "src/lib/quiz/day30QuizApi.ts"]) {
+    const source = readFileSync(path.join(REPO_ROOT, file), "utf8");
+    const hasImportStatement = /^\s*import\b[^\n]*delivery\/distractors/m.test(source);
+    assert.equal(hasImportStatement, false, `${file} must not import Checkpoint 3's distractor-selection module`);
+  }
+});
+
+// --- Bot-side trigger: single Web App button (replaces the old per-question
+// native message flow — see day30QuizApi.test.ts for the actual quiz logic,
+// now entirely inside the Web App page/API route) -------------------------
+
+function makeStartQuizDeps(appUrl: string | undefined = "https://thaitalkbreaks.example") {
+  return {
+    telegram: new FakeTelegramClient(),
+    quizStore: new FakeDay30QuizStore(),
+    appUrl,
+  };
+}
+
+test("startDay30Quiz sends exactly one message with a single web_app button opening /day30-quiz", async () => {
+  const deps = makeStartQuizDeps();
+
+  await startDay30Quiz("learner-1", 300, deps);
+
+  assert.equal(deps.telegram.sent.length, 1, "exactly one message — no per-question messages any more");
+  assert.equal(deps.telegram.sentAudio.length, 0, "no native audio at all any more");
+  const message = deps.telegram.sent[0];
+  assert.equal(message.keyboard?.length, 1);
+  assert.equal(message.keyboard?.[0].length, 1, "a single button, not one per option");
+  assert.deepEqual(message.keyboard?.[0][0], {
+    text: "🧠 Start the Day 30 Quiz",
+    web_app: { url: "https://thaitalkbreaks.example/day30-quiz" },
+  });
+});
+
+test("startDay30Quiz creates the progress row at question 1", async () => {
+  const deps = makeStartQuizDeps();
+
+  await startDay30Quiz("learner-2", 301, deps);
+
+  const progress = await deps.quizStore.findByLearner("learner-2");
+  assert.equal(progress?.current_question_index, 1);
+  assert.equal(progress?.correct_count, 0);
+  assert.equal(progress?.completed_at, null);
+});
+
+test("starting the quiz twice is a no-op the second time (guard against re-sending the button on a later cron tick)", async () => {
+  const deps = makeStartQuizDeps();
+
+  await startDay30Quiz("learner-3", 302, deps);
+  await startDay30Quiz("learner-3", 302, deps);
+
+  assert.equal(deps.telegram.sent.length, 1, "no second button send");
+});
+
+test("startDay30Quiz falls back to process.env.APP_URL when deps.appUrl is not provided", async () => {
+  const original = process.env.APP_URL;
+  process.env.APP_URL = "https://env-fallback.example";
+  try {
+    const deps = { telegram: new FakeTelegramClient(), quizStore: new FakeDay30QuizStore() };
+    await startDay30Quiz("learner-4", 303, deps);
+    const button = deps.telegram.sent[0].keyboard?.[0][0];
+    assert.deepEqual(button, { text: "🧠 Start the Day 30 Quiz", web_app: { url: "https://env-fallback.example/day30-quiz" } });
+  } finally {
+    if (original === undefined) delete process.env.APP_URL;
+    else process.env.APP_URL = original;
+  }
+});
+
+test("startDay30Quiz throws if neither deps.appUrl nor process.env.APP_URL is set", async () => {
+  const original = process.env.APP_URL;
+  delete process.env.APP_URL;
+  try {
+    const deps = { telegram: new FakeTelegramClient(), quizStore: new FakeDay30QuizStore() };
+    await assert.rejects(() => startDay30Quiz("learner-5", 304, deps));
+  } finally {
+    if (original === undefined) delete process.env.APP_URL;
+    else process.env.APP_URL = original;
+  }
 });
 
 // --- Part C: testing-only day-window extension -----------------------------

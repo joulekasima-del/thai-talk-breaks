@@ -2,20 +2,20 @@ import { createTelegramClient, type TelegramUpdate } from "@/lib/telegram";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { supabaseLearnerStore } from "@/lib/onboarding/learnerStore";
 import { handleUpdate } from "@/lib/onboarding/handleUpdate";
-import { supabaseDay30QuizStore } from "@/lib/quiz/day30QuizStore";
-import { handleDay30QuizCallback } from "@/lib/quiz/day30Quiz";
 import { supabaseProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
 import { dedupeAndProcess } from "@/lib/webhook/dedupeAndProcess";
 import { supabaseOopsReportsStore } from "@/lib/oops/oopsReportsStore";
 
 // Telegram webhook endpoint. Verifies the shared secret, dedups on
 // update_id (hotfix — Telegram retries delivery of the same update if it
-// doesn't get a timely 200 OK; see processedUpdatesStore.ts), then routes:
-//   - "quiz:*" callbacks -> day30Quiz.ts (Day 30 quiz-ladder progression, Checkpoint 4)
-//   - everything else    -> handleUpdate() (onboarding, Checkpoint 2 — untouched)
-// The "activity:*" callback route (Lessons 2-28's recognition-tap responses)
-// was removed along with the feature itself — see lib/delivery/deliverLesson.ts.
-// No lesson-DELIVERY or scheduling logic lives here — that's the cron route (Checkpoint 3/4).
+// doesn't get a timely 200 OK; see processedUpdatesStore.ts), then routes
+// everything to handleUpdate() (onboarding, Checkpoint 2 — untouched).
+// The "quiz:*" callback route (Day 30's native quiz-ladder progression,
+// Checkpoint 4) was removed along with the feature itself — Day 30 is now a
+// single continuous Web App page (src/app/day30-quiz/), same as the
+// "activity:*" callback route (Lessons 2-28's recognition-tap responses)
+// was removed earlier — see lib/delivery/deliverLesson.ts. No lesson-DELIVERY
+// or scheduling logic lives here — that's the cron route (Checkpoint 3/4).
 
 export async function POST(request: Request): Promise<Response> {
   const expectedSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
@@ -56,17 +56,7 @@ export async function POST(request: Request): Promise<Response> {
     // response). Either way this route still returns 200 OK, so Telegram
     // stops retrying.
     await dedupeAndProcess(update.update_id, processedUpdatesStore, async () => {
-      const callbackData = update.callback_query?.data;
-      if (callbackData?.startsWith("quiz:")) {
-        const quizStore = supabaseDay30QuizStore(supabase);
-        await handleDay30QuizCallback(update.callback_query!, callbackData, {
-          telegram,
-          learnerStore: store,
-          quizStore,
-        });
-      } else {
-        await handleUpdate(update, { store, telegram, oopsReportsStore, adminTelegramUserId });
-      }
+      await handleUpdate(update, { store, telegram, oopsReportsStore, adminTelegramUserId });
     });
   } catch (error) {
     console.error("Webhook handling failed", error);

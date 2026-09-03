@@ -1,0 +1,98 @@
+.app {
+  min-height: 100vh;
+  background: #0e0d12;
+  color: #f5f3ee;
+  font-family: var(--font-geist-sans, system-ui, sans-serif);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.25rem;
+  box-sizing: border-box;
+}
+
+.card {
+  max-width: 28rem;
+  width: 100%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.progress {
+  font-size: 0.9rem;
+  opacity: 0.7;
+}
+
+.question {
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.option {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 243, 238, 0.25);
+  background: rgba(245, 243, 238, 0.06);
+  color: #f5f3ee;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.option:hover:not(:disabled) {
+  background: rgba(245, 243, 238, 0.14);
+  border-color: rgba(245, 243, 238, 0.4);
+}
+
+.option:disabled {
+  cursor: default;
+}
+
+.optionCorrect {
+  border-color: rgba(120, 220, 150, 0.8);
+  background: rgba(120, 220, 150, 0.16);
+}
+
+.optionIncorrect {
+  border-color: rgba(230, 120, 120, 0.8);
+  background: rgba(230, 120, 120, 0.16);
+}
+
+.feedback {
+  font-size: 1rem;
+  min-height: 1.2em;
+}
+
+.nextButton {
+  margin-top: 0.5rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: none;
+  background: #f5f3ee;
+  color: #0e0d12;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.resultsScore {
+  font-size: 1.6rem;
+  font-weight: 600;
+}
+
+.resultsBadge {
+  font-size: 1.1rem;
+}
+
+.loading {
+  opacity: 0.7;
+  font-size: 0.95rem;
+  text-align: center;
+}

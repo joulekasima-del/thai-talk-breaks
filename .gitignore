@@ -29,7 +29,12 @@ next-env.d.ts
 # here, so this stays a derived build artifact rather than a second tracked copy.
 /public/day29/
 
-# Web App audio delivery prototype assets (Lesson 3 + Day 8 only) — synced
-# at build time from curriculum/ (scripts/syncLessonAssets.mjs), same
-# derived-build-artifact reasoning as /public/day29/ above.
+# Web App audio delivery, all 28 lesson days — synced at build time from
+# curriculum/ (scripts/syncLessonAssets.mjs), same derived-build-artifact
+# reasoning as /public/day29/ above.
 /public/lessons/
+
+# Day 30 quiz Web App audio — synced at build time from
+# curriculum/day30-audio/ (scripts/syncDay30QuizAssets.mjs), same
+# derived-build-artifact reasoning as /public/day29/ above.
+/public/day30-audio/
