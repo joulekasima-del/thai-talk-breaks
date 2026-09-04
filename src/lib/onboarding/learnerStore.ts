@@ -29,6 +29,13 @@ export interface Learner {
    * onboarding_step — see supabase/migrations/20260826000000_oops_reports.sql.
    */
   awaiting_oops_report_since: string | null;
+  /**
+   * Set while waiting for a learner's next message to be captured as a
+   * /paysupport request; null otherwise. Same pending-flag pattern as
+   * awaiting_oops_report_since — see
+   * supabase/migrations/20260903000000_star_payments.sql (Stage 5, LDTKB-014).
+   */
+  awaiting_paysupport_request_since: string | null;
 }
 
 export type LearnerPatch = Partial<
@@ -41,11 +48,20 @@ export type LearnerPatch = Partial<
     | "onboarding_completed_at"
     | "pilot_start_date"
     | "awaiting_oops_report_since"
+    | "awaiting_paysupport_request_since"
   >
 >;
 
 export interface LearnerStore {
   findByTelegramId(telegramUserId: number): Promise<Learner | null>;
+  /**
+   * Look up by the learner's own row id, not their Telegram id. Added for
+   * Stage 5 (LDTKB-014)'s /refund flow: a purchases row only carries
+   * learner_id (the internal uuid), so resolving the learner's
+   * telegram_user_id to actually send them the refund-issued message (and
+   * call refundStarPayment) needs this, not findByTelegramId.
+   */
+  findById(id: string): Promise<Learner | null>;
   create(telegramUserId: number): Promise<Learner>;
   update(id: string, patch: LearnerPatch): Promise<Learner>;
   /**
@@ -65,6 +81,12 @@ export function supabaseLearnerStore(client: SupabaseClient): LearnerStore {
         .select("*")
         .eq("telegram_user_id", telegramUserId)
         .maybeSingle();
+      if (error) throw error;
+      return (data as Learner | null) ?? null;
+    },
+
+    async findById(id) {
+      const { data, error } = await client.from("learners").select("*").eq("id", id).maybeSingle();
       if (error) throw error;
       return (data as Learner | null) ?? null;
     },

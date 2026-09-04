@@ -16,6 +16,7 @@ import {
 } from "@/lib/onboarding/content";
 import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
 import { FakeOopsReportsStore } from "./oopsFakes";
+import { FakePaymentSupportStore, FakePurchasesStore } from "./paymentsFakes";
 import type { TelegramUpdate } from "@/lib/telegram";
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -58,6 +59,10 @@ function makeDeps(now = new Date("2026-08-21T03:00:00.000Z")) {
     store: new FakeLearnerStore(),
     telegram: new FakeTelegramClient(),
     oopsReportsStore: new FakeOopsReportsStore(),
+    // Stage 5 (LDTKB-014): HandleUpdateDeps now requires these two — this
+    // file's tests never exercise payments, but the type requires them.
+    purchasesStore: new FakePurchasesStore(),
+    paymentSupportStore: new FakePaymentSupportStore(),
     adminTelegramUserId: null,
     now: () => now,
   };

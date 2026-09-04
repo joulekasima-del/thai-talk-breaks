@@ -6,6 +6,7 @@ import { OOPS_CONFIRMATION_MESSAGE, OOPS_PROMPT_MESSAGE } from "@/lib/oops/conte
 import { GENDER_QUESTION_MESSAGE } from "@/lib/onboarding/content";
 import { FakeLearnerStore, FakeTelegramClient } from "./fakes";
 import { FakeOopsReportsStore } from "./oopsFakes";
+import { FakePaymentSupportStore, FakePurchasesStore } from "./paymentsFakes";
 import type { TelegramUpdate } from "@/lib/telegram";
 
 let nextUpdateId = 1;
@@ -19,6 +20,10 @@ function makeDeps(adminTelegramUserId: number | null = null, now = new Date("202
     store: new FakeLearnerStore(),
     telegram: new FakeTelegramClient(),
     oopsReportsStore: new FakeOopsReportsStore(),
+    // Stage 5 (LDTKB-014): HandleUpdateDeps now requires these two — this
+    // file's tests never exercise payments, but the type requires them.
+    purchasesStore: new FakePurchasesStore(),
+    paymentSupportStore: new FakePaymentSupportStore(),
     adminTelegramUserId,
     now: () => now,
   };
