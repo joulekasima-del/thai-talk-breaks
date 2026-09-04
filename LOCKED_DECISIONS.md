@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 5.9  
+**Register version:** 6.0  
 **Last updated:** 3 September 2026  
 **Authority:** Joule
 
@@ -662,6 +662,22 @@ No other Day 29 content uses first-person narrator voice — confirmed via a ful
 **Boundary:** This matches, not exceeds, Telegram's own Stars ToS requirement — bots must be able to refund a failed delivery at no penalty via `refundStarPayment`, and must respond to `/paysupport` in a timely fashion, but nothing beyond that is mandated. `/paysupport`'s reply should state this standard plainly (e.g. that refunds are issued for delivery failures, not general returns) so learners know what to expect before asking. This does not remove Joule's discretion to grant an occasional goodwill refund outside this standard — it just means that's a judgment call each time, not a blanket policy.  
 **Locked by:** Joule's confirmation, 3 September 2026 (first version and same-day revision).
 
+## LDTKB-064 — Stage 5 payment copy: invoice, confirmation, /paysupport, refund messages
+
+**Status:** Locked  
+**Decision:** Confirms verbatim the draft copy built into `src/lib/payments/content.ts` (Stage 5, LDTKB-014). This is a test-purchase flow for checkout verification, not the final paywall (Stage 8).
+- Invoice title: "Thai Talk Breaks — 30-Day Course"
+- Invoice description: "The full 30-day spoken-Thai course, delivered daily at your chosen time. This is a test purchase for Stage 5 checkout verification."
+- Invoice price label: "30-Day Course", fixed at 500 Stars.
+- `/buy` before `/start`: "Send /start first to set up your account, then /buy again."
+- Payment confirmation (on `successful_payment`): "🎉 Payment received — thank you! If a lesson ever fails to arrive as scheduled, send /paysupport and I'll take a look."
+- `/paysupport` prompt (states LDTKB-063's refund standard plainly, up front): "What's going on with your payment? Describe it and I'll take a look. 💳\n\nJust so you know: refunds are issued when Thai Talk Breaks fails to deliver a lesson as scheduled. For anything else, I'm still glad to help however I can — it just may not always mean a refund."
+- `/paysupport` capture confirmation: "Got it — I've passed this along for review and will follow up here once it's sorted. 🙏"
+- Refund-issued message: "Your refund has been processed — the Stars are back in your balance. Thanks for your patience! 💛"
+
+**Reference:** `src/lib/payments/content.ts`; behavior in `src/lib/onboarding/handleUpdate.ts`'s `/buy`, `handleSuccessfulPayment`, `/paysupport`, and `/refund` handlers.  
+**Locked by:** Joule's confirmation, 3 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -723,3 +739,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 3 Sep 2026 | LDTKB-061 | Day 29's narrator pronoun revised to "we" (entry + completion messages, 3 instances) extending the welcome message's one-time exception to LDTKB-030's fixed "I" voice; also fixed a real layout bug where fixed-position nav arrows overlapped/blurred text on the Surprise Quest's completion page | Joule |
 | 3 Sep 2026 | LDTKB-062 | Day 29's scroll direction changed from vertical to horizontal to match the existing ◀/▶ nav arrows (arrows kept as-is); Page 8 gets a new first speech "ขอโทษค่ะ!" before the existing closing line, new recording provided by Joule | Joule |
 | 3 Sep 2026 | LDTKB-063 | Stage 5 kickoff: refund policy locked; revised same day from "any reason, no window" to Telegram's own baseline standard (refund only for genuine delivery failure, no separate time cutoff) after reviewing Telegram's requirements and market practice | Joule |
+| 3 Sep 2026 | LDTKB-064 | Stage 5 payment copy confirmed verbatim (invoice, payment confirmation, /paysupport prompt stating the LDTKB-063 refund standard, /paysupport capture confirmation, refund-issued message) | Joule |
