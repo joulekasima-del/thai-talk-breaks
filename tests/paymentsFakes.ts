@@ -40,6 +40,13 @@ export class FakePurchasesStore implements PurchasesStore {
     return { ...matches[matches.length - 1] };
   }
 
+  async findPaidByLearner(learnerId: string): Promise<Purchase | null> {
+    const matches = this.purchases.filter((p) => p.learner_id === learnerId && p.status === "paid");
+    if (matches.length === 0) return null;
+    // Same insertion-order = recency tie-break as findMostRecentByLearner.
+    return { ...matches[matches.length - 1] };
+  }
+
   async markRefunded(id: string, refundedAt: string): Promise<Purchase> {
     const purchase = this.purchases.find((p) => p.id === id);
     if (!purchase) throw new Error(`FakePurchasesStore: no purchase ${id}`);

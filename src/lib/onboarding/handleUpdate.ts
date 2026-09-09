@@ -28,6 +28,11 @@
 //                                      as above
 //   any plain text (report pending)-> captured verbatim as the report, flag
 //                                      cleared, confirmation sent, admin DMed
+//   any plain text (paywall check-in already sent, still unpaid, not yet
+//                   across the boundary) -> re-sends the same one-time Day 8
+//                                           check-in (LDTKB-016). Read-only:
+//                                           no flag set or cleared. Checked
+//                                           after both pending-capture flags.
 //   any plain text (nothing pending)-> silently ignored, same as before /oops existed
 //
 // Stage 5 (LDTKB-014) Telegram Stars checkout — a standalone, testable
@@ -44,7 +49,13 @@
 //   (on update.message)          the plain-text/oops-capture fallback (its
 //                               `text` is typically undefined and would
 //                               otherwise be silently swallowed). Records a
-//                               purchases row, confirms the learner.
+//                               purchases row, confirms the learner. Day 8
+//                               paywall gate (LDTKB-016): if the learner has
+//                               already used up the 7-day free preview,
+//                               sets paid_course_start_date = today and
+//                               delivers Day 8 in this same call. If still
+//                               mid-free-week, nothing extra — the cron
+//                               route crosses them over when Day 7 ends.
 //   /paysupport (no request pending)      -> sends the prompt (states
 //                                             LDTKB-063's refund standard),
 //                                             sets the pending flag.
@@ -68,12 +79,19 @@
 //                               genuine delivery failure only) is Joule's own
 //                               judgment call each time — this command is
 //                               the execution step, not an auto-approval.
+//                               Day 8 paywall gate (LDTKB-016): if the
+//                               refunded learner had crossed the paywall,
+//                               also clears paid_course_start_date, dropping
+//                               them back behind the gate.
 
 import type { TelegramClient, TelegramMessage, TelegramPreCheckoutQuery, TelegramUpdate } from "@/lib/telegram";
 import type { Learner, LearnerStore, SchedulePeriod } from "@/lib/onboarding/learnerStore";
 import type { OopsReportsStore } from "@/lib/oops/oopsReportsStore";
 import type { PurchasesStore } from "@/lib/payments/purchasesStore";
 import type { PaymentSupportStore } from "@/lib/payments/paymentSupportStore";
+import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
+import { deliverLesson, type MediaLoader } from "@/lib/delivery/deliverLesson";
+import { isFreeWeekExhausted, PAID_COURSE_FIRST_DAY } from "@/lib/delivery/duePaidLearners";
 import {
   ALREADY_ONBOARDED_MESSAGE,
   GENDER_QUESTION_KEYBOARD,
@@ -98,6 +116,7 @@ import {
   PAYMENT_CONFIRMATION_MESSAGE,
   PAYSUPPORT_CONFIRMATION_MESSAGE,
   PAYSUPPORT_PROMPT_MESSAGE,
+  PAYWALL_PROMPT_MESSAGE,
   REFUND_ISSUED_MESSAGE,
 } from "@/lib/payments/content";
 
@@ -107,6 +126,17 @@ export interface HandleUpdateDeps {
   oopsReportsStore: OopsReportsStore;
   purchasesStore: PurchasesStore;
   paymentSupportStore: PaymentSupportStore;
+  /**
+   * Needed only for the Day 8 paywall gate's "deliver Day 8 the instant
+   * payment succeeds" path (handleSuccessfulPayment) — the webhook route
+   * wires these in, mirroring the cron route's construction. Optional so the
+   * onboarding/oops/payments test suites, which never exercise that path,
+   * don't have to build them. If a learner crosses the boundary on payment
+   * but these are absent, delivery is left to the next cron tick.
+   */
+  deliveryStore?: DeliveryStore;
+  media?: MediaLoader;
+  appUrl?: string;
   /** Telegram user id to DM new /oops reports (and /paysupport requests) to. Null if ADMIN_TELEGRAM_USER_ID isn't set — the report is still saved, just no DM is attempted. Also the sole identity /refund is authorized against. */
   adminTelegramUserId: number | null;
   /** Injectable clock, for deterministic tests. Defaults to `new Date()`. */
@@ -253,6 +283,19 @@ async function maybeCapturePendingReport(
     await capturePaySupportRequest(learner, chatId, text, deps);
     return;
   }
+  // Day 8 paywall gate (LDTKB-016): a learner who's been shown the one-time
+  // check-in, still hasn't paid, and hasn't crossed the boundary — any
+  // message from them re-sends the same check-in. Read-only: no pending-flag
+  // semantics, nothing here is set or cleared. Checked last, after both
+  // real pending-capture flags above.
+  if (
+    learner.paywall_prompt_sent_at !== null &&
+    learner.paid_course_start_date === null &&
+    (await deps.purchasesStore.findPaidByLearner(learner.id)) === null
+  ) {
+    await deps.telegram.sendMessage(chatId, PAYWALL_PROMPT_MESSAGE);
+    return;
+  }
   // Nothing pending — silently ignored.
 }
 
@@ -349,6 +392,32 @@ async function handleSuccessfulPayment(message: TelegramMessage, deps: HandleUpd
   });
 
   await deps.telegram.sendMessage(chatId, PAYMENT_CONFIRMATION_MESSAGE);
+
+  // Day 8 paywall gate (LDTKB-016): if this learner has already used up the
+  // 7-day free preview, deliver Day 8 right now — genuinely instant, in this
+  // same handler call, no cron tick needed. If they're still mid-free-week
+  // (e.g. Day 3), do nothing extra here: the purchase is recorded, Days 4-7
+  // keep delivering normally, and the cron route's boundary-crossing check
+  // picks them up the moment their free week actually ends.
+  const now = deps.now ? deps.now() : new Date();
+  const today = todayInBangkok(now);
+  if (learner.paid_course_start_date === null && isFreeWeekExhausted(learner.pilot_start_date, today)) {
+    if (deps.deliveryStore && deps.media && learner.gender_branch) {
+      await deps.store.update(learner.id, { paid_course_start_date: today });
+      const previouslyDelivered = await deps.deliveryStore.listDeliveredLessonNumbers(learner.id);
+      await deliverLesson(
+        {
+          learnerId: learner.id,
+          chatId,
+          gender: learner.gender_branch,
+          lessonNumber: PAID_COURSE_FIRST_DAY,
+          deliveryDate: today,
+          previouslyDeliveredLessonNumbers: previouslyDelivered,
+        },
+        { telegram: deps.telegram, deliveryStore: deps.deliveryStore, media: deps.media, appUrl: deps.appUrl, now: () => now },
+      );
+    }
+  }
 }
 
 async function handlePaySupport(message: NonNullable<TelegramUpdate["message"]>, deps: HandleUpdateDeps): Promise<void> {
@@ -392,6 +461,15 @@ async function handleRefund(message: NonNullable<TelegramUpdate["message"]>, dep
 
   const now = deps.now ? deps.now() : new Date();
   await deps.purchasesStore.markRefunded(purchase.id, now.toISOString());
+
+  // Day 8 paywall gate (LDTKB-016): if this learner had crossed the paywall,
+  // a refund puts them back behind it — clear the anchor so they fall back
+  // to the gate (the next cron tick re-sends the check-in if they're past
+  // Day 7, or their next message does if they'd already been prompted
+  // before). This is what makes a refund-then-rebuy test behave correctly.
+  if (learner.paid_course_start_date !== null) {
+    await deps.store.update(learner.id, { paid_course_start_date: null });
+  }
 
   await deps.telegram.sendMessage(
     chatId,

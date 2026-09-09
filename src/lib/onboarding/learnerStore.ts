@@ -24,6 +24,23 @@ export interface Learner {
   onboarding_completed_at: string | null;
   pilot_start_date: string | null;
   /**
+   * Thailand calendar date ("YYYY-MM-DD") the learner's paid content (Day 8)
+   * actually started — the anchor Days 8-30 count from, replacing
+   * pilot_start_date for that range only (Days 1-7 keep using
+   * pilot_start_date, untouched). Null until they cross the Day 8 paywall.
+   * Cleared back to null by /refund. See
+   * supabase/migrations/20260909000000_paid_course_gating.sql and
+   * delivery/duePaidLearners.ts.
+   */
+  paid_course_start_date: string | null;
+  /**
+   * Set the first time the one-time Day 8 check-in message is sent; null
+   * otherwise. A permanent "have they ever seen this" marker — NOT a
+   * transient pending flag, so (unlike the awaiting_* flags below) it is
+   * deliberately never cleared on /start.
+   */
+  paywall_prompt_sent_at: string | null;
+  /**
    * Set while waiting for a learner's next message to be captured as an
    * /oops report; null otherwise. Deliberately independent of
    * onboarding_step — see supabase/migrations/20260826000000_oops_reports.sql.
@@ -47,6 +64,8 @@ export type LearnerPatch = Partial<
     | "onboarding_step"
     | "onboarding_completed_at"
     | "pilot_start_date"
+    | "paid_course_start_date"
+    | "paywall_prompt_sent_at"
     | "awaiting_oops_report_since"
     | "awaiting_paysupport_request_since"
   >

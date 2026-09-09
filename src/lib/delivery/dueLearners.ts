@@ -39,7 +39,12 @@ export function bangkokNow(date: Date): { calendarDate: string; minutesSinceMidn
   };
 }
 
-function daysBetween(fromDate: string, toDate: string): number {
+/**
+ * Whole-day difference between two "YYYY-MM-DD" Thailand calendar dates.
+ * Exported (was private) so duePaidLearners.ts reuses this exact date-diff
+ * rather than duplicating it — see that module's paid-content day math.
+ */
+export function daysBetween(fromDate: string, toDate: string): number {
   // Both are "YYYY-MM-DD" Thailand calendar dates — comparing them as UTC
   // midnights gives an exact whole-day difference with no DST/offset risk.
   const from = Date.parse(`${fromDate}T00:00:00Z`);
@@ -56,10 +61,13 @@ function daysBetween(fromDate: string, toDate: string): number {
  * treated the same as "nothing due" rather than throwing, since a clock
  * skew or retry shouldn't crash the whole delivery run over one learner.
  *
- * `maxDay` defaults to the real 7-day pilot (LDTKB-013). Checkpoint 4's
- * TESTING-ONLY extension to 30 (LDTKB-044) is applied by the caller passing
- * a larger `maxDay` — see TESTING_EXTENDED_DAY_WINDOW in this file. This
- * function has no opinion on which is "real"; it just bounds a range.
+ * `maxDay` defaults to the real 7-day pilot (LDTKB-013). This function has
+ * no opinion on scope; it just bounds a range. Days 8-30 are now handled by
+ * a separate paid-content path (delivery/duePaidLearners.ts) gated on a real
+ * purchase — NOT by widening `maxDay` here. The old
+ * TESTING_EXTENDED_WINDOW env bypass (LDTKB-044) that briefly let Days 8-30
+ * through for testing has been retired entirely, so no stray env var can
+ * ever again slip a learner past the Day 8 paywall.
  */
 export function dayNumberForLearner(pilotStartDate: string, todayCalendarDate: string, maxDay: number): number | null {
   const elapsedDays = daysBetween(pilotStartDate, todayCalendarDate);
@@ -73,14 +81,13 @@ export function lessonNumberForDay(pilotStartDate: string, todayCalendarDate: st
   return dayNumberForLearner(pilotStartDate, todayCalendarDate, PILOT_LESSON_COUNT);
 }
 
-// -----------------------------------------------------------------------
-// TEMPORARY TESTING BYPASS — see LDTKB-044. Real pilot scope is 7 days
-// (LDTKB-013). Do NOT treat this as the production day-window. Gated behind
-// an environment variable that defaults OFF, so a deployment without it
-// explicitly set behaves exactly like the real 7-day pilot.
-// -----------------------------------------------------------------------
-export const TESTING_EXTENDED_DAY_WINDOW = process.env.TESTING_EXTENDED_WINDOW === "true";
-export const DAY_WINDOW_MAX_DAY = TESTING_EXTENDED_DAY_WINDOW ? 30 : PILOT_LESSON_COUNT;
+// The free-preview day-window is exactly the 7-day pilot (LDTKB-013), full
+// stop. This was briefly toggleable to 30 via TESTING_EXTENDED_WINDOW for
+// end-to-end testing before the Day 8 paywall existed (LDTKB-044); that
+// bypass is now retired — hardcoded so a stray env var left in Vercel can
+// never re-open Days 8-30 for free. Days 8-30 deliver only through the paid
+// path (delivery/duePaidLearners.ts), anchored on a real purchase.
+export const DAY_WINDOW_MAX_DAY = PILOT_LESSON_COUNT;
 
 function timeStringToMinutes(time: string): number {
   const [h, m] = time.split(":").map(Number);

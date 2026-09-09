@@ -31,6 +31,14 @@ export interface PurchasesStore {
   findByChargeId(telegramPaymentChargeId: string): Promise<Purchase | null>;
   /** Most recent purchase for a learner, if any — used by /paysupport to attach a likely charge id. */
   findMostRecentByLearner(learnerId: string): Promise<Purchase | null>;
+  /**
+   * Most recent still-'paid' (not refunded) purchase for a learner, if any.
+   * The Day 8 paywall gate's "has this learner actually paid?" check
+   * (cron/deliver/route.ts boundary crossing, handleUpdate.ts check-in
+   * re-send) — deliberately narrower than findMostRecentByLearner, whose
+   * most-recent row could be a refund.
+   */
+  findPaidByLearner(learnerId: string): Promise<Purchase | null>;
   markRefunded(id: string, refundedAt: string): Promise<Purchase>;
 }
 
@@ -68,6 +76,19 @@ export function supabasePurchasesStore(client: SupabaseClient): PurchasesStore {
         .from("purchases")
         .select("*")
         .eq("learner_id", learnerId)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as Purchase | null) ?? null;
+    },
+
+    async findPaidByLearner(learnerId) {
+      const { data, error } = await client
+        .from("purchases")
+        .select("*")
+        .eq("learner_id", learnerId)
+        .eq("status", "paid")
         .order("created_at", { ascending: false })
         .limit(1)
         .maybeSingle();

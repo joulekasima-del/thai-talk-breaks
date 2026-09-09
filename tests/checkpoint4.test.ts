@@ -6,7 +6,7 @@ import path from "node:path";
 
 import { startDay30Quiz } from "@/lib/quiz/day30Quiz";
 import { DAY30_QUESTIONS, day30ScoreMessage, DAY30_BADGE_MESSAGE } from "@/lib/curriculum/day30Content";
-import { dayNumberForLearner, findDueLearners, type OnboardedLearner } from "@/lib/delivery/dueLearners";
+import { dayNumberForLearner, findDueLearners, DAY_WINDOW_MAX_DAY, type OnboardedLearner } from "@/lib/delivery/dueLearners";
 import { FakeTelegramClient } from "./fakes";
 import { FakeDay30QuizStore } from "./quizFakes";
 
@@ -129,16 +129,25 @@ test("startDay30Quiz throws if neither deps.appUrl nor process.env.APP_URL is se
   }
 });
 
-// --- Part C: testing-only day-window extension -----------------------------
+// --- Part C: day-window cap (testing-only extension retired, LDTKB-016) ----
+//
+// The old TESTING_EXTENDED_WINDOW env bypass that let Days 8-30 through for
+// end-to-end testing is gone — DAY_WINDOW_MAX_DAY is now hardcoded to the
+// real 7-day pilot, and Days 8-30 deliver only via the paid path
+// (duePaidLearners.ts). These tests keep covering dayNumberForLearner's cap
+// math (its `maxDay` argument still bounds the 1-7 range) and confirm the
+// free-preview window can no longer be widened past 7 in the real route.
 
-test("dayNumberForLearner respects an arbitrary maxDay (the testing extension is just a bigger cap)", () => {
-  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-30", 30), 30);
-  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-31", 30), null, "day 31 is past even the extended window");
-  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-08", 7), null, "day 8 is past the real 7-day pilot");
-  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-08", 30), 8, "but day 8 is fine under the extended window");
+test("dayNumberForLearner's maxDay argument bounds the range it will return", () => {
+  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-07", 7), 7, "day 7 is the last free-preview day");
+  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-08", 7), null, "day 8 is past the 7-day pilot");
+  assert.equal(dayNumberForLearner("2026-08-01", "2026-08-01", 7), 1, "day 1 is pilot_start_date itself");
+  assert.equal(dayNumberForLearner("2026-08-01", "2026-07-31", 7), null, "a day before pilot_start_date is defensively null");
 });
 
-test("findDueLearners with an extended maxDay surfaces day 8-29 (route.ts is responsible for skipping them gracefully)", () => {
+test("the free-preview day-window is hardcoded to 7 — no env bypass can widen it any more", () => {
+  assert.equal(DAY_WINDOW_MAX_DAY, 7, "DAY_WINDOW_MAX_DAY is the real pilot count, not toggleable");
+
   const learner: OnboardedLearner = {
     id: "l1",
     telegram_user_id: 1,
@@ -148,10 +157,9 @@ test("findDueLearners with an extended maxDay surfaces day 8-29 (route.ts is res
     pilot_start_date: "2026-08-01",
   };
   const now = new Date("2026-08-15T01:00:00.000Z"); // day 15 of the pilot, 08:00 Bangkok
-  const withoutExtension = findDueLearners([learner], { now, lookbackMinutes: 30 });
-  const withExtension = findDueLearners([learner], { now, lookbackMinutes: 30, maxDay: 30 });
 
-  assert.equal(withoutExtension.length, 0, "day 15 is past the real 7-day window by default");
-  assert.equal(withExtension.length, 1);
-  assert.equal(withExtension[0].lessonNumber, 15);
+  // The cron route always passes DAY_WINDOW_MAX_DAY — day 15 is never a free
+  // lesson. (Days 8-30 are duePaidLearners.ts's job, gated on a purchase.)
+  const due = findDueLearners([learner], { now, lookbackMinutes: 30, maxDay: DAY_WINDOW_MAX_DAY });
+  assert.equal(due.length, 0, "day 15 is past the free-preview window and stays out");
 });

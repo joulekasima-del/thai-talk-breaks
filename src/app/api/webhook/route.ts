@@ -7,6 +7,14 @@ import { dedupeAndProcess } from "@/lib/webhook/dedupeAndProcess";
 import { supabaseOopsReportsStore } from "@/lib/oops/oopsReportsStore";
 import { supabasePurchasesStore } from "@/lib/payments/purchasesStore";
 import { supabasePaymentSupportStore } from "@/lib/payments/paymentSupportStore";
+import { supabaseDeliveryStore } from "@/lib/delivery/deliveryStore";
+import type { MediaLoader } from "@/lib/delivery/deliverLesson";
+import {
+  loadCombinedNumbersImage,
+  loadPhraseLessonImage,
+  loadRepresentativeClip,
+  loadWordSetImage,
+} from "@/lib/curriculum/mediaFiles";
 
 // Telegram webhook endpoint. Verifies the shared secret, dedups on
 // update_id (hotfix — Telegram retries delivery of the same update if it
@@ -18,6 +26,19 @@ import { supabasePaymentSupportStore } from "@/lib/payments/paymentSupportStore"
 // "activity:*" callback route (Lessons 2-28's recognition-tap responses)
 // was removed earlier — see lib/delivery/deliverLesson.ts. No lesson-DELIVERY
 // or scheduling logic lives here — that's the cron route (Checkpoint 3/4).
+//
+// One narrow exception (Stage 8, LDTKB-016): the Day 8 paywall gate delivers
+// Day 8 the instant a `successful_payment` arrives for a learner already
+// past their free week. handleUpdate.ts owns that decision; this route just
+// hands it the same deliveryStore/media/appUrl the cron route builds so the
+// delivery can happen in-request rather than waiting for the next cron tick.
+
+const media: MediaLoader = {
+  loadPhraseLessonImage,
+  loadCombinedNumbersImage,
+  loadRepresentativeClip,
+  loadWordSetImage,
+};
 
 export async function POST(request: Request): Promise<Response> {
   const expectedSecret = process.env.TELEGRAM_WEBHOOK_SECRET;
@@ -45,6 +66,7 @@ export async function POST(request: Request): Promise<Response> {
   const oopsReportsStore = supabaseOopsReportsStore(supabase);
   const purchasesStore = supabasePurchasesStore(supabase);
   const paymentSupportStore = supabasePaymentSupportStore(supabase);
+  const deliveryStore = supabaseDeliveryStore(supabase);
 
   // Missing/unset -> null: /oops reports are still saved, the admin DM is
   // just skipped (see handleUpdate.ts's maybeCaptureOopsReport).
@@ -60,7 +82,17 @@ export async function POST(request: Request): Promise<Response> {
     // response). Either way this route still returns 200 OK, so Telegram
     // stops retrying.
     await dedupeAndProcess(update.update_id, processedUpdatesStore, async () => {
-      await handleUpdate(update, { store, telegram, oopsReportsStore, purchasesStore, paymentSupportStore, adminTelegramUserId });
+      await handleUpdate(update, {
+        store,
+        telegram,
+        oopsReportsStore,
+        purchasesStore,
+        paymentSupportStore,
+        deliveryStore,
+        media,
+        appUrl: process.env.APP_URL,
+        adminTelegramUserId,
+      });
     });
   } catch (error) {
     console.error("Webhook handling failed", error);

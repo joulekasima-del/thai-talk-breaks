@@ -33,6 +33,8 @@ export class FakeLearnerStore implements LearnerStore {
       onboarding_step: "gender_pending",
       onboarding_completed_at: null,
       pilot_start_date: null,
+      paid_course_start_date: null,
+      paywall_prompt_sent_at: null,
       awaiting_oops_report_since: null,
       awaiting_paysupport_request_since: null,
     };
