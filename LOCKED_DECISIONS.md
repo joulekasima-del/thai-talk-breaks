@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 6.0  
+**Register version:** 6.1  
 **Last updated:** 3 September 2026  
 **Authority:** Joule
 
@@ -678,6 +678,17 @@ No other Day 29 content uses first-person narrator voice — confirmed via a ful
 **Reference:** `src/lib/payments/content.ts`; behavior in `src/lib/onboarding/handleUpdate.ts`'s `/buy`, `handleSuccessfulPayment`, `/paysupport`, and `/refund` handlers.  
 **Locked by:** Joule's confirmation, 3 September 2026.
 
+## LDTKB-065 — Day 8 paywall gate: mechanism and check-in copy
+
+**Status:** Locked  
+**Decision:** Extends LDTKB-016 (first paid product, 18 Aug 2026) with the actual gating mechanism and the exact check-in message. Days 1–7 remain a free preview, delivered exactly as before, anchored to `pilot_start_date`. Day 8 onward requires a purchase (`purchases.status = 'paid'`, Stage 5's checkout — LDTKB-014). The moment a learner would first become due for Day 8 unpaid, the bot sends this message once instead of a lesson (never automatically repeated — only re-sent if they message the bot again while still gated):
+> "How's it going so far? Ready to keep going? Send /buy to unlock Days 8–30."
+
+The moment payment succeeds, Day 8 delivers — instantly if they're already past their free week, or automatically right after Day 7 finishes if they paid early (mid-free-week payments never skip unseen free days). Day 9 onward continues on a daily schedule anchored to `paid_course_start_date` — the date they actually crossed into paid content — not `pilot_start_date`, so a long gap waiting for payment never causes days to be skipped once they resume. A `/refund` (LDTKB-063) clears this anchor, dropping the learner back behind the gate.  
+**Boundary:** This is real Stage 8 architecture, built ahead of Stages 6–7 (commercial registration, published policies) — a conscious choice, not an oversight. Nothing changes for the current single pilot learner until a real second learner exists, but the mechanism is live for anyone who reaches Day 8 once this ships. The `TESTING_EXTENDED_WINDOW` bypass that previously let Days 8–30 through for testing is retired entirely (hardcoded off in code, not just the env var), since this gate is now the correct way to reach those days, testing included.  
+**Reference:** `src/lib/delivery/duePaidLearners.ts`, `src/lib/onboarding/handleUpdate.ts`'s `successful_payment`/`/refund` handlers, `supabase/migrations/20260909000000_paid_course_gating.sql`.  
+**Locked by:** Joule's confirmation, 3 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -740,3 +751,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 3 Sep 2026 | LDTKB-062 | Day 29's scroll direction changed from vertical to horizontal to match the existing ◀/▶ nav arrows (arrows kept as-is); Page 8 gets a new first speech "ขอโทษค่ะ!" before the existing closing line, new recording provided by Joule | Joule |
 | 3 Sep 2026 | LDTKB-063 | Stage 5 kickoff: refund policy locked; revised same day from "any reason, no window" to Telegram's own baseline standard (refund only for genuine delivery failure, no separate time cutoff) after reviewing Telegram's requirements and market practice | Joule |
 | 3 Sep 2026 | LDTKB-064 | Stage 5 payment copy confirmed verbatim (invoice, payment confirmation, /paysupport prompt stating the LDTKB-063 refund standard, /paysupport capture confirmation, refund-issued message) | Joule |
+| 3 Sep 2026 | LDTKB-065 | Day 8 paywall gate locked: mechanism (paid_course_start_date anchor, TESTING_EXTENDED_WINDOW retired) and check-in copy confirmed verbatim, extending LDTKB-016 | Joule |
