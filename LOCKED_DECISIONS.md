@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 6.2  
+**Register version:** 6.3  
 **Last updated:** 3 September 2026  
 **Authority:** Joule
 
@@ -753,6 +753,16 @@ No new vocabulary word or audio recording — this stays entirely within Day 8's
 **Reference:** `src/lib/curriculum/lessonExplanations.ts`, `LESSON_EXPLANATIONS[8]`.  
 **Locked by:** Joule's confirmation, 3 September 2026.
 
+## LDTKB-067 — Welcome message: community-channel attribution corrected (no mascot mention)
+
+**Status:** Locked  
+**Decision:** Revises LDTKB-054's community-channel sentence in `WELCOME_MESSAGE`. That version implied the mascot "Chaa-yen" personally delivers the community's practice exercises ("Every Saturday morning, Chaa-yen brings you..."). Corrected: Chaa-yen is only the group's mascot, not the content deliverer; Joule Kasima (the course's creator) is who actually posts, as group admin; and the cadence changes from a fixed weekly day ("Every Saturday morning") to an irregular "every few days." Per Joule's explicit instruction, this revision drops any mention of the mascot entirely, rather than keeping a mascot mention alongside the corrected attribution. New sentence, replacing the old one exactly in place, no other part of `WELCOME_MESSAGE` touched:
+> "And if you'd like to put your Thai into practice, join our Thai Talk: Jot It Down community. Every few days, Joule Kasima — the course's creator — shares a new little exercise to practise everyday Thai, improve your sentences, and grow together with others."  
+
+(The live message keeps `<b>Thai Talk: Jot It Down</b>` in bold, matching the surrounding HTML formatting — the plain text above is for readability in this entry only.)  
+**Reference:** `src/lib/onboarding/content.ts`'s `WELCOME_MESSAGE`; canonical source `onboarding/welcome-message.md` (byte-for-byte parity enforced by `tests/onboarding.test.ts`).  
+**Locked by:** Joule's confirmation, 3 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -817,3 +827,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 3 Sep 2026 | LDTKB-064 | Stage 5 payment copy confirmed verbatim (invoice, payment confirmation, /paysupport prompt stating the LDTKB-063 refund standard, /paysupport capture confirmation, refund-issued message) | Joule |
 | 3 Sep 2026 | LDTKB-065 | Day 8 paywall gate locked: mechanism (paid_course_start_date anchor, TESTING_EXTENDED_WINDOW retired) and check-in copy confirmed verbatim, extending LDTKB-016 | Joule |
 | 3 Sep 2026 | LDTKB-066 | Day 8 explanation expanded to all four words with the dâi-loei politeness pattern, confirmed verbatim; deliberately not connected to Day 7's เลย (different mechanism); no new vocabulary word or audio | Joule |
+| 3 Sep 2026 | LDTKB-067 | Welcome message's community-channel sentence corrected: Chaa-yen mascot mention removed entirely, Joule Kasima credited as the actual poster, cadence changed from weekly Saturday to "every few days" | Joule |
