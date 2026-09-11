@@ -1,6 +1,6 @@
 # Thai Talk Breaks — Locked Decisions
 
-**Register version:** 6.1  
+**Register version:** 6.2  
 **Last updated:** 3 September 2026  
 **Authority:** Joule
 
@@ -689,6 +689,70 @@ The moment payment succeeds, Day 8 delivers — instantly if they're already pas
 **Reference:** `src/lib/delivery/duePaidLearners.ts`, `src/lib/onboarding/handleUpdate.ts`'s `successful_payment`/`/refund` handlers, `supabase/migrations/20260909000000_paid_course_gating.sql`.  
 **Locked by:** Joule's confirmation, 3 September 2026.
 
+## LDTKB-066 — Day 8 explanation expanded: dâi-loei politeness pattern (all four words)
+
+**Status:** Locked  
+**Decision:** Day 8's explanation section (`LESSON_EXPLANATIONS[8]`) is expanded from its single existing example (จอดตรงนี้ครับ/ค่ะ) to show all four of Day 8's words combined with ได้เลย (dâi-loei) — a fused unit, not a wrap-around pattern like Day 7's เลย. Confirmed final text:
+
+> 🧩 How it works
+>
+> Add dâi-loei right after a direction word, and it turns a bare instruction into a clear, confident, polite request — the way you'd speak to a driver when you want them to know exactly what you mean, no hesitation.
+>
+> 🌱 In a real conversation
+>
+> Male
+> dtrong bpai dâi-loei kráp
+> ตรงไปได้เลยครับ
+>
+> Female
+> dtrong bpai dâi-loei kâ
+> ตรงไปได้เลยค่ะ
+>
+> → Straight ahead, please.
+>
+> Male
+> líeow sái dâi-loei kráp
+> เลี้ยวซ้ายได้เลยครับ
+>
+> Female
+> líeow sái dâi-loei kâ
+> เลี้ยวซ้ายได้เลยค่ะ
+>
+> → Turn left, please.
+>
+> Male
+> líeow khwǎa dâi-loei kráp
+> เลี้ยวขวาได้เลยครับ
+>
+> Female
+> líeow khwǎa dâi-loei kâ
+> เลี้ยวขวาได้เลยค่ะ
+>
+> → Turn right, please.
+>
+> Male
+> jòrt dtrong-níi dâi-loei kráp
+> จอดตรงนี้ได้เลยครับ
+>
+> Female
+> jòrt dtrong-níi dâi-loei kâ
+> จอดตรงนี้ได้เลยค่ะ
+>
+> → Stop here, please.
+>
+> 💡 Feel the difference
+>
+> dtrong bpai
+> → straight ahead (just the direction, plain)
+>
+> dtrong bpai dâi-loei
+> → straight ahead, please — said with confidence, so there's no doubt what you want
+
+No new vocabulary word or audio recording — this stays entirely within Day 8's existing explanation text, not its word list, and not the word-set's audio.  
+**Boundary:** Deliberately not connected back to Day 7's เลย ("mâi kâo-jai loei" — an intensifier, "not... at all"). Confirmed with Joule that ได้เลย here is a fused expression (confident, polite immediacy), a genuinely different mechanism from Day 7's standalone เลย, even though it's visually the same word — so no comparison or cross-reference between the two lessons is made in either day's content.  
+**Reference:** `src/lib/curriculum/lessonExplanations.ts`, `LESSON_EXPLANATIONS[8]`.  
+**Locked by:** Joule's confirmation, 3 September 2026.
+
 ## Future ideas — not decisions, not scheduled
 
 These are not locked decisions, not open questions blocking current work, and not committed to any stage. They are noted here only so they aren't lost by the time the pilot is behind us.
@@ -752,3 +816,4 @@ These are not locked decisions, not open questions blocking current work, and no
 | 3 Sep 2026 | LDTKB-063 | Stage 5 kickoff: refund policy locked; revised same day from "any reason, no window" to Telegram's own baseline standard (refund only for genuine delivery failure, no separate time cutoff) after reviewing Telegram's requirements and market practice | Joule |
 | 3 Sep 2026 | LDTKB-064 | Stage 5 payment copy confirmed verbatim (invoice, payment confirmation, /paysupport prompt stating the LDTKB-063 refund standard, /paysupport capture confirmation, refund-issued message) | Joule |
 | 3 Sep 2026 | LDTKB-065 | Day 8 paywall gate locked: mechanism (paid_course_start_date anchor, TESTING_EXTENDED_WINDOW retired) and check-in copy confirmed verbatim, extending LDTKB-016 | Joule |
+| 3 Sep 2026 | LDTKB-066 | Day 8 explanation expanded to all four words with the dâi-loei politeness pattern, confirmed verbatim; deliberately not connected to Day 7's เลย (different mechanism); no new vocabulary word or audio | Joule |
