@@ -256,19 +256,57 @@ Here loei adds emphasis.
 ```
 🧩 How it works
 
-These are practical direction chunks.
+Add dâi-loei right after a direction word, and it turns a bare instruction into a clear, confident, polite request — the way you'd speak to a driver when you want them to know exactly what you mean, no hesitation.
 
 🌱 In a real conversation
 
 Male
-jòrt dtrong-níi kráp
-จอดตรงนี้ครับ
+dtrong bpai dâi-loei kráp
+ตรงไปได้เลยครับ
 
 Female
-jòrt dtrong-níi kâ
-จอดตรงนี้ค่ะ
+dtrong bpai dâi-loei kâ
+ตรงไปได้เลยค่ะ
+
+→ Straight ahead, please.
+
+Male
+líeow sái dâi-loei kráp
+เลี้ยวซ้ายได้เลยครับ
+
+Female
+líeow sái dâi-loei kâ
+เลี้ยวซ้ายได้เลยค่ะ
+
+→ Turn left, please.
+
+Male
+líeow khwǎa dâi-loei kráp
+เลี้ยวขวาได้เลยครับ
+
+Female
+líeow khwǎa dâi-loei kâ
+เลี้ยวขวาได้เลยค่ะ
+
+→ Turn right, please.
+
+Male
+jòrt dtrong-níi dâi-loei kráp
+จอดตรงนี้ได้เลยครับ
+
+Female
+jòrt dtrong-níi dâi-loei kâ
+จอดตรงนี้ได้เลยค่ะ
 
 → Stop here, please.
+
+💡 Feel the difference
+
+dtrong bpai
+→ straight ahead (just the direction, plain)
+
+dtrong bpai dâi-loei
+→ straight ahead, please — said with confidence, so there's no doubt what you want
 ```
 
 ## Day 9
