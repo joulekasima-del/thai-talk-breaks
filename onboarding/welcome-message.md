@@ -7,6 +7,7 @@
 **Formatting note (24 August 2026, LDTKB-053/054):** this is the only message in the entire product sent with Telegram's HTML formatting enabled — a real bug was found where the original asterisks (intended as Markdown bold) were never actually rendered, since no `parse_mode` was ever set anywhere in the codebase. LDTKB-054 then further revised the message to use multiple, sometimes-nested `<b>`/`<i>` tags. Confirmed correct against Telegram's actual supported HTML tag set (`<b>`, `<i>`, not `<italic>`; every tag needs a proper `</tag>` close, not a repeated opening tag) before locking. Every other message in the product remains plain text, unaffected.
 **Content note (LDTKB-054):** the community-channel section was substantially revised — new name ("Thai Talk: Jot It Down," replacing "Thai Talk Newsletter"), new link, a named host ("Chaa-yen"), and reframed from a passive newsletter to a weekly Saturday practice exercise. Also fixed a stale reference to the removed testing activity ("one quick activity to help it stick" → "explanation for daily use").
 **Ka-tic note (LDTKB-055):** this message's second "ka" (in the /oops line) has been removed — only the very first "Sawasdee ka!" remains, as the sole surviving instance of this tic anywhere in the product.
+**Content note (LDTKB-067):** the community-channel sentence was corrected — the mascot ("Chaa-yen") was wrongly credited as personally delivering the practice content and has been removed entirely, replaced with the correct attribution to Joule Kasima, the course's creator. Cadence also corrected from "Every Saturday morning" to "every few days."
 
 ---
 
@@ -34,7 +35,7 @@ No Thai script required. We'll focus first on Thai you can understand, say, and 
 <i>If something ever seems confusing or doesn't work properly, just type <b>/oops</b> anytime. We'll take a look.</i>
 
 
-And if you'd like to put your Thai into practice, join our <b>Thai Talk: Jot It Down</b> community. Every Saturday morning, <i>Chaa-yen</i> brings you a new little exercise to practise everyday Thai, improve your sentences, and learn together with the community.
+And if you'd like to put your Thai into practice, join our <b>Thai Talk: Jot It Down</b> community. Every few days, Joule Kasima — the course's creator — shares a new little exercise to practise everyday Thai, improve your sentences, and grow together with others.
 👉 https://t.me/thaitalk_jot_it_down
 
 That's it. No preparation needed.

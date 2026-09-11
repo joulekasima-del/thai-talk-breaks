@@ -38,7 +38,7 @@ export const WELCOME_MESSAGE =
   "<i>If something ever seems confusing or doesn't work properly, just type <b>/oops</b> anytime. We'll take a look.</i>\n" +
   "\n" +
   "\n" +
-  "And if you'd like to put your Thai into practice, join our <b>Thai Talk: Jot It Down</b> community. Every Saturday morning, <i>Chaa-yen</i> brings you a new little exercise to practise everyday Thai, improve your sentences, and learn together with the community.\n" +
+  "And if you'd like to put your Thai into practice, join our <b>Thai Talk: Jot It Down</b> community. Every few days, Joule Kasima — the course's creator — shares a new little exercise to practise everyday Thai, improve your sentences, and grow together with others.\n" +
   "👉 https://t.me/thaitalk_jot_it_down\n" +
   "\n" +
   "That's it. No preparation needed.\n" +
