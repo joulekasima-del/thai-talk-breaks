@@ -2,7 +2,7 @@
 // Every report gets its own row — unlike day29QuestStore.ts's single-row-
 // per-learner guard, there is no "already exists" check here at all.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryOneOrThrow, type Query } from "@/lib/db";
 
 export interface OopsReport {
   id: string;
@@ -15,16 +15,14 @@ export interface OopsReportsStore {
   create(learnerId: string, reportText: string): Promise<OopsReport>;
 }
 
-export function supabaseOopsReportsStore(client: SupabaseClient): OopsReportsStore {
+export function pgOopsReportsStore(query: Query): OopsReportsStore {
   return {
     async create(learnerId, reportText) {
-      const { data, error } = await client
-        .from("oops_reports")
-        .insert({ learner_id: learnerId, report_text: reportText })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as OopsReport;
+      return queryOneOrThrow<OopsReport>(
+        query,
+        "INSERT INTO oops_reports (learner_id, report_text) VALUES ($1, $2) RETURNING to_jsonb(oops_reports) AS r",
+        [learnerId, reportText],
+      );
     },
   };
 }

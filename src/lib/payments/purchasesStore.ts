@@ -2,7 +2,7 @@
 // Same shape as oopsReportsStore.ts: one row per event (here, a successful
 // payment), plus lookups the /refund and /paysupport flows need.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryOne, queryOneOrThrow, type Query } from "@/lib/db";
 
 export interface Purchase {
   id: string;
@@ -42,69 +42,53 @@ export interface PurchasesStore {
   markRefunded(id: string, refundedAt: string): Promise<Purchase>;
 }
 
-export function supabasePurchasesStore(client: SupabaseClient): PurchasesStore {
+export function pgPurchasesStore(query: Query): PurchasesStore {
   return {
     async create(input) {
-      const { data, error } = await client
-        .from("purchases")
-        .insert({
-          learner_id: input.learnerId,
-          telegram_payment_charge_id: input.telegramPaymentChargeId,
-          provider_payment_charge_id: input.providerPaymentChargeId,
-          currency: input.currency,
-          total_amount: input.totalAmount,
-          invoice_payload: input.invoicePayload,
-        })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Purchase;
+      return queryOneOrThrow<Purchase>(
+        query,
+        "INSERT INTO purchases (learner_id, telegram_payment_charge_id, provider_payment_charge_id, currency, total_amount, invoice_payload) VALUES ($1, $2, $3, $4, $5, $6) RETURNING to_jsonb(purchases) AS r",
+        [
+          input.learnerId,
+          input.telegramPaymentChargeId,
+          input.providerPaymentChargeId,
+          input.currency,
+          input.totalAmount,
+          input.invoicePayload,
+        ],
+      );
     },
 
     async findByChargeId(telegramPaymentChargeId) {
-      const { data, error } = await client
-        .from("purchases")
-        .select("*")
-        .eq("telegram_payment_charge_id", telegramPaymentChargeId)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as Purchase | null) ?? null;
+      return queryOne<Purchase>(
+        query,
+        "SELECT to_jsonb(p) AS r FROM purchases p WHERE telegram_payment_charge_id = $1",
+        [telegramPaymentChargeId],
+      );
     },
 
     async findMostRecentByLearner(learnerId) {
-      const { data, error } = await client
-        .from("purchases")
-        .select("*")
-        .eq("learner_id", learnerId)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as Purchase | null) ?? null;
+      return queryOne<Purchase>(
+        query,
+        "SELECT to_jsonb(p) AS r FROM purchases p WHERE learner_id = $1 ORDER BY created_at DESC LIMIT 1",
+        [learnerId],
+      );
     },
 
     async findPaidByLearner(learnerId) {
-      const { data, error } = await client
-        .from("purchases")
-        .select("*")
-        .eq("learner_id", learnerId)
-        .eq("status", "paid")
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as Purchase | null) ?? null;
+      return queryOne<Purchase>(
+        query,
+        "SELECT to_jsonb(p) AS r FROM purchases p WHERE learner_id = $1 AND status = 'paid' ORDER BY created_at DESC LIMIT 1",
+        [learnerId],
+      );
     },
 
     async markRefunded(id, refundedAt) {
-      const { data, error } = await client
-        .from("purchases")
-        .update({ status: "refunded", refunded_at: refundedAt })
-        .eq("id", id)
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Purchase;
+      return queryOneOrThrow<Purchase>(
+        query,
+        "UPDATE purchases SET status = 'refunded', refunded_at = $2 WHERE id = $1 RETURNING to_jsonb(purchases) AS r",
+        [id, refundedAt],
+      );
     },
   };
 }

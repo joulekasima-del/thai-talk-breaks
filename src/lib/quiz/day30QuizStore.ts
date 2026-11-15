@@ -2,7 +2,7 @@
 // Row existence is the guard against re-starting the quiz on a later cron
 // tick — same spirit as lesson_deliveries' unique constraint for Lessons 1-7.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryOne, queryOneOrThrow, type Query } from "@/lib/db";
 
 export interface Day30QuizProgress {
   id: string;
@@ -20,66 +20,48 @@ export interface Day30QuizStore {
   complete(id: string, completedAt: string): Promise<Day30QuizProgress>;
 }
 
-export function supabaseDay30QuizStore(client: SupabaseClient): Day30QuizStore {
+export function pgDay30QuizStore(query: Query): Day30QuizStore {
   return {
     async findByLearner(learnerId) {
-      const { data, error } = await client
-        .from("day30_quiz_progress")
-        .select("*")
-        .eq("learner_id", learnerId)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as Day30QuizProgress | null) ?? null;
+      return queryOne<Day30QuizProgress>(
+        query,
+        "SELECT to_jsonb(q) AS r FROM day30_quiz_progress q WHERE learner_id = $1",
+        [learnerId],
+      );
     },
 
     async start(learnerId) {
-      const { data, error } = await client
-        .from("day30_quiz_progress")
-        .insert({ learner_id: learnerId })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Day30QuizProgress;
+      return queryOneOrThrow<Day30QuizProgress>(
+        query,
+        "INSERT INTO day30_quiz_progress (learner_id) VALUES ($1) RETURNING to_jsonb(day30_quiz_progress) AS r",
+        [learnerId],
+      );
     },
 
     async recordAnswer(id, correct) {
-      const { data: current, error: fetchError } = await client
-        .from("day30_quiz_progress")
-        .select("correct_count")
-        .eq("id", id)
-        .single();
-      if (fetchError) throw fetchError;
-
-      const { data, error } = await client
-        .from("day30_quiz_progress")
-        .update({ correct_count: (current as { correct_count: number }).correct_count + (correct ? 1 : 0) })
-        .eq("id", id)
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Day30QuizProgress;
+      // One atomic statement instead of read-then-write, so two answers
+      // arriving together can't lose an increment.
+      return queryOneOrThrow<Day30QuizProgress>(
+        query,
+        "UPDATE day30_quiz_progress SET correct_count = correct_count + $2 WHERE id = $1 RETURNING to_jsonb(day30_quiz_progress) AS r",
+        [id, correct ? 1 : 0],
+      );
     },
 
     async advance(id, nextQuestionIndex) {
-      const { data, error } = await client
-        .from("day30_quiz_progress")
-        .update({ current_question_index: nextQuestionIndex })
-        .eq("id", id)
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Day30QuizProgress;
+      return queryOneOrThrow<Day30QuizProgress>(
+        query,
+        "UPDATE day30_quiz_progress SET current_question_index = $2 WHERE id = $1 RETURNING to_jsonb(day30_quiz_progress) AS r",
+        [id, nextQuestionIndex],
+      );
     },
 
     async complete(id, completedAt) {
-      const { data, error } = await client
-        .from("day30_quiz_progress")
-        .update({ completed_at: completedAt })
-        .eq("id", id)
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Day30QuizProgress;
+      return queryOneOrThrow<Day30QuizProgress>(
+        query,
+        "UPDATE day30_quiz_progress SET completed_at = $2 WHERE id = $1 RETURNING to_jsonb(day30_quiz_progress) AS r",
+        [id, completedAt],
+      );
     },
   };
 }

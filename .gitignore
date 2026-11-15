@@ -38,3 +38,12 @@ next-env.d.ts
 # curriculum/day30-audio/ (scripts/syncDay30QuizAssets.mjs), same
 # derived-build-artifact reasoning as /public/day29/ above.
 /public/day30-audio/
+
+# Neon database credentials (secret)
+.env.neon
+
+# Cloudflare Worker build output and local config
+/out
+.wrangler/
+.dev.vars
+.env.cloudflare

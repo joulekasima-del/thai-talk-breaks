@@ -1,7 +1,7 @@
 // Access to day29_quest_progress (supabase/migrations/20260824000000_day29_quest_progress.sql).
 // Row existence is the entire guard — see that migration's comment.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryOne, queryOneOrThrow, type Query } from "@/lib/db";
 
 export interface Day29QuestProgress {
   id: string;
@@ -14,26 +14,22 @@ export interface Day29QuestStore {
   markAnsweredCorrectly(learnerId: string, answeredAt: string): Promise<Day29QuestProgress>;
 }
 
-export function supabaseDay29QuestStore(client: SupabaseClient): Day29QuestStore {
+export function pgDay29QuestStore(query: Query): Day29QuestStore {
   return {
     async findByLearner(learnerId) {
-      const { data, error } = await client
-        .from("day29_quest_progress")
-        .select("*")
-        .eq("learner_id", learnerId)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as Day29QuestProgress | null) ?? null;
+      return queryOne<Day29QuestProgress>(
+        query,
+        "SELECT to_jsonb(q) AS r FROM day29_quest_progress q WHERE learner_id = $1",
+        [learnerId],
+      );
     },
 
     async markAnsweredCorrectly(learnerId, answeredAt) {
-      const { data, error } = await client
-        .from("day29_quest_progress")
-        .upsert({ learner_id: learnerId, answered_correctly_at: answeredAt }, { onConflict: "learner_id" })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Day29QuestProgress;
+      return queryOneOrThrow<Day29QuestProgress>(
+        query,
+        "INSERT INTO day29_quest_progress (learner_id, answered_correctly_at) VALUES ($1, $2) ON CONFLICT (learner_id) DO UPDATE SET answered_correctly_at = EXCLUDED.answered_correctly_at RETURNING to_jsonb(day29_quest_progress) AS r",
+        [learnerId, answeredAt],
+      );
     },
   };
 }

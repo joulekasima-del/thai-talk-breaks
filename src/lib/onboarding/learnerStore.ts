@@ -1,10 +1,10 @@
 // Learner persistence, abstracted behind an interface so the onboarding
 // logic (handleUpdate.ts) can be unit-tested against an in-memory fake
-// without a real Supabase connection. supabaseLearnerStore() below is the
+// without a real database connection. pgLearnerStore() below is the
 // only implementation that talks to the actual `learners` table defined in
 // supabase/migrations/20260820000000_initial_schema.sql.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryMany, queryOne, queryOneOrThrow, type Query } from "@/lib/db";
 
 export type GenderBranch = "male" | "female";
 export type SchedulePeriod = "morning" | "afternoon" | "evening";
@@ -92,49 +92,58 @@ export interface LearnerStore {
   listOnboarded(): Promise<Learner[]>;
 }
 
-export function supabaseLearnerStore(client: SupabaseClient): LearnerStore {
+const LEARNER_PATCH_COLUMNS = [
+  "gender_branch",
+  "schedule_period",
+  "schedule_time",
+  "onboarding_step",
+  "onboarding_completed_at",
+  "pilot_start_date",
+  "paid_course_start_date",
+  "paywall_prompt_sent_at",
+  "awaiting_oops_report_since",
+  "awaiting_paysupport_request_since",
+] as const;
+
+export function pgLearnerStore(query: Query): LearnerStore {
   return {
     async findByTelegramId(telegramUserId) {
-      const { data, error } = await client
-        .from("learners")
-        .select("*")
-        .eq("telegram_user_id", telegramUserId)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as Learner | null) ?? null;
+      return queryOne<Learner>(query, "SELECT to_jsonb(l) AS r FROM learners l WHERE telegram_user_id = $1", [
+        telegramUserId,
+      ]);
     },
 
     async findById(id) {
-      const { data, error } = await client.from("learners").select("*").eq("id", id).maybeSingle();
-      if (error) throw error;
-      return (data as Learner | null) ?? null;
+      return queryOne<Learner>(query, "SELECT to_jsonb(l) AS r FROM learners l WHERE id = $1", [id]);
     },
 
     async create(telegramUserId) {
-      const { data, error } = await client
-        .from("learners")
-        .insert({ telegram_user_id: telegramUserId })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Learner;
+      return queryOneOrThrow<Learner>(
+        query,
+        "INSERT INTO learners (telegram_user_id) VALUES ($1) RETURNING to_jsonb(learners) AS r",
+        [telegramUserId],
+      );
     },
 
     async update(id, patch) {
-      const { data, error } = await client
-        .from("learners")
-        .update(patch)
-        .eq("id", id)
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as Learner;
+      // Same as the old PostgREST update: keys the patch doesn't set (or sets to
+      // undefined) are left alone; only whitelisted columns can be written.
+      const entries = LEARNER_PATCH_COLUMNS.filter((column) => patch[column] !== undefined).map(
+        (column) => [column, patch[column]] as const,
+      );
+      if (entries.length === 0) {
+        return queryOneOrThrow<Learner>(query, "SELECT to_jsonb(l) AS r FROM learners l WHERE id = $1", [id]);
+      }
+      const assignments = entries.map(([column], index) => `${column} = $${index + 2}`).join(", ");
+      return queryOneOrThrow<Learner>(
+        query,
+        `UPDATE learners SET ${assignments} WHERE id = $1 RETURNING to_jsonb(learners) AS r`,
+        [id, ...entries.map(([, value]) => value)],
+      );
     },
 
     async listOnboarded() {
-      const { data, error } = await client.from("learners").select("*").eq("onboarding_step", "complete");
-      if (error) throw error;
-      return (data as Learner[]) ?? [];
+      return queryMany<Learner>(query, "SELECT to_jsonb(l) AS r FROM learners l WHERE onboarding_step = 'complete'");
     },
   };
 }

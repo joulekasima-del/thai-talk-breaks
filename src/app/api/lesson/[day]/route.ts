@@ -1,6 +1,6 @@
-import { createSupabaseServerClient } from "@/lib/supabase";
-import { supabaseLearnerStore } from "@/lib/onboarding/learnerStore";
-import { supabaseDeliveryStore } from "@/lib/delivery/deliveryStore";
+import { createDbQuery } from "@/lib/db";
+import { pgLearnerStore } from "@/lib/onboarding/learnerStore";
+import { pgDeliveryStore } from "@/lib/delivery/deliveryStore";
 import { validateTelegramInitData } from "@/lib/day29/telegramInitData";
 import { getLessonAudioContent } from "@/lib/lessonAudio/lessonAudioApi";
 
@@ -25,10 +25,10 @@ export async function GET(request: Request, context: { params: Promise<{ day: st
   const validated = validateTelegramInitData(searchParams.get("initData") ?? "", botToken);
   if (!validated) return new Response("Unauthorized", { status: 401 });
 
-  const supabase = createSupabaseServerClient();
+  const db = createDbQuery();
   const result = await getLessonAudioContent(validated.telegramUserId, day, {
-    learnerStore: supabaseLearnerStore(supabase),
-    deliveryStore: supabaseDeliveryStore(supabase),
+    learnerStore: pgLearnerStore(db),
+    deliveryStore: pgDeliveryStore(db),
   });
 
   if (!result.ok) {

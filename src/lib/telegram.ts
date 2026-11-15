@@ -13,9 +13,30 @@ export type InlineKeyboardButton =
 export type InlineKeyboard = InlineKeyboardButton[][];
 
 export interface MediaFile {
-  buffer: Buffer;
+  buffer: Uint8Array; // Buffer is a Uint8Array, so Node callers keep working
   filename: string;
   contentType: string;
+  /**
+   * Path relative to curriculum/ (e.g. "week2-images/week2_day09_female.png").
+   * Set by mediaFiles.ts; it is the key for reusing Telegram's file_id, so a
+   * file without a path is always uploaded.
+   */
+  path?: string;
+}
+
+/**
+ * Remembers Telegram's file_id per media path for one bot, so the same picture
+ * is sent by id instead of being uploaded again (much less CPU per delivery on
+ * Cloudflare's free plan). Backed by the telegram_file_ids table
+ * (telegramFileIdStore.ts). Failures here never block a delivery.
+ */
+export interface FileIdCache {
+  get(mediaPath: string): Promise<string | null>;
+  put(mediaPath: string, fileId: string): Promise<void>;
+}
+
+export interface TelegramClientOptions {
+  fileIdCache?: FileIdCache;
 }
 
 // Telegram's sendAudio has real `title`/`performer` fields specifically so a
@@ -78,9 +99,11 @@ export interface TelegramClient {
 
 class HttpTelegramClient implements TelegramClient {
   private readonly baseUrl: string;
+  private readonly fileIdCache?: FileIdCache;
 
-  constructor(botToken: string) {
+  constructor(botToken: string, options: TelegramClientOptions = {}) {
     this.baseUrl = `https://api.telegram.org/bot${botToken}`;
+    this.fileIdCache = options.fileIdCache;
   }
 
   async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard, parseMode?: "HTML"): Promise<void> {
@@ -113,7 +136,36 @@ class HttpTelegramClient implements TelegramClient {
   }
 
   async sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void> {
-    await this.sendMultipart("sendPhoto", "photo", chatId, photo, caption);
+    const cache = photo.path ? this.fileIdCache : undefined;
+
+    // 1. Known picture: send Telegram's file_id, no upload.
+    if (cache && photo.path) {
+      const fileId = await cache.get(photo.path).catch(() => null);
+      if (fileId) {
+        const body: Record<string, unknown> = { chat_id: chatId, photo: fileId };
+        if (caption) body.caption = caption;
+        const res = await fetch(`${this.baseUrl}/sendPhoto`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        if (res.ok) return;
+        // 400 = Telegram no longer accepts this id (e.g. it belongs to another
+        // bot): fall through and upload, which replaces the cached id. Any
+        // other failure is a real error, same as the upload path.
+        if (res.status !== 400) {
+          throw new Error(`Telegram sendPhoto failed: ${res.status} ${await res.text()}`);
+        }
+      }
+    }
+
+    // 2. Upload the bytes, then remember the file_id Telegram gives back.
+    const message = await this.sendMultipart("sendPhoto", "photo", chatId, photo, caption);
+    if (cache && photo.path) {
+      const sizes = (message as { photo?: { file_id?: string }[] } | null)?.photo;
+      const fileId = sizes?.[sizes.length - 1]?.file_id;
+      if (fileId) await cache.put(photo.path, fileId).catch(() => undefined);
+    }
   }
 
   async sendAudio(chatId: number, audio: MediaFile, options?: SendAudioOptions): Promise<void> {
@@ -180,7 +232,7 @@ class HttpTelegramClient implements TelegramClient {
     file: MediaFile,
     caption?: string,
     extraFields?: Record<string, string>,
-  ): Promise<void> {
+  ): Promise<unknown> {
     const form = new FormData();
     form.set("chat_id", String(chatId));
     if (caption) form.set("caption", caption);
@@ -189,17 +241,20 @@ class HttpTelegramClient implements TelegramClient {
         form.set(key, value);
       }
     }
-    form.set(field, new Blob([new Uint8Array(file.buffer)], { type: file.contentType }), file.filename);
+    form.set(field, new Blob([file.buffer as BlobPart], { type: file.contentType }), file.filename);
 
     const res = await fetch(`${this.baseUrl}/${method}`, { method: "POST", body: form });
     if (!res.ok) {
       throw new Error(`Telegram ${method} failed: ${res.status} ${await res.text()}`);
     }
+    // The sent Message (Telegram wraps it as { ok, result }); null if the body isn't JSON.
+    const json = (await res.json().catch(() => null)) as { result?: unknown } | null;
+    return json?.result ?? null;
   }
 }
 
-export function createTelegramClient(botToken: string): TelegramClient {
-  return new HttpTelegramClient(botToken);
+export function createTelegramClient(botToken: string, options: TelegramClientOptions = {}): TelegramClient {
+  return new HttpTelegramClient(botToken, options);
 }
 
 // Minimal subset of the Telegram Update shape this webhook actually reads.

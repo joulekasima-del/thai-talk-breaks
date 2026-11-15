@@ -7,23 +7,29 @@
     "dev": "next dev",
     "prebuild": "node scripts/syncDay29Assets.mjs && node scripts/syncLessonAssets.mjs && node scripts/syncDay30QuizAssets.mjs",
     "build": "next build",
+    "build:worker": "node scripts/buildWorkerAssets.mjs",
+    "dev:worker": "npm run build:worker && wrangler dev",
+    "deploy:worker": "npm run build:worker && wrangler deploy",
     "start": "next start",
     "lint": "eslint",
-    "test": "tsx --test tests/onboarding.test.ts tests/delivery.test.ts tests/checkpoint4.test.ts tests/checkpoint5.test.ts tests/schema.test.ts tests/day29.test.ts tests/webhookDedup.test.ts tests/oops.test.ts tests/lessonExplanations.test.ts tests/telegramClient.test.ts tests/lessonAudio.test.ts tests/deliverLessonWebAppPrototype.test.ts tests/day30QuizApi.test.ts tests/payments.test.ts tests/duePaidLearners.test.ts tests/paywall.test.ts"
+    "test": "tsx --test tests/onboarding.test.ts tests/delivery.test.ts tests/checkpoint4.test.ts tests/checkpoint5.test.ts tests/schema.test.ts tests/day29.test.ts tests/webhookDedup.test.ts tests/oops.test.ts tests/lessonExplanations.test.ts tests/telegramClient.test.ts tests/lessonAudio.test.ts tests/deliverLessonWebAppPrototype.test.ts tests/day30QuizApi.test.ts tests/payments.test.ts tests/duePaidLearners.test.ts tests/paywall.test.ts tests/pgStores.test.ts tests/runDeliveryCron.test.ts tests/telegramFileIds.test.ts"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.112.3",
+    "@neondatabase/serverless": "^1.2.0",
+    "geist": "^1.9.2",
     "next": "16.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
+    "@electric-sql/pglite": "^0.5.16",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
     "tsx": "^4.23.12",
-    "typescript": "^5"
+    "typescript": "^5",
+    "wrangler": "^4.161.0"
   }
 }

@@ -2,7 +2,7 @@
 // Every request gets its own row — same "no already-exists check" shape as
 // oopsReportsStore.ts, not day29QuestStore.ts's single-row-per-learner guard.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryOneOrThrow, type Query } from "@/lib/db";
 
 export interface PaymentSupportRequest {
   id: string;
@@ -16,16 +16,14 @@ export interface PaymentSupportStore {
   create(learnerId: string, purchaseId: string | null, requestText: string): Promise<PaymentSupportRequest>;
 }
 
-export function supabasePaymentSupportStore(client: SupabaseClient): PaymentSupportStore {
+export function pgPaymentSupportStore(query: Query): PaymentSupportStore {
   return {
     async create(learnerId, purchaseId, requestText) {
-      const { data, error } = await client
-        .from("payment_support_requests")
-        .insert({ learner_id: learnerId, purchase_id: purchaseId, request_text: requestText })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as PaymentSupportRequest;
+      return queryOneOrThrow<PaymentSupportRequest>(
+        query,
+        "INSERT INTO payment_support_requests (learner_id, purchase_id, request_text) VALUES ($1, $2, $3) RETURNING to_jsonb(payment_support_requests) AS r",
+        [learnerId, purchaseId, requestText],
+      );
     },
   };
 }

@@ -4,7 +4,7 @@
 // attempted), markAudioSent() afterwards. Reuses the exact German Breaks
 // text-before-audio pattern documented in ARCHITECTURE.md — see report item 5.
 
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { queryMany, queryOne, queryOneOrThrow, type Query } from "@/lib/db";
 
 export interface DeliveryRecord {
   id: number;
@@ -29,72 +29,64 @@ export interface DeliveryStore {
   markActivityAnswered(deliveryId: number, correct: boolean, answeredAt: string): Promise<void>;
 }
 
-export function supabaseDeliveryStore(client: SupabaseClient): DeliveryStore {
+export function pgDeliveryStore(query: Query): DeliveryStore {
   return {
     async findExisting(learnerId, lessonNumber, deliveryDate) {
-      const { data, error } = await client
-        .from("lesson_deliveries")
-        .select("*")
-        .eq("learner_id", learnerId)
-        .eq("lesson_number", lessonNumber)
-        .eq("delivery_date", deliveryDate)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as DeliveryRecord | null) ?? null;
+      return queryOne<DeliveryRecord>(
+        query,
+        "SELECT to_jsonb(d) AS r FROM lesson_deliveries d WHERE learner_id = $1 AND lesson_number = $2 AND delivery_date = $3",
+        [learnerId, lessonNumber, deliveryDate],
+      );
     },
 
     async insertTextSent(learnerId, lessonNumber, deliveryDate, deliveredAt) {
-      const { data, error } = await client
-        .from("lesson_deliveries")
-        .insert({
-          learner_id: learnerId,
-          lesson_number: lessonNumber,
-          delivery_date: deliveryDate,
-          delivered_at: deliveredAt,
-        })
-        .select("*")
-        .single();
-      if (error) throw error;
-      return data as DeliveryRecord;
+      return queryOneOrThrow<DeliveryRecord>(
+        query,
+        "INSERT INTO lesson_deliveries (learner_id, lesson_number, delivery_date, delivered_at) VALUES ($1, $2, $3, $4) RETURNING to_jsonb(lesson_deliveries) AS r",
+        [learnerId, lessonNumber, deliveryDate, deliveredAt],
+      );
     },
 
     async markAudioSent(deliveryId, audioDeliveredAt) {
-      const { error } = await client
-        .from("lesson_deliveries")
-        .update({ audio_delivered_at: audioDeliveredAt })
-        .eq("id", deliveryId);
-      if (error) throw error;
+      await query("UPDATE lesson_deliveries SET audio_delivered_at = $2 WHERE id = $1", [deliveryId, audioDeliveredAt]);
     },
 
     async listDeliveredLessonNumbers(learnerId) {
-      const { data, error } = await client
-        .from("lesson_deliveries")
-        .select("lesson_number")
-        .eq("learner_id", learnerId);
-      if (error) throw error;
-      return (data as { lesson_number: number }[]).map((row) => row.lesson_number);
+      const rows = await queryMany<{ lesson_number: number }>(
+        query,
+        "SELECT jsonb_build_object('lesson_number', lesson_number) AS r FROM lesson_deliveries WHERE learner_id = $1",
+        [learnerId],
+      );
+      return rows.map((row) => row.lesson_number);
     },
 
     async findUnansweredActivity(learnerId, lessonNumber) {
-      const { data, error } = await client
-        .from("lesson_deliveries")
-        .select("*")
-        .eq("learner_id", learnerId)
-        .eq("lesson_number", lessonNumber)
-        .is("activity_answered_at", null)
-        .order("delivered_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      if (error) throw error;
-      return (data as DeliveryRecord | null) ?? null;
+      return queryOne<DeliveryRecord>(
+        query,
+        "SELECT to_jsonb(d) AS r FROM lesson_deliveries d WHERE learner_id = $1 AND lesson_number = $2 AND activity_answered_at IS NULL ORDER BY delivered_at DESC LIMIT 1",
+        [learnerId, lessonNumber],
+      );
     },
 
     async markActivityAnswered(deliveryId, correct, answeredAt) {
-      const { error } = await client
-        .from("lesson_deliveries")
-        .update({ activity_answered_at: answeredAt, activity_correct: correct })
-        .eq("id", deliveryId);
-      if (error) throw error;
+      await query("UPDATE lesson_deliveries SET activity_answered_at = $2, activity_correct = $3 WHERE id = $1", [
+        deliveryId,
+        answeredAt,
+        correct,
+      ]);
     },
   };
+}
+
+/**
+ * One query: "learner_id:lesson_number" for every delivery row dated `deliveryDate`.
+ * Lets the cron run skip learners already served today without a query each.
+ */
+export async function listDeliveryKeysOn(query: Query, deliveryDate: string): Promise<Set<string>> {
+  const rows = await queryMany<{ k: string }>(
+    query,
+    "SELECT jsonb_build_object('k', learner_id::text || ':' || lesson_number::text) AS r FROM lesson_deliveries WHERE delivery_date = $1",
+    [deliveryDate],
+  );
+  return new Set(rows.map((row) => row.k));
 }

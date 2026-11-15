@@ -15,20 +15,36 @@
 // its (currently unwired) cross-lesson-distractor logic. Image loaders are
 // unaffected — every lesson kind still sends its photo natively.
 //
-// Files are read directly off the deployment's filesystem (they ship inside
-// the repo checkout, which Vercel's Node.js functions can read) and uploaded
-// to Telegram as multipart bytes — no separate public URL/CDN needed. See
-// SCHEDULER.md for why.
+// Files are read through a pluggable MediaReader and uploaded to Telegram as
+// multipart bytes — no separate public URL/CDN needed. See SCHEDULER.md for
+// why. Paths handed to the reader are relative to the curriculum/ folder
+// (e.g. "pilot/images/lesson01_male.png", "week2-images/week2_day09_male.png",
+// "day30-audio/<file>.mp3"). On Cloudflare Workers there is no filesystem, so
+// the Worker entry installs a reader backed by the static-assets binding
+// (worker/index.ts, files synced by scripts/syncWorkerMedia.mjs); everywhere
+// else (local scripts, tests) the default reader below reads the repo's
+// curriculum/ folder from disk.
 
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { isWordSetDay } from "@/lib/curriculum/content";
 import type { GenderBranch } from "@/lib/curriculum/content";
 import type { MediaFile } from "@/lib/telegram";
 
-const CURRICULUM_ROOT = path.join(process.cwd(), "curriculum", "pilot");
-const DAY30_AUDIO_ROOT = path.join(process.cwd(), "curriculum", "day30-audio");
-const WEEKS234_ROOT = path.join(process.cwd(), "curriculum");
+export type MediaReader = (relativePath: string) => Promise<Uint8Array>;
+
+const diskReader: MediaReader = async (relativePath) => {
+  // Imported lazily so a Workers bundle never needs the filesystem unless this
+  // default reader is actually used.
+  const { readFile } = await import("node:fs/promises");
+  const path = await import("node:path");
+  return readFile(path.join(process.cwd(), "curriculum", relativePath));
+};
+
+let mediaReader: MediaReader = diskReader;
+
+/** Swap where media bytes come from (the Worker installs an assets-backed reader). */
+export function setMediaReader(reader: MediaReader): void {
+  mediaReader = reader;
+}
 
 function lessonCode(lessonNumber: number): string {
   return String(lessonNumber).padStart(2, "0");
@@ -39,8 +55,9 @@ async function readMediaFile(
   filename: string,
   contentType: string,
 ): Promise<MediaFile> {
-  const buffer = await readFile(path.join(CURRICULUM_ROOT, subdir, filename));
-  return { buffer, filename, contentType };
+  const path = `pilot/${subdir}/${filename}`;
+  const buffer = await mediaReader(path);
+  return { buffer, filename, contentType, path };
 }
 
 const WEEKS234_PILOT_BOUNDARY = 7; // Days 1-7 = pilot (curriculum/pilot/); 8+ = Weeks 2-4
@@ -54,8 +71,9 @@ function weeks234Location(dayNumber: number): { weekFolder: string; filePrefix: 
 
 async function readWeeks234File(subdir: "audio" | "images", dayNumber: number, filename: string, contentType: string): Promise<MediaFile> {
   const { weekFolder } = weeks234Location(dayNumber);
-  const buffer = await readFile(path.join(WEEKS234_ROOT, `${weekFolder}-${subdir}`, filename));
-  return { buffer, filename, contentType };
+  const path = `${weekFolder}-${subdir}/${filename}`;
+  const buffer = await mediaReader(path);
+  return { buffer, filename, contentType, path };
 }
 
 /**
@@ -174,6 +192,7 @@ export async function loadRepresentativeClip(lessonNumber: number, gender: Gende
  * aren't read by this module.
  */
 export async function loadDay30Audio(filename: string): Promise<MediaFile> {
-  const buffer = await readFile(path.join(DAY30_AUDIO_ROOT, filename));
-  return { buffer, filename, contentType: "audio/mpeg" };
+  const path = `day30-audio/${filename}`;
+  const buffer = await mediaReader(path);
+  return { buffer, filename, contentType: "audio/mpeg", path };
 }

@@ -8,8 +8,8 @@ neither exists yet.
 
 ## Stack
 
-Vercel (hosting) + Next.js (App Router, TypeScript) + Supabase Postgres
-(database) + pg_cron (scheduling), per LDTKB-037. Fresh build, not a fork of
+Cloudflare Workers (hosting, API routes, cron trigger) + Next.js (App Router, TypeScript; the three Web App pages are exported as static files) + Neon Postgres (was Vercel + Supabase until Nov 2026; see DEPLOY_CLOUDFLARE.md)
+(database), per LDTKB-037 (originally Vercel + Supabase + pg_cron). Fresh build, not a fork of
 the German Breaks codebase; designed multi-learner from day one, unlike
 German Breaks' single-user design.
 

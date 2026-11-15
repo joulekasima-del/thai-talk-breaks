@@ -1,6 +1,6 @@
-import { createSupabaseServerClient } from "@/lib/supabase";
-import { supabaseLearnerStore } from "@/lib/onboarding/learnerStore";
-import { supabaseDay30QuizStore } from "@/lib/quiz/day30QuizStore";
+import { createDbQuery } from "@/lib/db";
+import { pgLearnerStore } from "@/lib/onboarding/learnerStore";
+import { pgDay30QuizStore } from "@/lib/quiz/day30QuizStore";
 import { validateTelegramInitData } from "@/lib/day29/telegramInitData";
 import { getDay30QuizStatus, submitDay30QuizAnswer } from "@/lib/quiz/day30QuizApi";
 import type { OptionKind } from "@/lib/quiz/day30Quiz";
@@ -22,10 +22,10 @@ export async function GET(request: Request): Promise<Response> {
   const validated = validateTelegramInitData(searchParams.get("initData") ?? "", botToken);
   if (!validated) return new Response("Unauthorized", { status: 401 });
 
-  const supabase = createSupabaseServerClient();
+  const db = createDbQuery();
   const result = await getDay30QuizStatus(validated.telegramUserId, {
-    learnerStore: supabaseLearnerStore(supabase),
-    quizStore: supabaseDay30QuizStore(supabase),
+    learnerStore: pgLearnerStore(db),
+    quizStore: pgDay30QuizStore(db),
   });
 
   if (!result.ok) {
@@ -61,10 +61,10 @@ export async function POST(request: Request): Promise<Response> {
     return new Response("Missing/invalid questionIndex or kind", { status: 400 });
   }
 
-  const supabase = createSupabaseServerClient();
+  const db = createDbQuery();
   const result = await submitDay30QuizAnswer(validated.telegramUserId, body.questionIndex, body.kind, {
-    learnerStore: supabaseLearnerStore(supabase),
-    quizStore: supabaseDay30QuizStore(supabase),
+    learnerStore: pgLearnerStore(db),
+    quizStore: pgDay30QuizStore(db),
   });
 
   if (!result.ok) {

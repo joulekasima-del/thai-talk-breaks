@@ -1,5 +1,8 @@
 # Thai Talk Breaks — Scheduler & Lesson Delivery (Checkpoint 3)
 
+> **Update (Nov 2026): the scheduler moved to Cloudflare.** The delivery run is now `runDeliveryCron()` (`src/lib/delivery/runDeliveryCron.ts`), triggered every minute by a Cloudflare Cron Trigger (`wrangler.jsonc` / `worker/index.ts`) instead of the Supabase `pg_cron` + `pg_net` job described below. The 30-minute lookback window, the day rules and the duplicate-send guard are unchanged; the run now also stops before Cloudflare's 50-request-per-invocation limit and leaves the rest for the next minute. See `DEPLOY_CLOUDFLARE.md`. The `delivery_cron` migration is kept only as history and is not applied to Neon.
+
+
 **Status:** Checkpoint 3 (Scheduler & Lesson Delivery).
 **Scope note:** Documents the pg_cron job and the delivery logic that sends
 the 7 pilot lessons. Does not describe onboarding (`ONBOARDING_FLOW.md`,

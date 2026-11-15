@@ -1,33 +1,32 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Query } from "@/lib/db";
 
-import { supabaseProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
+import { pgProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
 import { dedupeAndProcess } from "@/lib/webhook/dedupeAndProcess";
 import { FakeProcessedUpdatesStore } from "./webhookDedupFakes";
 
-// --- supabaseProcessedUpdatesStore: unique-violation vs. real error -------
+// --- pgProcessedUpdatesStore: unique-violation vs. real error -------
 
-function fakeSupabaseInsertClient(error: { code: string } | null): SupabaseClient {
-  return {
-    from: () => ({
-      insert: async () => ({ error }),
-    }),
-  } as unknown as SupabaseClient;
+function fakeInsertQuery(error: { code: string } | null): Query {
+  return async () => {
+    if (error) throw Object.assign(new Error("db error"), error);
+    return [];
+  };
 }
 
-test("supabaseProcessedUpdatesStore.tryMarkProcessed returns true when the insert succeeds (new update)", async () => {
-  const store = supabaseProcessedUpdatesStore(fakeSupabaseInsertClient(null));
+test("pgProcessedUpdatesStore.tryMarkProcessed returns true when the insert succeeds (new update)", async () => {
+  const store = pgProcessedUpdatesStore(fakeInsertQuery(null));
   assert.equal(await store.tryMarkProcessed(100), true);
 });
 
-test("supabaseProcessedUpdatesStore.tryMarkProcessed returns false on a unique-constraint conflict (retry of a known update)", async () => {
-  const store = supabaseProcessedUpdatesStore(fakeSupabaseInsertClient({ code: "23505" }));
+test("pgProcessedUpdatesStore.tryMarkProcessed returns false on a unique-constraint conflict (retry of a known update)", async () => {
+  const store = pgProcessedUpdatesStore(fakeInsertQuery({ code: "23505" }));
   assert.equal(await store.tryMarkProcessed(100), false);
 });
 
-test("supabaseProcessedUpdatesStore.tryMarkProcessed rethrows any other database error", async () => {
-  const store = supabaseProcessedUpdatesStore(fakeSupabaseInsertClient({ code: "08006" })); // connection failure, unrelated to dedup
+test("pgProcessedUpdatesStore.tryMarkProcessed rethrows any other database error", async () => {
+  const store = pgProcessedUpdatesStore(fakeInsertQuery({ code: "08006" })); // connection failure, unrelated to dedup
   await assert.rejects(() => store.tryMarkProcessed(100));
 });
 

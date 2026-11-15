@@ -1,6 +1,6 @@
-import { createSupabaseServerClient } from "@/lib/supabase";
-import { supabaseLearnerStore } from "@/lib/onboarding/learnerStore";
-import { supabaseDay29QuestStore } from "@/lib/day29/questStore";
+import { createDbQuery } from "@/lib/db";
+import { pgLearnerStore } from "@/lib/onboarding/learnerStore";
+import { pgDay29QuestStore } from "@/lib/day29/questStore";
 import { validateTelegramInitData } from "@/lib/day29/telegramInitData";
 import { getQuestStatus, submitQuestAnswer } from "@/lib/day29/questApi";
 
@@ -19,10 +19,10 @@ export async function GET(request: Request): Promise<Response> {
   const validated = validateTelegramInitData(searchParams.get("initData") ?? "", botToken);
   if (!validated) return new Response("Unauthorized", { status: 401 });
 
-  const supabase = createSupabaseServerClient();
+  const db = createDbQuery();
   const result = await getQuestStatus(validated.telegramUserId, {
-    learnerStore: supabaseLearnerStore(supabase),
-    questStore: supabaseDay29QuestStore(supabase),
+    learnerStore: pgLearnerStore(db),
+    questStore: pgDay29QuestStore(db),
   });
 
   if (!result.ok) return new Response("Learner not found", { status: 404 });
@@ -44,10 +44,10 @@ export async function POST(request: Request): Promise<Response> {
   if (!validated) return new Response("Unauthorized", { status: 401 });
   if (!body.answerId) return new Response("Missing answerId", { status: 400 });
 
-  const supabase = createSupabaseServerClient();
+  const db = createDbQuery();
   const result = await submitQuestAnswer(validated.telegramUserId, body.answerId, {
-    learnerStore: supabaseLearnerStore(supabase),
-    questStore: supabaseDay29QuestStore(supabase),
+    learnerStore: pgLearnerStore(db),
+    questStore: pgDay29QuestStore(db),
   });
 
   if (!result.ok) return new Response("Learner not found", { status: 404 });

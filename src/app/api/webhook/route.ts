@@ -1,13 +1,14 @@
 import { createTelegramClient, type TelegramUpdate } from "@/lib/telegram";
-import { createSupabaseServerClient } from "@/lib/supabase";
-import { supabaseLearnerStore } from "@/lib/onboarding/learnerStore";
+import { createDbQuery } from "@/lib/db";
+import { fileIdCacheForBot } from "@/lib/telegramFileIdStore";
+import { pgLearnerStore } from "@/lib/onboarding/learnerStore";
 import { handleUpdate } from "@/lib/onboarding/handleUpdate";
-import { supabaseProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
+import { pgProcessedUpdatesStore } from "@/lib/webhook/processedUpdatesStore";
 import { dedupeAndProcess } from "@/lib/webhook/dedupeAndProcess";
-import { supabaseOopsReportsStore } from "@/lib/oops/oopsReportsStore";
-import { supabasePurchasesStore } from "@/lib/payments/purchasesStore";
-import { supabasePaymentSupportStore } from "@/lib/payments/paymentSupportStore";
-import { supabaseDeliveryStore } from "@/lib/delivery/deliveryStore";
+import { pgOopsReportsStore } from "@/lib/oops/oopsReportsStore";
+import { pgPurchasesStore } from "@/lib/payments/purchasesStore";
+import { pgPaymentSupportStore } from "@/lib/payments/paymentSupportStore";
+import { pgDeliveryStore } from "@/lib/delivery/deliveryStore";
 import type { MediaLoader } from "@/lib/delivery/deliverLesson";
 import {
   loadCombinedNumbersImage,
@@ -59,14 +60,14 @@ export async function POST(request: Request): Promise<Response> {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  const supabase = createSupabaseServerClient();
-  const telegram = createTelegramClient(botToken);
-  const store = supabaseLearnerStore(supabase);
-  const processedUpdatesStore = supabaseProcessedUpdatesStore(supabase);
-  const oopsReportsStore = supabaseOopsReportsStore(supabase);
-  const purchasesStore = supabasePurchasesStore(supabase);
-  const paymentSupportStore = supabasePaymentSupportStore(supabase);
-  const deliveryStore = supabaseDeliveryStore(supabase);
+  const db = createDbQuery();
+  const telegram = createTelegramClient(botToken, { fileIdCache: fileIdCacheForBot(db, botToken) });
+  const store = pgLearnerStore(db);
+  const processedUpdatesStore = pgProcessedUpdatesStore(db);
+  const oopsReportsStore = pgOopsReportsStore(db);
+  const purchasesStore = pgPurchasesStore(db);
+  const paymentSupportStore = pgPaymentSupportStore(db);
+  const deliveryStore = pgDeliveryStore(db);
 
   // Missing/unset -> null: /oops reports are still saved, the admin DM is
   // just skipped (see handleUpdate.ts's maybeCaptureOopsReport).
