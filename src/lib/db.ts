@@ -13,6 +13,68 @@ import { neon } from "@neondatabase/serverless";
 // ISO-8601 strings, dates as "YYYY-MM-DD", time as "HH:MM:SS".
 export type Query = (text: string, params?: unknown[]) => Promise<Record<string, unknown>[]>;
 
+// Neon's HTTP endpoint fails occasionally — about 4 of the ~1440 daily cron runs
+// (0.3%) died on their very first query with `NeonDbError: Server error (HTTP
+// status 520)`, observed in the Worker logs on 2026-11-15. Nothing is lost when
+// that happens (the next minute's run retries, and lesson_deliveries' unique
+// constraint stops a double send), but a run that dies does no work at all, so
+// one short retry removes almost all of them.
+//
+// Only read-only statements are retried. A retry is safe only when running the
+// statement twice is the same as running it once, and that is NOT true of every
+// write here: day30QuizStore's `correct_count + $2` would double-count, and a
+// retried lesson_deliveries insert whose first attempt actually succeeded would
+// hit the unique constraint. A transport error gives no way to tell whether the
+// statement ran, so writes are left alone and keep failing fast as before.
+
+const RETRY_DELAYS_MS = [150, 500];
+
+/** A statement that only reads, and so can be repeated safely. */
+export function isReadOnlyStatement(text: string): boolean {
+  const trimmed = text.trim().toLowerCase();
+  if (!trimmed.startsWith("select") && !trimmed.startsWith("with")) return false;
+  // A CTE can still write (`with d as (delete ... )`), and so can SELECT ... FOR
+  // UPDATE; anything carrying a write keyword is treated as a write.
+  return !/\b(insert|update|delete|upsert|for\s+update|for\s+no\s+key\s+update|returning)\b/.test(trimmed);
+}
+
+/**
+ * Transport-level failure (Neon unreachable, 5xx from its endpoint) rather than
+ * the database rejecting the statement. A rejected statement — bad SQL, a
+ * constraint violation — fails the same way every time, so retrying it only
+ * wastes the run.
+ */
+export function isTransientDbError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  if (/\bHTTP status 5\d\d\b/.test(message)) return true;
+  return /fetch failed|network|socket hang up|terminated|ECONNRESET|ETIMEDOUT|EAI_AGAIN/i.test(message);
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Wraps a runner so a read-only statement that fails on transport is tried
+ * again. Exported for tests; createDbQuery() below is the production caller.
+ */
+export function withDbRetry(
+  run: (text: string, params: unknown[]) => Promise<Record<string, unknown>[]>,
+  delaysMs: number[] = RETRY_DELAYS_MS,
+): Query {
+  return async (text, params = []) => {
+    const retryable = isReadOnlyStatement(text);
+    let attempt = 0;
+    for (;;) {
+      try {
+        return await run(text, params);
+      } catch (error) {
+        if (!retryable || attempt >= delaysMs.length || !isTransientDbError(error)) throw error;
+        await sleep(delaysMs[attempt]);
+        attempt += 1;
+      }
+    }
+  };
+}
+
 // Server-side only. DATABASE_URL is the pooled Neon connection string.
 export function createDbQuery(): Query {
   const url = process.env.DATABASE_URL;
@@ -20,7 +82,7 @@ export function createDbQuery(): Query {
     throw new Error("DATABASE_URL must be set");
   }
   const sql = neon(url);
-  return async (text, params = []) => (await sql.query(text, params)) as Record<string, unknown>[];
+  return withDbRetry(async (text, params) => (await sql.query(text, params)) as Record<string, unknown>[]);
 }
 
 /** First row's `r` column, or null when the statement returned no rows (replaces supabase `.maybeSingle()`). */
