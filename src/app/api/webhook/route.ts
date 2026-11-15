@@ -9,6 +9,8 @@ import { pgOopsReportsStore } from "@/lib/oops/oopsReportsStore";
 import { pgPurchasesStore } from "@/lib/payments/purchasesStore";
 import { pgPaymentSupportStore } from "@/lib/payments/paymentSupportStore";
 import { pgDeliveryStore } from "@/lib/delivery/deliveryStore";
+import { pgSrsStore } from "@/lib/srs/srsStore";
+import { pgDay30QuizStore } from "@/lib/quiz/day30QuizStore";
 import type { MediaLoader } from "@/lib/delivery/deliverLesson";
 import {
   loadCombinedNumbersImage,
@@ -91,6 +93,8 @@ export async function POST(request: Request): Promise<Response> {
         paymentSupportStore,
         deliveryStore,
         media,
+        srsStore: pgSrsStore(db),
+        quizStore: pgDay30QuizStore(db),
         appUrl: process.env.APP_URL,
         adminTelegramUserId,
       });

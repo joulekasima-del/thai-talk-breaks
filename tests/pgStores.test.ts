@@ -47,7 +47,8 @@ test("learnerStore: create / find / update round trip keeps the JS types the app
   const store = pgLearnerStore(query);
   const created = await store.create(7691221493);
   assert.equal(created.telegram_user_id, 7691221493); // bigint comes back as a number
-  assert.equal(created.onboarding_step, "gender_pending");
+  assert.equal(created.onboarding_step, "name_pending");
+  assert.equal(created.next_lesson_number, 1);
   assert.equal(typeof created.pilot_start_date === "string" || created.pilot_start_date === null, true);
 
   assert.equal((await store.findByTelegramId(7691221493))?.id, created.id);
