@@ -30,13 +30,20 @@ export class FakeLearnerStore implements LearnerStore {
       gender_branch: null,
       schedule_period: null,
       schedule_time: null,
-      onboarding_step: "gender_pending",
+      onboarding_step: "name_pending",
       onboarding_completed_at: null,
       pilot_start_date: null,
       paid_course_start_date: null,
       paywall_prompt_sent_at: null,
       awaiting_oops_report_since: null,
       awaiting_paysupport_request_since: null,
+      display_name: null,
+      survey_location: null,
+      survey_level: null,
+      survey_reason: null,
+      survey_source: null,
+      next_lesson_number: 1,
+      last_session_date: null,
     };
     this.learners.set(id, learner);
     this.byTelegramId.set(telegramUserId, id);
@@ -100,12 +107,17 @@ export class FakeTelegramClient implements TelegramClient {
   sentInvoices: SentInvoice[] = [];
   answeredPreCheckoutQueries: AnsweredPreCheckoutQuery[] = [];
   refunds: IssuedRefund[] = [];
+  edited: { chatId: number; messageId: number; text: string }[] = [];
 
   /** Optional shared event log (see tests/deliveryFakes.ts EventLog), for cross-fake ordering assertions. */
   constructor(private log?: { push(event: string): void }) {}
 
   async sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard, parseMode?: "HTML"): Promise<void> {
     this.sent.push({ chatId, text, keyboard, parseMode });
+  }
+
+  async editMessageText(chatId: number, messageId: number, text: string): Promise<void> {
+    this.edited.push({ chatId, messageId, text });
   }
 
   async answerCallbackQuery(callbackQueryId: string): Promise<void> {

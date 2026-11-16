@@ -119,3 +119,133 @@ export const ALREADY_ONBOARDED_MESSAGE =
   "You're all set already! 😊\n" +
   "\n" +
   "No need to go through this again — your lessons are on their way at your chosen time.";
+
+// --- Instant-lessons onboarding (proposed 15 November 2026) — DRAFT, not locked ---
+// Replaces the long welcome + schedule-first flow with: name -> krap/ka ->
+// four one-tap survey questions -> Lesson 1 straight away -> reminder time.
+// Plain text only (no parse_mode), so a typed name can never break
+// formatting. The long WELCOME_MESSAGE above is no longer sent; its /oops
+// line, free-lessons note and community link moved into
+// readyMessage() below. Needs Joule's confirmation before locking.
+
+export const LEAN_WELCOME_MESSAGE =
+  "Sawasdee ka! 🙏 Welcome to Thai Talk Breaks.\n" +
+  "\n" +
+  "Spoken Thai in tiny breaks — your first word is less than a minute away.\n" +
+  "\n" +
+  "First, what should I call you? Just type your name 👇";
+
+export function nameKeyboard(firstName: string | undefined): InlineKeyboard | undefined {
+  const name = cleanName(firstName ?? "");
+  if (!name) return undefined;
+  return [[{ text: `Call me ${name}`, callback_data: "name:tg" }]];
+}
+
+/** Trims, collapses whitespace, caps at 40 characters. Empty string = not a usable name. */
+export function cleanName(raw: string): string {
+  return raw.replace(/\s+/g, " ").trim().slice(0, 40).trim();
+}
+
+export function niceToMeetYou(name: string): string {
+  return `Nice to meet you, ${name}! 😊`;
+}
+
+export interface SurveyQuestion {
+  step: "survey_location_pending" | "survey_level_pending" | "survey_reason_pending" | "survey_source_pending";
+  column: "survey_location" | "survey_level" | "survey_reason" | "survey_source";
+  prefix: string; // callback_data prefix
+  text: string;
+  options: { value: string; label: string }[];
+}
+
+export const SURVEY_INTRO = "4 quick taps so I can get to know you (it really helps us too 🙏)";
+
+export const SURVEY_QUESTIONS: SurveyQuestion[] = [
+  {
+    step: "survey_location_pending",
+    column: "survey_location",
+    prefix: "loc",
+    text: "1/4 · Are you in Thailand?",
+    options: [
+      { value: "live", label: "🏠 I live here" },
+      { value: "visiting", label: "✈️ Visiting soon" },
+      { value: "someday", label: "🗓️ Planning someday" },
+      { value: "curious", label: "🌍 Just curious" },
+    ],
+  },
+  {
+    step: "survey_level_pending",
+    column: "survey_level",
+    prefix: "lvl",
+    text: "2/4 · How much Thai do you know?",
+    options: [
+      { value: "beginner", label: "🌱 Total beginner" },
+      { value: "few", label: "🙂 A few words" },
+      { value: "basic", label: "💬 Basic chats" },
+    ],
+  },
+  {
+    step: "survey_reason_pending",
+    column: "survey_reason",
+    prefix: "why",
+    text: "3/4 · What's your main reason for learning?",
+    options: [
+      { value: "daily", label: "🏡 Daily life" },
+      { value: "travel", label: "🧳 Travel" },
+      { value: "family", label: "❤️ Partner or family" },
+      { value: "work", label: "💼 Work" },
+    ],
+  },
+  {
+    step: "survey_source_pending",
+    column: "survey_source",
+    prefix: "src",
+    text: "4/4 · How did you find us?",
+    options: [
+      { value: "telegram", label: "💬 Telegram group" },
+      { value: "friend", label: "👋 A friend" },
+      { value: "social", label: "📱 Social media" },
+      { value: "other", label: "✨ Other" },
+    ],
+  },
+];
+
+export function surveyKeyboard(question: SurveyQuestion): InlineKeyboard {
+  // Two buttons per row keeps four options compact on a phone.
+  const buttons = question.options.map((o) => ({ text: o.label, callback_data: `${question.prefix}:${o.value}` }));
+  const rows: InlineKeyboard = [];
+  for (let i = 0; i < buttons.length; i += 2) rows.push(buttons.slice(i, i + 2));
+  return rows;
+}
+
+export function firstWordMessage(name: string | null): string {
+  return name ? `Perfect, ${name}! Here's your first Thai word 👇` : "Perfect! Here's your first Thai word 👇";
+}
+
+// Asked after Lesson 1. Same buttons/times as LDTKB-034, reworded: the time
+// is now a daily reminder, not the only way to get a lesson.
+export const REMINDER_PERIOD_MESSAGE =
+  "One last thing: when should I send your daily Thai break? (Thailand time 🇹🇭)";
+
+export const REMINDER_NOTIFICATION_TEST_MESSAGE =
+  "🔔 This is what your daily reminder will look like.\n" +
+  "\n" +
+  "If you saw or heard this, you're all set.\n" +
+  "\n" +
+  "If you didn't notice anything, check that notifications are turned on for Telegram in your phone settings.";
+
+export function readyMessage(name: string | null): string {
+  return (
+    `That's it, you're all set${name ? `, ${name}` : ""}! 🎉\n` +
+    "\n" +
+    "Your first 7 lessons are free, and you never have to wait — tap below whenever you want the next one.\n" +
+    "\n" +
+    "If something ever looks wrong, type /oops.\n" +
+    "Want to practise with others? Join Thai Talk: Jot It Down 👉 https://t.me/thaitalk_jot_it_down"
+  );
+}
+
+export const ALREADY_ONBOARDED_NEXT_MESSAGE =
+  "You're all set already! 😊\n" +
+  "\n" +
+  "Tap below for your next lesson, or wait for your daily reminder.";

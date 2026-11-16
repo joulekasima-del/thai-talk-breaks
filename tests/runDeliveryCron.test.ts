@@ -11,7 +11,8 @@ import { runDeliveryCron } from "@/lib/delivery/runDeliveryCron";
 import { pgLearnerStore } from "@/lib/onboarding/learnerStore";
 
 // The Cloudflare cron trigger's whole job, run against a real (in-process)
-// Postgres: due learners get their lesson once, a second run is a no-op, and
+// Postgres: due learners get their reminder session once a day (a second run
+// is a no-op), and
 // the request-budget stop leaves the rest for the next run.
 
 const MIGRATIONS_DIR = path.join(__dirname, "..", "supabase", "migrations");
@@ -37,6 +38,7 @@ class FakeTelegram implements TelegramClient {
     this.sent.push({ chatId, kind: "message" });
   }
   async answerCallbackQuery() {}
+  async editMessageText() {}
   async sendPhoto(chatId: number) {
     this.sent.push({ chatId, kind: "photo" });
   }
@@ -73,14 +75,14 @@ async function addLearner(telegramUserId: number): Promise<string> {
   return learner.id;
 }
 
-test("delivers Day 1 once; an immediate second run sends nothing more", async () => {
+test("the reminder starts a session with the next lesson once; an immediate second run sends nothing more", async () => {
   const learnerId = await addLearner(9001);
   const telegram = new FakeTelegram();
   const deps = { telegram, query, media, appUrl: "https://example.test", now: NOW };
 
   const first = await runDeliveryCron(deps);
   assert.equal(first.stoppedEarly, false);
-  assert.deepEqual(first.results.map((r) => r.status), ["delivered"]);
+  assert.deepEqual(first.results.map((r) => r.status), ["started"]);
   assert.ok(telegram.sent.some((m) => m.kind === "photo" && m.chatId === 9001));
 
   const rows = await query("SELECT lesson_number, delivery_date::text AS d FROM lesson_deliveries WHERE learner_id = $1", [learnerId]);

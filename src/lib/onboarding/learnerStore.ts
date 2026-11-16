@@ -9,7 +9,13 @@ import { queryMany, queryOne, queryOneOrThrow, type Query } from "@/lib/db";
 export type GenderBranch = "male" | "female";
 export type SchedulePeriod = "morning" | "afternoon" | "evening";
 export type OnboardingStep =
+  | "name_pending"
   | "gender_pending"
+  | "survey_location_pending"
+  | "survey_level_pending"
+  | "survey_reason_pending"
+  | "survey_source_pending"
+  | "first_lesson"
   | "schedule_period_pending"
   | "schedule_time_pending"
   | "complete";
@@ -53,6 +59,16 @@ export interface Learner {
    * supabase/migrations/20260903000000_star_payments.sql (Stage 5, LDTKB-014).
    */
   awaiting_paysupport_request_since: string | null;
+  /** Instant-lessons redesign (20261115000000_instant_lessons_srs.sql). */
+  display_name: string | null;
+  survey_location: string | null;
+  survey_level: string | null;
+  survey_reason: string | null;
+  survey_source: string | null;
+  /** The lesson the next session teaches; 31 once the course is finished. */
+  next_lesson_number: number;
+  /** Thailand calendar date of the learner's most recent session start. */
+  last_session_date: string | null;
 }
 
 export type LearnerPatch = Partial<
@@ -68,6 +84,13 @@ export type LearnerPatch = Partial<
     | "paywall_prompt_sent_at"
     | "awaiting_oops_report_since"
     | "awaiting_paysupport_request_since"
+    | "display_name"
+    | "survey_location"
+    | "survey_level"
+    | "survey_reason"
+    | "survey_source"
+    | "next_lesson_number"
+    | "last_session_date"
   >
 >;
 
@@ -103,6 +126,13 @@ const LEARNER_PATCH_COLUMNS = [
   "paywall_prompt_sent_at",
   "awaiting_oops_report_since",
   "awaiting_paysupport_request_since",
+  "display_name",
+  "survey_location",
+  "survey_level",
+  "survey_reason",
+  "survey_source",
+  "next_lesson_number",
+  "last_session_date",
 ] as const;
 
 export function pgLearnerStore(query: Query): LearnerStore {
@@ -120,7 +150,7 @@ export function pgLearnerStore(query: Query): LearnerStore {
     async create(telegramUserId) {
       return queryOneOrThrow<Learner>(
         query,
-        "INSERT INTO learners (telegram_user_id) VALUES ($1) RETURNING to_jsonb(learners) AS r",
+        "INSERT INTO learners (telegram_user_id, onboarding_step) VALUES ($1, 'name_pending') RETURNING to_jsonb(learners) AS r",
         [telegramUserId],
       );
     },

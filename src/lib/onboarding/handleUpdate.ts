@@ -90,20 +90,31 @@ import type { OopsReportsStore } from "@/lib/oops/oopsReportsStore";
 import type { PurchasesStore } from "@/lib/payments/purchasesStore";
 import type { PaymentSupportStore } from "@/lib/payments/paymentSupportStore";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
-import { deliverLesson, type MediaLoader } from "@/lib/delivery/deliverLesson";
-import { isFreeWeekExhausted, PAID_COURSE_FIRST_DAY } from "@/lib/delivery/duePaidLearners";
+import type { MediaLoader } from "@/lib/delivery/deliverLesson";
+import type { SrsStore } from "@/lib/srs/srsStore";
+import type { Day30QuizStore } from "@/lib/quiz/day30QuizStore";
+import { handleMore, handleQuizAnswer, isBehindPaywall, startSession, type SessionDeps } from "@/lib/session/session";
+import { LESSON_PAYWALL_MESSAGE, NEXT_LESSON_KEYBOARD } from "@/lib/session/content";
 import {
-  ALREADY_ONBOARDED_MESSAGE,
+  ALREADY_ONBOARDED_NEXT_MESSAGE,
   GENDER_QUESTION_KEYBOARD,
   GENDER_QUESTION_MESSAGE,
-  NOTIFICATION_TEST_MESSAGE,
-  ONBOARDING_COMPLETE_MESSAGE,
+  LEAN_WELCOME_MESSAGE,
+  REMINDER_NOTIFICATION_TEST_MESSAGE,
+  REMINDER_PERIOD_MESSAGE,
   SCHEDULE_PERIOD_KEYBOARD,
-  SCHEDULE_PERIOD_MESSAGE,
   SCHEDULE_TIME_MESSAGE,
-  WELCOME_MESSAGE,
+  SURVEY_INTRO,
+  SURVEY_QUESTIONS,
+  cleanName,
+  firstWordMessage,
   isValidTimeForPeriod,
+  nameKeyboard,
+  niceToMeetYou,
+  readyMessage,
   scheduleTimeKeyboard,
+  surveyKeyboard,
+  type SurveyQuestion,
 } from "@/lib/onboarding/content";
 import { OOPS_CONFIRMATION_MESSAGE, OOPS_PROMPT_MESSAGE } from "@/lib/oops/content";
 import {
@@ -116,7 +127,6 @@ import {
   PAYMENT_CONFIRMATION_MESSAGE,
   PAYSUPPORT_CONFIRMATION_MESSAGE,
   PAYSUPPORT_PROMPT_MESSAGE,
-  PAYWALL_PROMPT_MESSAGE,
   REFUND_ISSUED_MESSAGE,
 } from "@/lib/payments/content";
 
@@ -137,6 +147,15 @@ export interface HandleUpdateDeps {
   deliveryStore?: DeliveryStore;
   media?: MediaLoader;
   appUrl?: string;
+  /**
+   * Instant-lessons redesign: lessons, quizzes and spaced repetition run in
+   * sessions (src/lib/session/session.ts). Without these (and deliveryStore +
+   * media), anything that would start or continue a session is skipped —
+   * the onboarding/oops/payments test suites don't need to build them.
+   */
+  srsStore?: SrsStore;
+  quizStore?: Day30QuizStore;
+  rng?: () => number;
   /** Telegram user id to DM new /oops reports (and /paysupport requests) to. Null if ADMIN_TELEGRAM_USER_ID isn't set — the report is still saved, just no DM is attempted. Also the sole identity /refund is authorized against. */
   adminTelegramUserId: number | null;
   /** Injectable clock, for deterministic tests. Defaults to `new Date()`. */
@@ -176,6 +195,10 @@ export async function handleUpdate(update: TelegramUpdate, deps: HandleUpdateDep
     await handleRefund(update.message!, deps);
     return;
   }
+  if (text?.startsWith("/next")) {
+    await handleNextCommand(update.message!, deps);
+    return;
+  }
   if (update.callback_query) {
     await handleCallbackQuery(update.callback_query, deps);
     return;
@@ -210,10 +233,8 @@ async function handleStart(
 
   if (!learner) {
     learner = await deps.store.create(telegramUserId);
-    // LDTKB-053/054: the only message in the product sent with HTML
-    // formatting — see telegram.ts's sendMessage signature.
-    await deps.telegram.sendMessage(chatId, WELCOME_MESSAGE, undefined, "HTML");
-    await deps.telegram.sendMessage(chatId, GENDER_QUESTION_MESSAGE, GENDER_QUESTION_KEYBOARD);
+    // Instant-lessons onboarding: one short welcome that asks for a name.
+    await deps.telegram.sendMessage(chatId, LEAN_WELCOME_MESSAGE, nameKeyboard(message.from.first_name));
     return;
   }
 
@@ -230,13 +251,46 @@ async function handleStart(
   }
 
   if (learner.onboarding_step === "complete") {
-    // Design choice — not a locked message. See report item 9.
-    await deps.telegram.sendMessage(chatId, ALREADY_ONBOARDED_MESSAGE);
+    await deps.telegram.sendMessage(chatId, ALREADY_ONBOARDED_NEXT_MESSAGE, NEXT_LESSON_KEYBOARD);
     return;
   }
 
   // Mid-onboarding: resume at the current step rather than restarting.
-  await resendCurrentStep(learner, chatId, deps);
+  await resendCurrentStep(learner, chatId, deps, message.from.first_name);
+}
+
+/** Everything a session needs, or null when this webhook wasn't given it. */
+function sessionDeps(deps: HandleUpdateDeps): SessionDeps | null {
+  if (!deps.srsStore || !deps.deliveryStore || !deps.media) return null;
+  return {
+    telegram: deps.telegram,
+    learnerStore: deps.store,
+    srsStore: deps.srsStore,
+    deliveryStore: deps.deliveryStore,
+    purchasesStore: deps.purchasesStore,
+    media: deps.media,
+    quizStore: deps.quizStore,
+    appUrl: deps.appUrl,
+    now: deps.now,
+    rng: deps.rng,
+  };
+}
+
+/** "▶️ Next lesson" (button or /next): start a session right away, no waiting for the reminder. */
+async function startNextLesson(learner: Learner, chatId: number, deps: HandleUpdateDeps): Promise<void> {
+  if (learner.onboarding_step !== "complete" && learner.onboarding_step !== "first_lesson") {
+    await resendCurrentStep(learner, chatId, deps);
+    return;
+  }
+  const session = sessionDeps(deps);
+  if (!session) return;
+  await startSession(learner, chatId, session);
+}
+
+async function handleNextCommand(message: NonNullable<TelegramUpdate["message"]>, deps: HandleUpdateDeps): Promise<void> {
+  const learner = await deps.store.findByTelegramId(message.from.id);
+  if (!learner) return;
+  await startNextLesson(learner, message.chat.id, deps);
 }
 
 async function handleOops(message: NonNullable<TelegramUpdate["message"]>, deps: HandleUpdateDeps): Promise<void> {
@@ -283,17 +337,16 @@ async function maybeCapturePendingReport(
     await capturePaySupportRequest(learner, chatId, text, deps);
     return;
   }
-  // Day 8 paywall gate (LDTKB-016): a learner who's been shown the one-time
-  // check-in, still hasn't paid, and hasn't crossed the boundary — any
-  // message from them re-sends the same check-in. Read-only: no pending-flag
-  // semantics, nothing here is set or cleared. Checked last, after both
-  // real pending-capture flags above.
-  if (
-    learner.paywall_prompt_sent_at !== null &&
-    learner.paid_course_start_date === null &&
-    (await deps.purchasesStore.findPaidByLearner(learner.id)) === null
-  ) {
-    await deps.telegram.sendMessage(chatId, PAYWALL_PROMPT_MESSAGE);
+  // Onboarding's first question: whatever they type is the name to use.
+  if (learner.onboarding_step === "name_pending") {
+    await saveNameAndContinue(learner, text, chatId, deps);
+    return;
+  }
+  // Paywall gate (LDTKB-016), counted in lessons: a learner who's been shown
+  // the check-in and still hasn't paid gets it again on any message.
+  // Read-only, checked after the real pending-capture flags above.
+  if (learner.paywall_prompt_sent_at !== null && (await isBehindPaywall(learner, deps))) {
+    await deps.telegram.sendMessage(chatId, LESSON_PAYWALL_MESSAGE);
     return;
   }
   // Nothing pending — silently ignored.
@@ -393,30 +446,16 @@ async function handleSuccessfulPayment(message: TelegramMessage, deps: HandleUpd
 
   await deps.telegram.sendMessage(chatId, PAYMENT_CONFIRMATION_MESSAGE);
 
-  // Day 8 paywall gate (LDTKB-016): if this learner has already used up the
-  // 7-day free preview, deliver Day 8 right now — genuinely instant, in this
-  // same handler call, no cron tick needed. If they're still mid-free-week
-  // (e.g. Day 3), do nothing extra here: the purchase is recorded, Days 4-7
-  // keep delivering normally, and the cron route's boundary-crossing check
-  // picks them up the moment their free week actually ends.
+  // Paywall gate (LDTKB-016), counted in lessons: a learner waiting at
+  // Lesson 8 gets it straight away. One who pays early just carries on —
+  // Lesson 8 follows Lesson 7 whenever they get there.
   const now = deps.now ? deps.now() : new Date();
-  const today = todayInBangkok(now);
-  if (learner.paid_course_start_date === null && isFreeWeekExhausted(learner.pilot_start_date, today)) {
-    if (deps.deliveryStore && deps.media && learner.gender_branch) {
-      await deps.store.update(learner.id, { paid_course_start_date: today });
-      const previouslyDelivered = await deps.deliveryStore.listDeliveredLessonNumbers(learner.id);
-      await deliverLesson(
-        {
-          learnerId: learner.id,
-          chatId,
-          gender: learner.gender_branch,
-          lessonNumber: PAID_COURSE_FIRST_DAY,
-          deliveryDate: today,
-          previouslyDeliveredLessonNumbers: previouslyDelivered,
-        },
-        { telegram: deps.telegram, deliveryStore: deps.deliveryStore, media: deps.media, appUrl: deps.appUrl, now: () => now },
-      );
-    }
+  if (learner.paid_course_start_date === null) {
+    await deps.store.update(learner.id, { paid_course_start_date: todayInBangkok(now) });
+  }
+  const session = sessionDeps(deps);
+  if (session && learner.onboarding_step === "complete" && learner.next_lesson_number === 8) {
+    await startSession({ ...learner, paid_course_start_date: todayInBangkok(now) }, chatId, session);
   }
 }
 
@@ -478,13 +517,26 @@ async function handleRefund(message: NonNullable<TelegramUpdate["message"]>, dep
   await deps.telegram.sendMessage(learner.telegram_user_id, REFUND_ISSUED_MESSAGE);
 }
 
-async function resendCurrentStep(learner: Learner, chatId: number, deps: HandleUpdateDeps): Promise<void> {
+async function resendCurrentStep(learner: Learner, chatId: number, deps: HandleUpdateDeps, firstName?: string): Promise<void> {
+  const survey = SURVEY_QUESTIONS.find((q) => q.step === learner.onboarding_step);
+  if (survey) {
+    await deps.telegram.sendMessage(chatId, survey.text, surveyKeyboard(survey));
+    return;
+  }
   switch (learner.onboarding_step) {
+    case "name_pending":
+      await deps.telegram.sendMessage(chatId, LEAN_WELCOME_MESSAGE, nameKeyboard(firstName));
+      return;
     case "gender_pending":
       await deps.telegram.sendMessage(chatId, GENDER_QUESTION_MESSAGE, GENDER_QUESTION_KEYBOARD);
       return;
+    case "first_lesson": {
+      const session = sessionDeps(deps);
+      if (session) await startSession(learner, chatId, session);
+      return;
+    }
     case "schedule_period_pending":
-      await deps.telegram.sendMessage(chatId, SCHEDULE_PERIOD_MESSAGE, SCHEDULE_PERIOD_KEYBOARD);
+      await deps.telegram.sendMessage(chatId, REMINDER_PERIOD_MESSAGE, SCHEDULE_PERIOD_KEYBOARD);
       return;
     case "schedule_time_pending":
       if (!learner.schedule_period) return; // defensive: shouldn't happen
@@ -517,8 +569,35 @@ async function handleCallbackQuery(
   const kind = data.slice(0, separatorIndex);
   const value = data.slice(separatorIndex + 1);
 
+  if (kind === "name") {
+    if (learner.onboarding_step === "name_pending" && value === "tg") {
+      await saveNameAndContinue(learner, callbackQuery.from.first_name ?? "", chatId, deps);
+    }
+    return;
+  }
   if (kind === "gender") {
     await handleGenderSelection(learner, value, chatId, deps);
+    return;
+  }
+  const survey = SURVEY_QUESTIONS.find((q) => q.prefix === kind);
+  if (survey) {
+    await handleSurveyAnswer(learner, survey, value, chatId, deps);
+    return;
+  }
+  if (kind === "q") {
+    const [promptId, chosen] = value.split(":").map(Number);
+    const session = sessionDeps(deps);
+    if (session && Number.isInteger(promptId) && Number.isInteger(chosen)) {
+      await handleQuizAnswer(learner, promptId, chosen, chatId, callbackQuery.message?.message_id, session);
+    }
+    return;
+  }
+  if (kind === "next") {
+    await startNextLesson(learner, chatId, deps);
+    return;
+  }
+  if (kind === "more") {
+    await handleMore(learner, Number(value), chatId, deps);
     return;
   }
   if (kind === "period") {
@@ -540,11 +619,48 @@ async function handleGenderSelection(
   if (learner.onboarding_step !== "gender_pending") return; // out-of-order/stale
   if (!VALID_GENDERS.has(value)) return;
 
+  const first = SURVEY_QUESTIONS[0];
   await deps.store.update(learner.id, {
     gender_branch: value as "male" | "female",
-    onboarding_step: "schedule_period_pending",
+    onboarding_step: first.step,
   });
-  await deps.telegram.sendMessage(chatId, SCHEDULE_PERIOD_MESSAGE, SCHEDULE_PERIOD_KEYBOARD);
+  await deps.telegram.sendMessage(chatId, `${SURVEY_INTRO}\n\n${first.text}`, surveyKeyboard(first));
+}
+
+async function saveNameAndContinue(learner: Learner, rawName: string, chatId: number, deps: HandleUpdateDeps): Promise<void> {
+  const name = cleanName(rawName);
+  if (!name || name.startsWith("/")) {
+    await deps.telegram.sendMessage(chatId, "Just type the name you'd like me to use 😊");
+    return;
+  }
+  await deps.store.update(learner.id, { display_name: name, onboarding_step: "gender_pending" });
+  await deps.telegram.sendMessage(chatId, niceToMeetYou(name));
+  await deps.telegram.sendMessage(chatId, GENDER_QUESTION_MESSAGE, GENDER_QUESTION_KEYBOARD);
+}
+
+async function handleSurveyAnswer(
+  learner: Learner,
+  question: SurveyQuestion,
+  value: string,
+  chatId: number,
+  deps: HandleUpdateDeps,
+): Promise<void> {
+  if (learner.onboarding_step !== question.step) return; // out-of-order/stale
+  if (!question.options.some((o) => o.value === value)) return;
+
+  const index = SURVEY_QUESTIONS.indexOf(question);
+  const next = SURVEY_QUESTIONS[index + 1];
+  if (next) {
+    await deps.store.update(learner.id, { [question.column]: value, onboarding_step: next.step });
+    await deps.telegram.sendMessage(chatId, next.text, surveyKeyboard(next));
+    return;
+  }
+
+  // Survey done: Lesson 1 starts right now, no waiting for tomorrow.
+  const updated = await deps.store.update(learner.id, { [question.column]: value, onboarding_step: "first_lesson" });
+  await deps.telegram.sendMessage(chatId, firstWordMessage(updated.display_name));
+  const session = sessionDeps(deps);
+  if (session) await startSession(updated, chatId, session);
 }
 
 async function handlePeriodSelection(
@@ -574,19 +690,17 @@ async function handleTimeSelection(
   if (!learner.schedule_period) return; // defensive: shouldn't happen
   if (!isValidTimeForPeriod(learner.schedule_period, value)) return;
 
-  await deps.store.update(learner.id, { schedule_time: value });
-
-  // LDTKB-028: passive, no gate — sent regardless of any learner reaction.
-  await deps.telegram.sendMessage(chatId, NOTIFICATION_TEST_MESSAGE);
-  // LDTKB-036: immediately after the notification test.
-  await deps.telegram.sendMessage(chatId, ONBOARDING_COMPLETE_MESSAGE);
-
   const now = deps.now ? deps.now() : new Date();
   await deps.store.update(learner.id, {
+    schedule_time: value,
     onboarding_step: "complete",
     onboarding_completed_at: now.toISOString(),
     pilot_start_date: todayInBangkok(now),
   });
+
+  // LDTKB-005/028: passive notification test, no gate — now for the reminder.
+  await deps.telegram.sendMessage(chatId, REMINDER_NOTIFICATION_TEST_MESSAGE);
+  await deps.telegram.sendMessage(chatId, readyMessage(learner.display_name), NEXT_LESSON_KEYBOARD);
 }
 
 /**

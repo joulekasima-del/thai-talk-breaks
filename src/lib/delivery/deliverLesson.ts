@@ -10,6 +10,7 @@
 
 import { getLesson, WEEKS234_LAST_DAY, type GenderBranch, type Lesson, type WordSetLesson } from "@/lib/curriculum/content";
 import { LESSON_EXPLANATIONS } from "@/lib/curriculum/lessonExplanations";
+import { lessonTip } from "@/lib/curriculum/lessonTips";
 import type { InlineKeyboard, MediaFile, TelegramClient } from "@/lib/telegram";
 import type { DeliveryStore } from "@/lib/delivery/deliveryStore";
 
@@ -78,10 +79,21 @@ export interface DeliverLessonDeps {
   appUrl?: string;
 }
 
+/**
+ * How a lesson ends. "explanation" (the default) is the original daily
+ * delivery: audio button, then the full LDTKB-051 explanation. "tip" is the
+ * lean session format (src/lib/session/): one short tip message carrying the
+ * audio button and a "📖 More" button that opens the full explanation on
+ * demand. The tip format also leaves the tone legend to "More".
+ */
+export interface DeliverLessonOptions {
+  finale?: "explanation" | "tip";
+}
+
 export type DeliverLessonResult = { status: "delivered" } | { status: "already_delivered" };
 
 // curriculum/tone-mark-explainer.md (LDTKB-052)
-const TONE_LEGEND_MESSAGE =
+export const TONE_LEGEND_MESSAGE =
   "Before your first phrase — Thai Talk Breaks uses its own romanization with 5 tone marks, made specifically to help you pronounce Thai correctly here in @ThaiTalkBreaksBot. Thai has an official romanization for writing (called RTGS) but it doesn't include tone marks, so it's not what you'll see here. Here's what our tone marks mean:\n\n" +
   "a = mid (flat, calm)\n" +
   "à = low (starts low, stays low)\n" +
@@ -98,7 +110,12 @@ function composePhraseText(lessonNumber: number, lesson: Extract<Lesson, { kind:
   );
 }
 
-export async function deliverLesson(input: DeliverLessonInput, deps: DeliverLessonDeps): Promise<DeliverLessonResult> {
+export async function deliverLesson(
+  input: DeliverLessonInput,
+  deps: DeliverLessonDeps,
+  options: DeliverLessonOptions = {},
+): Promise<DeliverLessonResult> {
+  const finale = options.finale ?? "explanation";
   const now = deps.now ? deps.now() : new Date();
 
   const existing = await deps.deliveryStore.findExisting(input.learnerId, input.lessonNumber, input.deliveryDate);
@@ -111,12 +128,14 @@ export async function deliverLesson(input: DeliverLessonInput, deps: DeliverLess
   const lesson = getLesson(input.lessonNumber);
 
   if (lesson.kind === "phrase") {
-    await deliverPhraseLesson(input, lesson, deps, now);
+    await deliverPhraseLesson(input, lesson, deps, now, finale);
   } else if (lesson.kind === "numbers") {
-    await deliverNumbersLesson(input, deps, now);
+    await deliverNumbersLesson(input, deps, now, finale);
   } else {
-    await deliverWordSetLesson(input, lesson, deps, now);
+    await deliverWordSetLesson(input, lesson, deps, now, finale);
   }
+
+  if (finale === "tip") return { status: "delivered" };
 
   // LDTKB-051: the lesson explanation, sent as the final message — replaces
   // the gap left by the removed recognition-tap activity.
@@ -130,6 +149,7 @@ async function deliverPhraseLesson(
   lesson: Extract<Lesson, { kind: "phrase" }>,
   deps: DeliverLessonDeps,
   now: Date,
+  finale: "explanation" | "tip",
 ): Promise<void> {
   const image = await deps.media.loadPhraseLessonImage(input.lessonNumber, input.gender);
   await deps.telegram.sendPhoto(input.chatId, image);
@@ -139,7 +159,7 @@ async function deliverPhraseLesson(
   // is where this checkpoint fulfills that requirement. Exact wording here
   // is NOT locked copy (LDTKB-025 locks the 5-mark system, not this
   // message's phrasing) — flagged in SCHEDULER.md for review.
-  if (input.lessonNumber === 1) {
+  if (input.lessonNumber === 1 && finale === "explanation") {
     await deps.telegram.sendMessage(input.chatId, TONE_LEGEND_MESSAGE);
   }
 
@@ -154,8 +174,30 @@ async function deliverPhraseLesson(
     now.toISOString(),
   );
 
-  await sendWebAppAudioButton(input, deps);
+  await sendAudioOrTip(input, deps, finale, lesson.kind === "phrase" ? lesson.karaoke[input.gender] : "");
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
+}
+
+async function sendAudioOrTip(
+  input: DeliverLessonInput,
+  deps: DeliverLessonDeps,
+  finale: "explanation" | "tip",
+  learnerPhrase: string,
+): Promise<void> {
+  if (finale === "explanation") {
+    await sendWebAppAudioButton(input, deps);
+    return;
+  }
+  const appUrl = deps.appUrl ?? process.env.APP_URL;
+  if (!appUrl) throw new Error("APP_URL must be set to deliver the Web App audio button");
+  const tip = lessonTip(input.lessonNumber, learnerPhrase);
+  const keyboard: InlineKeyboard = [
+    [
+      { text: "🔊 Listen", web_app: { url: `${appUrl}/lesson/${input.lessonNumber}` } },
+      { text: "📖 More", callback_data: `more:${input.lessonNumber}` },
+    ],
+  ];
+  await deps.telegram.sendMessage(input.chatId, tip ? `💡 ${tip}` : "Tap below to hear it:", keyboard);
 }
 
 /** Shared by deliverPhraseLesson/deliverNumbersLesson/deliverWordSetLesson — see WEB_APP_AUDIO_DAYS. */
@@ -173,7 +215,12 @@ async function sendWebAppAudioButton(input: DeliverLessonInput, deps: DeliverLes
 // lesson02_combined.png) and text summary are unchanged. Audio delivers via
 // the Web App (see WEB_APP_AUDIO_DAYS / sendWebAppAudioButton), delivering
 // the original 10 per-number files (lesson02_1.mp3 .. lesson02_10.mp3).
-async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLessonDeps, now: Date): Promise<void> {
+async function deliverNumbersLesson(
+  input: DeliverLessonInput,
+  deps: DeliverLessonDeps,
+  now: Date,
+  finale: "explanation" | "tip",
+): Promise<void> {
   const lesson = getLesson(2);
   if (lesson.kind !== "numbers") throw new Error("expected lesson 2 to be the numbers lesson");
 
@@ -186,7 +233,7 @@ async function deliverNumbersLesson(input: DeliverLessonInput, deps: DeliverLess
   // Guard point, same rule as the phrase-lesson path: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, 2, input.deliveryDate, now.toISOString());
 
-  await sendWebAppAudioButton(input, deps);
+  await sendAudioOrTip(input, deps, finale, "");
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 
@@ -202,6 +249,7 @@ async function deliverWordSetLesson(
   lesson: WordSetLesson,
   deps: DeliverLessonDeps,
   now: Date,
+  finale: "explanation" | "tip",
 ): Promise<void> {
   const image = await deps.media.loadWordSetImage(input.lessonNumber);
   await deps.telegram.sendPhoto(input.chatId, image);
@@ -212,7 +260,7 @@ async function deliverWordSetLesson(
   // Guard point, same rule as the other two delivery paths: text/visual first.
   const delivery = await deps.deliveryStore.insertTextSent(input.learnerId, input.lessonNumber, input.deliveryDate, now.toISOString());
 
-  await sendWebAppAudioButton(input, deps);
+  await sendAudioOrTip(input, deps, finale, "");
   await deps.deliveryStore.markAudioSent(delivery.id, new Date().toISOString());
 }
 

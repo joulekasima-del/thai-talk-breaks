@@ -1,5 +1,12 @@
 # Thai Talk Breaks — Onboarding Flow (Checkpoint 2)
 
+> **Superseded in code by the instant-lessons flow (LDTKB-068, proposed 15 Nov 2026):**
+> `/start` → name → krap/ka → 4 survey taps → Lesson 1 immediately (with quiz) →
+> reminder period → reminder time → notification test → ready message with
+> "▶️ Next lesson". New states: `name_pending`, `survey_*_pending`,
+> `first_lesson` (migration `20261115000000_instant_lessons_srs.sql`). The
+> description below is the original Checkpoint 2 flow, kept for history.
+
 **Status:** Checkpoint 2 (Telegram Webhook & Onboarding Flow).
 **Scope note:** Documents the webhook handler and the six-step onboarding
 conversation. No lesson delivery or scheduling (Checkpoint 3) is described

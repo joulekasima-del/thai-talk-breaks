@@ -75,6 +75,12 @@ export interface TelegramClient {
    */
   sendMessage(chatId: number, text: string, keyboard?: InlineKeyboard, parseMode?: "HTML"): Promise<void>;
   answerCallbackQuery(callbackQueryId: string): Promise<void>;
+  /**
+   * Replaces an earlier message's text and removes its inline keyboard — used
+   * to turn an answered quiz question into its result, so the buttons can't
+   * be tapped twice.
+   */
+  editMessageText(chatId: number, messageId: number, text: string): Promise<void>;
   /** Uploads photo bytes directly (multipart) — Checkpoint 3, for lesson pictures. */
   sendPhoto(chatId: number, photo: MediaFile, caption?: string): Promise<void>;
   /** Uploads audio bytes directly (multipart) — Checkpoint 3, for lesson/activity audio. */
@@ -121,6 +127,17 @@ class HttpTelegramClient implements TelegramClient {
     });
     if (!res.ok) {
       throw new Error(`Telegram sendMessage failed: ${res.status} ${await res.text()}`);
+    }
+  }
+
+  async editMessageText(chatId: number, messageId: number, text: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/editMessageText`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ chat_id: chatId, message_id: messageId, text }),
+    });
+    if (!res.ok) {
+      throw new Error(`Telegram editMessageText failed: ${res.status} ${await res.text()}`);
     }
   }
 
@@ -280,9 +297,11 @@ export interface TelegramUpdate {
 }
 
 export interface TelegramMessage {
+  message_id?: number;
   text?: string;
   chat: { id: number };
-  from: { id: number };
+  /** first_name is used to offer "Call me <first name>" during onboarding. */
+  from: { id: number; first_name?: string };
   /**
    * Stage 5 (LDTKB-014): present on the confirmation message Telegram sends
    * once a Stars payment actually completes. `text` is typically undefined
@@ -311,6 +330,6 @@ export interface TelegramSuccessfulPayment {
 export interface TelegramCallbackQuery {
   id: string;
   data?: string;
-  from: { id: number };
-  message?: { chat: { id: number } };
+  from: { id: number; first_name?: string };
+  message?: { message_id?: number; chat: { id: number } };
 }

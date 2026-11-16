@@ -1,45 +1,29 @@
 import type { Query } from "@/lib/db";
 import type { TelegramClient } from "@/lib/telegram";
-import { pgLearnerStore, type GenderBranch } from "@/lib/onboarding/learnerStore";
-import { pgDeliveryStore, listDeliveryKeysOn } from "@/lib/delivery/deliveryStore";
+import { pgLearnerStore } from "@/lib/onboarding/learnerStore";
+import { pgDeliveryStore } from "@/lib/delivery/deliveryStore";
 import { pgPurchasesStore } from "@/lib/payments/purchasesStore";
-import { findDueLearners, bangkokNow, isWithinDeliveryWindow, DAY_WINDOW_MAX_DAY } from "@/lib/delivery/dueLearners";
-import {
-  findDuePaidLearners,
-  decidePaywallGateAction,
-  PAID_COURSE_FIRST_DAY,
-  type PaidCourseLearner,
-  type PaywallGateLearner,
-} from "@/lib/delivery/duePaidLearners";
-import { deliverLesson, type MediaLoader } from "@/lib/delivery/deliverLesson";
-import { PAYWALL_PROMPT_MESSAGE } from "@/lib/payments/content";
+import { bangkokNow, isWithinDeliveryWindow } from "@/lib/delivery/dueLearners";
+import type { MediaLoader } from "@/lib/delivery/deliverLesson";
 import { pgDay30QuizStore } from "@/lib/quiz/day30QuizStore";
-import { startDay30Quiz } from "@/lib/quiz/day30Quiz";
-import { deliverDay29Entry, DAY29_LESSON_NUMBER } from "@/lib/day29/deliverDay29Entry";
-import { WEEKS234_LAST_DAY } from "@/lib/curriculum/content";
+import { pgSrsStore } from "@/lib/srs/srsStore";
+import { startSession } from "@/lib/session/session";
 
-// The delivery run itself (used by the Cloudflare cron trigger and by the
-// /api/cron/deliver route). Originally written for the pg_cron -> pg_net delivery endpoint. See SCHEDULER.md (Checkpoints 1-3)
-// and CHECKPOINT4.md (Day 30 quiz-ladder, testing day-window) for the
-// schedule/window rationale. No lesson-authoring or scheduling *decisions*
-// live here beyond what dueLearners.ts / duePaidLearners.ts /
-// deliverLesson.ts / day30Quiz.ts already encode — this route is just
-// wiring: auth, fetch due learners, dispatch, report.
+// The daily reminder run (Cloudflare cron trigger, and the /api/cron/deliver
+// route). Instant-lessons redesign: lessons are no longer tied to calendar
+// days — a learner can tap "▶️ Next lesson" any time. The learner's chosen
+// time is now a daily reminder: if they haven't had a session yet today, the
+// reminder starts one (due reviews, then their next lesson). See
+// src/lib/session/session.ts.
 //
-// Day 8 paywall gate (Stage 8 groundwork, LDTKB-016): Days 1-7 deliver
-// exactly as before (findDueLearners, capped at 7). Days 8-30 deliver only
-// for learners who have crossed the paywall (paid_course_start_date set),
-// via findDuePaidLearners, anchored on that date rather than
-// pilot_start_date. Learners who haven't crossed it yet are handled by the
-// boundary-crossing loop below: an instant Day 8 if they've already paid, a
-// one-time check-in message otherwise.
+// Paywall (LDTKB-016/065), counted in lessons: a learner whose next lesson is
+// 8+ without a paid purchase gets the check-in message once; after that the
+// reminder only fires when they have reviews due.
+//
+// Every learner handled gets last_session_date = today, so the 30-minute
+// window (one run a minute) reaches each learner at most once a day.
 
 const LOOKBACK_MINUTES = 30; // see SCHEDULER.md "Cron interval and window"
-
-// Day-number 30 = the fixed slot for the quiz-ladder. Day 29 = the living
-// comic entry message + Web App button (Checkpoint 6) — DAY29_LESSON_NUMBER
-// is imported from deliverDay29Entry.ts rather than redefined here.
-const DAY30_QUIZ_DAY_NUMBER = 30;
 
 export interface DeliveryCronDeps {
   telegram: TelegramClient;
@@ -51,8 +35,7 @@ export interface DeliveryCronDeps {
    * Cloudflare's free plan allows only 50 outgoing requests (database, Telegram,
    * assets) per invocation. The Worker passes a function that turns true when
    * most of that budget is spent; the run then stops cleanly and whatever is
-   * still due is picked up by the next run a minute later. This is safe because
-   * every delivery is guarded by a unique row in lesson_deliveries.
+   * still due is picked up by the next run a minute later.
    */
   shouldStop?: () => boolean;
 }
@@ -68,157 +51,52 @@ export async function runDeliveryCron(deps: DeliveryCronDeps): Promise<DeliveryC
   const { now, telegram, query, media, appUrl, shouldStop } = deps;
   const { calendarDate, minutesSinceMidnight } = bangkokNow(now);
   const learnerStore = pgLearnerStore(query);
-  const deliveryStore = pgDeliveryStore(query);
-  const purchasesStore = pgPurchasesStore(query);
-  const quizStore = pgDay30QuizStore(query);
-  let stoppedEarly = false;
+  const sessionDeps = {
+    telegram,
+    learnerStore,
+    srsStore: pgSrsStore(query),
+    deliveryStore: pgDeliveryStore(query),
+    purchasesStore: pgPurchasesStore(query),
+    quizStore: pgDay30QuizStore(query),
+    media,
+    appUrl,
+    now: () => now,
+  };
 
-  // idx_learners_due_for_delivery (Checkpoint 1) covers this query.
   const onboarded = await learnerStore.listOnboarded();
-
-  // Learners with a null pilot_start_date are excluded here structurally,
-  // not by a special case: OnboardedLearner requires pilot_start_date to be
-  // a string, so a null-pilot_start_date row simply fails this filter and
-  // never reaches findDueLearners. In practice this shouldn't happen —
-  // pilot_start_date is always set in the same write that sets
-  // onboarding_step = 'complete' (handleUpdate.ts) — but a learner mid
-  // onboarding is also excluded already, since listOnboarded() only returns
-  // onboarding_step = 'complete' rows.
-  const eligible = onboarded.filter(
-    (l): l is typeof l & { gender_branch: NonNullable<typeof l.gender_branch>; schedule_time: string; pilot_start_date: string } =>
-      l.gender_branch !== null && l.schedule_time !== null && l.pilot_start_date !== null,
+  const eligible = onboarded.filter((l) => l.gender_branch !== null && l.schedule_time !== null);
+  const due = eligible.filter(
+    (l) =>
+      l.last_session_date !== calendarDate &&
+      isWithinDeliveryWindow(l.schedule_time!, minutesSinceMidnight, LOOKBACK_MINUTES),
   );
-
-  // Days 1-7 (the free preview). DAY_WINDOW_MAX_DAY is now always 7 — the
-  // old TESTING_EXTENDED_WINDOW bypass is retired (dueLearners.ts).
-  const dueFree = findDueLearners(eligible, { now, lookbackMinutes: LOOKBACK_MINUTES, maxDay: DAY_WINDOW_MAX_DAY });
-
-  // Days 8-30, for learners who have already crossed the paywall. Anchored
-  // on paid_course_start_date, NOT pilot_start_date.
-  const crossed: PaidCourseLearner[] = eligible.filter(
-    (l): l is (typeof eligible)[number] & { paid_course_start_date: string } => l.paid_course_start_date !== null,
-  );
-  const duePaid = findDuePaidLearners(crossed, { now, lookbackMinutes: LOOKBACK_MINUTES });
-
-  // One merged dispatch list feeding the exact same day-number branches as
-  // before — only the day-number *source* is new for 8-30. Typed to just the
-  // fields the dispatch below reads, so free-range (OnboardedLearner) and
-  // paid-range (PaidCourseLearner) rows drop in without a cast.
-  type DispatchLearner = { id: string; telegram_user_id: number; gender_branch: GenderBranch };
-  const dispatch: { learner: DispatchLearner; dayNumber: number }[] = [
-    ...dueFree.map((d) => ({ learner: d.learner, dayNumber: d.lessonNumber })),
-    ...duePaid.map((d) => ({ learner: d.learner, dayNumber: d.dayNumber })),
-  ];
 
   const results: DeliveryCronResult["results"] = [];
+  let stoppedEarly = false;
 
-  // Skip entries that already have today's delivery row, with one query for
-  // everyone, so a crowd of already-served learners (the 30-minute lookback
-  // keeps them "due") can't use up the request budget before a learner who
-  // still needs their lesson is reached. Day 30 has no lesson_deliveries row of
-  // its own (its guard is the quiz row), so it always goes through.
-  const deliveredKeys = dispatch.length > 0 ? await listDeliveryKeysOn(query, calendarDate) : new Set<string>();
-  const pending = dispatch.filter(
-    ({ learner, dayNumber }) => dayNumber > DAY29_LESSON_NUMBER || !deliveredKeys.has(`${learner.id}:${dayNumber}`),
-  );
-
-  for (const { learner, dayNumber } of pending) {
+  for (const learner of due) {
     if (shouldStop?.()) {
       stoppedEarly = true;
       break;
     }
     try {
-      if (dayNumber >= 1 && dayNumber <= WEEKS234_LAST_DAY) {
-        const previouslyDelivered = await deliveryStore.listDeliveredLessonNumbers(learner.id);
-        const result = await deliverLesson(
-          {
-            learnerId: learner.id,
-            chatId: learner.telegram_user_id,
-            gender: learner.gender_branch,
-            lessonNumber: dayNumber,
-            deliveryDate: calendarDate,
-            previouslyDeliveredLessonNumbers: previouslyDelivered,
-          },
-          { telegram, deliveryStore, media, appUrl, now: () => now },
-        );
-        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: result.status });
-      } else if (dayNumber === DAY29_LESSON_NUMBER) {
-        if (!appUrl) throw new Error("APP_URL must be set to deliver Day 29's living comic button");
-        const result = await deliverDay29Entry(
-          { learnerId: learner.id, chatId: learner.telegram_user_id, deliveryDate: calendarDate },
-          { telegram, deliveryStore, appUrl, now: () => now },
-        );
-        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: result.status });
-      } else if (dayNumber === DAY30_QUIZ_DAY_NUMBER) {
-        if (!appUrl) throw new Error("APP_URL must be set to deliver the Day 30 quiz button");
-        await startDay30Quiz(learner.id, learner.telegram_user_id, { telegram, quizStore, appUrl });
-        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "day30_quiz_started_or_already_in_progress" });
-      } else {
-        // Defensive fallback only — every value dueFree/duePaid can return
-        // (1..30) is handled by one of the branches above. Kept per
-        // LDTKB-044's "must not crash" requirement.
-        results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "skipped_unrecognized_day_number" });
-      }
-    } catch (error) {
-      console.error(`Delivery failed for learner ${learner.id}, day ${dayNumber}`, error);
-      results.push({ telegramUserId: learner.telegram_user_id, dayNumber, status: "error" });
-    }
-  }
-
-  // Boundary crossing — learners who have NOT yet crossed the paywall. Only
-  // acts on those actually in their delivery window whose free week is spent
-  // (decidePaywallGateAction re-checks both); everyone else is a no-op.
-  const notCrossed: PaywallGateLearner[] = eligible.filter(
-    (l): l is (typeof eligible)[number] & { paid_course_start_date: null } => l.paid_course_start_date === null,
-  );
-
-  for (const learner of notCrossed) {
-    if (shouldStop?.()) {
-      stoppedEarly = true;
-      break;
-    }
-    try {
-      // Cheap gate before the purchases lookup: only learners whose lesson
-      // time is up right now can possibly need action this tick.
-      if (!isWithinDeliveryWindow(learner.schedule_time, minutesSinceMidnight, LOOKBACK_MINUTES)) continue;
-
-      const paidPurchase = await purchasesStore.findPaidByLearner(learner.id);
-      const action = decidePaywallGateAction(learner, {
-        now,
-        lookbackMinutes: LOOKBACK_MINUTES,
-        hasPaidPurchase: paidPurchase !== null,
+      const result = await startSession(learner, learner.telegram_user_id, sessionDeps, {
+        reminder: true,
+        paywallOnlyOnce: true,
+        skipIfActive: true,
       });
-
-      if (action.kind === "none") continue;
-
-      if (action.kind === "checkin") {
-        await telegram.sendMessage(learner.telegram_user_id, PAYWALL_PROMPT_MESSAGE);
-        await learnerStore.update(learner.id, { paywall_prompt_sent_at: now.toISOString() });
-        results.push({ telegramUserId: learner.telegram_user_id, dayNumber: PAID_COURSE_FIRST_DAY, status: "paywall_checkin_sent" });
-        continue;
-      }
-
-      // cross_boundary: they've paid and their free week is up — anchor Day 8
-      // to today and deliver it in this same run.
-      await learnerStore.update(learner.id, { paid_course_start_date: calendarDate });
-      const previouslyDelivered = await deliveryStore.listDeliveredLessonNumbers(learner.id);
-      const result = await deliverLesson(
-        {
-          learnerId: learner.id,
-          chatId: learner.telegram_user_id,
-          gender: learner.gender_branch,
-          lessonNumber: action.dayNumber,
-          deliveryDate: calendarDate,
-          previouslyDeliveredLessonNumbers: previouslyDelivered,
-        },
-        { telegram, deliveryStore, media, appUrl, now: () => now },
-      );
-      results.push({ telegramUserId: learner.telegram_user_id, dayNumber: action.dayNumber, status: `boundary_crossed:${result.status}` });
+      // startSession already stamps today on a session it starts; stamp the rest too.
+      if (result.status !== "started") await learnerStore.update(learner.id, { last_session_date: calendarDate });
+      results.push({
+        telegramUserId: learner.telegram_user_id,
+        dayNumber: result.status === "started" ? (result.lessonNumber ?? 0) : learner.next_lesson_number,
+        status: result.status,
+      });
     } catch (error) {
-      console.error(`Paywall gate failed for learner ${learner.id}`, error);
-      results.push({ telegramUserId: learner.telegram_user_id, dayNumber: 8, status: "error" });
+      console.error(`Reminder failed for learner ${learner.id}`, error);
+      results.push({ telegramUserId: learner.telegram_user_id, dayNumber: learner.next_lesson_number, status: "error" });
     }
   }
 
-  return { checked: eligible.length, due: pending.length, results, stoppedEarly };
+  return { checked: eligible.length, due: due.length, results, stoppedEarly };
 }

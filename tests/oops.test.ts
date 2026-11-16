@@ -57,7 +57,8 @@ test("/oops from an onboarded learner sends the prompt and sets awaiting_oops_re
 
 test("/oops from a mid-onboarding learner works too — independent of onboarding_step", async () => {
   const deps = makeDeps();
-  await deps.store.create(222); // starts gender_pending
+  const created222 = await deps.store.create(222);
+  await deps.store.update(created222.id, { onboarding_step: "gender_pending" }); // mid-onboarding
 
   await handleUpdate(textUpdate(222, "/oops"), deps);
 
@@ -166,7 +167,8 @@ test("a failing admin DM does not undo the already-saved report or the learner's
 
 test("/start while a report is pending clears the pending flag and proceeds with /start's existing behavior", async () => {
   const deps = makeDeps();
-  await deps.store.create(666); // gender_pending
+  const created666 = await deps.store.create(666);
+  await deps.store.update(created666.id, { onboarding_step: "gender_pending" }); // mid-onboarding
   await handleUpdate(textUpdate(666, "/oops"), deps);
   assert.ok((await deps.store.findByTelegramId(666))!.awaiting_oops_report_since);
 
@@ -184,7 +186,9 @@ test("/start while a report is pending clears the pending flag and proceeds with
 
 test("plain text with no report pending is still silently ignored, exactly as before /oops existed", async () => {
   const deps = makeDeps();
-  await deps.store.create(777);
+  // A learner past onboarding (during name_pending, plain text is the name).
+  const created777 = await deps.store.create(777);
+  await deps.store.update(created777.id, { onboarding_step: "complete" });
 
   await handleUpdate(textUpdate(777, "hey is this thing on?"), deps);
 
